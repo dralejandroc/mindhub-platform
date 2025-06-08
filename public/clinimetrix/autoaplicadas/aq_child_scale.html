@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cociente de TEA Niño de 4 a 11 años</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .question-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.15);
+            border-color: #29A98C;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.3);
+        }
+
+        .option.green {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .option.light-green {
+            background: linear-gradient(135deg, #68d391, #48bb78);
+            color: white;
+        }
+
+        .option.light-red {
+            background: linear-gradient(135deg, #fc8181, #f56565);
+            color: white;
+        }
+
+        .option.red {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
+        }
+
+        .instructions {
+            background: #f0f8f5;
+            border: 2px solid #29A98C;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+            line-height: 1.7;
+        }
+
+        .instructions h3 {
+            color: #112F33;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #112F33;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            min-width: 200px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.4);
+        }
+
+        .back-btn.show {
+            display: block;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .results-section {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .score-display h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .score-display p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .interpretation {
+            background: #f0f8f5;
+            border-left: 5px solid #29A98C;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .interpretation h4 {
+            color: #112F33;
+            margin-bottom: 10px;
+        }
+
+        .subscale-results {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .subscale {
+            background: #f8f9fa;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .subscale.high {
+            border-color: #f56565;
+            background: #fed7d7;
+        }
+
+        .subscale h5 {
+            color: #112F33;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .subscale p {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            background: #fed7d7;
+            border: 2px solid #f56565;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .export-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .card h1 {
+                font-size: 1.6rem;
+            }
+            
+            .options {
+                gap: 12px;
+            }
+            
+            .option {
+                padding: 15px;
+                font-size: 0.9rem;
+            }
+            
+            .back-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        .emoji {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Card 0: Bienvenida e Instrucciones -->
+    <div class="container">
+        <div class="card active" id="card-0">
+            <h1>Cociente de TEA Niño de 4 a 11 años</h1>
+            <h2>(AQ-Child)</h2>
+            
+            <div class="instructions">
+                <h3>📋 Instrucciones para padres/cuidadores:</h3>
+                <ul>
+                    <li><strong>Este cuestionario evalúa rasgos relacionados con el espectro autista en niños de 4 a 11 años</strong></li>
+                    <li>Conteste pensando en el comportamiento habitual de su hijo/a</li>
+                    <li>Son 50 preguntas sobre 5 áreas: habilidades sociales, comunicación, imaginación, atención al detalle y cambios de atención</li>
+                    <li>Para cada pregunta, elija la opción que mejor describa a su hijo/a</li>
+                    <li><strong>Guía visual de respuestas:</strong></li>
+                </ul>
+                
+                <div style="margin: 20px 0; display: grid; gap: 10px;">
+                    <div style="padding: 10px; background: linear-gradient(135deg, #48bb78, #38a169); color: white; border-radius: 10px;">
+                        <span class="emoji">😊</span><strong>Muy de acuerdo</strong> - Verde intenso
+                    </div>
+                    <div style="padding: 10px; background: linear-gradient(135deg, #68d391, #48bb78); color: white; border-radius: 10px;">
+                        <span class="emoji">🙂</span><strong>Medianamente de acuerdo</strong> - Verde claro
+                    </div>
+                    <div style="padding: 10px; background: linear-gradient(135deg, #fc8181, #f56565); color: white; border-radius: 10px;">
+                        <span class="emoji">😐</span><strong>Medianamente en desacuerdo</strong> - Rojo claro
+                    </div>
+                    <div style="padding: 10px; background: linear-gradient(135deg, #f56565, #e53e3e); color: white; border-radius: 10px;">
+                        <span class="emoji">🙁</span><strong>Muy en desacuerdo</strong> - Rojo intenso
+                    </div>
+                </div>
+                
+                <ul>
+                    <li>No hay respuestas correctas o incorrectas</li>
+                    <li>La escala avanza automáticamente tras cada respuesta</li>
+                    <li>Puede usar el botón "← Regresar" si necesita revisar alguna respuesta</li>
+                    <li>Al finalizar, los resultados serán revisados por el profesional</li>
+                </ul>
+            </div>
+
+            <button class="btn" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-50: Preguntas individuales -->
+        <!-- Se generarán dinámicamente -->
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h1>✅ Evaluación Completada</h1>
+            <h2>¡Muchas gracias!</h2>
+            
+            <div class="instructions">
+                <h3>Siguiente paso:</h3>
+                <p>Por favor, entregue el dispositivo a su médico o profesional de la salud para la revisión de los resultados.</p>
+                <p>Los resultados proporcionarán información valiosa para la evaluación clínica.</p>
+            </div>
+
+            <button class="btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h1>📊 Resultados AQ-Child</h1>
+            
+            <div class="score-display" id="score-display">
+                <!-- Se llenará dinámicamente -->
+            </div>
+
+            <div class="results-section">
+                <div class="interpretation" id="interpretation">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <h3>🎯 Resultados por Subescala:</h3>
+                <div class="subscale-results" id="subscale-results">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <div id="alerts">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <div class="interpretation">
+                    <h4>📝 Información Clínica:</h4>
+                    <p><strong>Punto de corte:</strong> 76 puntos (sensibilidad y especificidad del 95%)</p>
+                    <p><strong>Rango de puntuación:</strong> 0-150 puntos</p>
+                    <p><strong>Propósito:</strong> Cuantificar rasgos autistas en niños de 4-11 años mediante reporte parental</p>
+                    <p><strong>Subescalas evaluadas:</strong> Habilidades Sociales, Comunicación, Imaginación, Atención al Detalle, Cambios de Atención</p>
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="btn-export" onclick="exportToJPG()">🖼️ Capturar Imagen</button>
+                <button class="btn-export" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de regreso -->
+    <button class="back-btn" id="back-btn" onclick="previousCard()">←</button>
+
+    <!-- Barra de progreso -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        // Variables globales
+        let currentCard = 0;
+        let responses = {};
+        let totalQuestions = 50;
+
+        // Ítems del AQ-Child
+        const questions = [
+            { id: 1, text: "Prefiere hacer cosas con otros a hacerlas solo/a.", subscale: "social" },
+            { id: 2, text: "Prefiere hacer las cosas de una misma manera una y otra vez.", subscale: "attention_switching", reverse: true },
+            { id: 3, text: "Cuando trata de imaginarse algo, le parece muy fácil crear la imagen en su cabeza.", subscale: "imagination" },
+            { id: 4, text: "Con frecuencia queda tan absorto/a (Concentrado) en una actividad que parece no darse cuenta de las cosas que suceden a su alrededor.", subscale: "attention_switching", reverse: true },
+            { id: 5, text: "Usualmente puede oír débiles sonidos que otros no.", subscale: "attention_detail", reverse: true },
+            { id: 6, text: "A menudo le llaman la atención los números de las casas, matrículas de coches, números impresos en carteles o información similar.", subscale: "attention_detail", reverse: true },
+            { id: 7, text: "Tiene dificultad en comprender las reglas de la conducta cortés.", subscale: "communication", reverse: true },
+            { id: 8, text: "Cuando lee un cuento, le resulta fácil imaginarse cómo son los personajes.", subscale: "imagination" },
+            { id: 9, text: "Le fascinan las fechas.", subscale: "attention_detail", reverse: true },
+            { id: 10, text: "Cuando está con otras personas, puede seguir varias conversaciones de distintas personas.", subscale: "attention_switching" },
+            { id: 11, text: "Se desenvuelve con facilidad en distintas situaciones sociales.", subscale: "social" },
+            { id: 12, text: "Suele fijarse en detalles que a otros no les llaman la atención.", subscale: "attention_detail", reverse: true },
+            { id: 13, text: "Se sentiría más a gusto en una biblioteca que en una fiesta de cumpleaños.", subscale: "social", reverse: true },
+            { id: 14, text: "Inventa historias con facilidad.", subscale: "imagination" },
+            { id: 15, text: "Le interesan más las personas que las cosas.", subscale: "social" },
+            { id: 16, text: "Algunas cosas le interesan mucho y se molesta si no puede dedicarles tiempo.", subscale: "attention_switching", reverse: true },
+            { id: 17, text: "Le gusta la charlar de manera social.", subscale: "communication" },
+            { id: 18, text: "Cuando habla no siempre es fácil para los demás meterse en la conversación.", subscale: "communication", reverse: true },
+            { id: 19, text: "Le fascinan los números.", subscale: "attention_detail", reverse: true },
+            { id: 20, text: "Cuando lee un cuento le cuesta identificar las intenciones o sentimientos de los personajes.", subscale: "imagination", reverse: true },
+            { id: 21, text: "No le gustan los cuentos de historias de ficción.", subscale: "imagination", reverse: true },
+            { id: 22, text: "Le cuesta hacer nuevos amigos.", subscale: "social", reverse: true },
+            { id: 23, text: "Siempre está encontrando patrones o regularidades en las cosas.", subscale: "attention_detail", reverse: true },
+            { id: 24, text: "Le gusta más ir al cine que a un museo.", subscale: "imagination" },
+            { id: 25, text: "No se altera cuando se le cambia su rutina diaria.", subscale: "attention_switching" },
+            { id: 26, text: "No sabe como hacer para conversar con niños de su edad.", subscale: "communication", reverse: true },
+            { id: 27, text: "No le cuesta \"leer entre líneas\" cuando otras personas le dicen algo.", subscale: "communication" },
+            { id: 28, text: "Cuando mira un dibujo, un cuadro, o una fotografía, presta más atención a la imagen completa que a los detalles.", subscale: "attention_detail" },
+            { id: 29, text: "No se le da bien memorizar números de teléfono.", subscale: "attention_detail" },
+            { id: 30, text: "No suele darse cuenta de pequeños cambios en la situación de objetos o en la apariencia de las personas.", subscale: "attention_detail" },
+            { id: 31, text: "Cuando habla, se da cuenta cuando la gente se aburre con lo que dice.", subscale: "communication" },
+            { id: 32, text: "Le es fácil hacer más de una cosa a la vez.", subscale: "attention_switching" },
+            { id: 33, text: "Cuando habla por teléfono no sabe cuando es su turno para hablar.", subscale: "communication", reverse: true },
+            { id: 34, text: "Le gusta hacer cosas de manera espontánea.", subscale: "attention_switching" },
+            { id: 35, text: "Es el/la último/a en entender un chiste o una broma.", subscale: "communication", reverse: true },
+            { id: 36, text: "Se da cuenta fácilmente de lo que piensa o siente una persona sólo con mirarla a la cara.", subscale: "social" },
+            { id: 37, text: "Cuando hay alguna interrupción, puede volver facilidad a lo que estaba haciendo.", subscale: "attention_switching" },
+            { id: 38, text: "Es bueno para las conversaciones sociales.", subscale: "communication" },
+            { id: 39, text: "La gente dice que él/ella siempre habla del mismo tema.", subscale: "communication", reverse: true },
+            { id: 40, text: "Cuando estaba en preescolar le gustaba jugar a juegos de simulación con otros niños (por ejemplo: vaqueros, mamá y papá,...).", subscale: "imagination" },
+            { id: 41, text: "Le gusta juntar información sobre categorías de cosas (autos, trenes, aviones, plantas, animales, etc.).", subscale: "attention_detail", reverse: true },
+            { id: 42, text: "Le cuesta imaginarse como sería ser otra persona.", subscale: "imagination", reverse: true },
+            { id: 43, text: "Le gusta planificar cuidadosamente cualquier actividad en la que vaya a participar.", subscale: "attention_switching", reverse: true },
+            { id: 44, text: "Disfruta de situaciones o eventos sociales.", subscale: "social" },
+            { id: 45, text: "Le es difícil darse cuenta de las intenciones de las otras personas.", subscale: "social", reverse: true },
+            { id: 46, text: "Las situaciones nuevas le generan ansiedad.", subscale: "attention_switching", reverse: true },
+            { id: 47, text: "Disfruta conociendo gente nueva.", subscale: "social" },
+            { id: 48, text: "Va con cuidado para no herir los sentimientos de la gente.", subscale: "social" },
+            { id: 49, text: "No se le da bien recordar las fechas de cumpleaños.", subscale: "attention_detail" },
+            { id: 50, text: "Le resulta fácil jugar con otros niños haciendose pasar por personajes.", subscale: "imagination" }
+        ];
+
+        // Opciones de respuesta
+        const options = [
+            { value: 0, text: "Muy de acuerdo", emoji: "😊", class: "green" },
+            { value: 1, text: "Medianamente de acuerdo", emoji: "🙂", class: "light-green" },
+            { value: 2, text: "Medianamente en desacuerdo", emoji: "😐", class: "light-red" },
+            { value: 3, text: "Muy en desacuerdo", emoji: "🙁", class: "red" }
+        ];
+
+        // Inicializar la aplicación
+        function initializeApp() {
+            createQuestionCards();
+            updateProgressBar();
+            updateBackButton();
+        }
+
+        // Crear las tarjetas de preguntas
+        function createQuestionCards() {
+            const container = document.querySelector('.container');
+            
+            questions.forEach((question, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${index + 1}`;
+                
+                card.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">Pregunta ${index + 1} de ${totalQuestions}</div>
+                        <div class="question-text">${question.text}</div>
+                    </div>
+                    
+                    <div class="options">
+                        ${options.map(option => `
+                            <div class="option ${option.class}" onclick="selectOption(${question.id}, ${option.value})">
+                                <span class="emoji">${option.emoji}</span>
+                                ${option.text}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Insertar antes de card-final
+                const finalCard = document.getElementById('card-final');
+                container.insertBefore(card, finalCard);
+            });
+        }
+
+        // Seleccionar opción
+        function selectOption(questionId, value) {
+            responses[questionId] = value;
+            
+            // Marcar opción como seleccionada
+            const currentCardElement = document.getElementById(`card-${currentCard}`);
+            if (currentCardElement) {
+                const options = currentCardElement.querySelectorAll('.option');
+                options.forEach(option => option.classList.remove('selected'));
+                
+                // Encontrar la opción clickeada y marcarla
+                const clickedOption = event.target.closest('.option');
+                if (clickedOption) {
+                    clickedOption.classList.add('selected');
+                }
+            }
+            
+            // Auto-avance con delay
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        // Siguiente tarjeta
+        function nextCard() {
+            const currentCardElement = document.getElementById(`card-${currentCard}`);
+            if (currentCardElement) {
+                currentCardElement.classList.remove('active');
+            }
+            
+            currentCard++;
+            
+            let nextCardElement;
+            if (currentCard <= totalQuestions) {
+                // Tarjetas de preguntas (1-50)
+                nextCardElement = document.getElementById(`card-${currentCard}`);
+            } else if (currentCard === totalQuestions + 1) {
+                // Tarjeta final
+                nextCardElement = document.getElementById('card-final');
+            }
+            
+            if (nextCardElement) {
+                nextCardElement.classList.add('active');
+                updateProgressBar();
+                updateBackButton();
+            } else {
+                console.error(`No se pudo encontrar la tarjeta: card-${currentCard}`);
+            }
+        }
+
+        // Tarjeta anterior
+        function previousCard() {
+            if (currentCard > 0) {
+                const currentCardElement = document.getElementById(`card-${currentCard}`) || 
+                                         document.getElementById('card-final') || 
+                                         document.getElementById('card-results');
+                
+                if (currentCardElement) {
+                    currentCardElement.classList.remove('active');
+                }
+                
+                currentCard--;
+                
+                let prevCardElement;
+                if (currentCard === 0) {
+                    prevCardElement = document.getElementById('card-0');
+                } else if (currentCard <= totalQuestions) {
+                    prevCardElement = document.getElementById(`card-${currentCard}`);
+                } else if (currentCard === totalQuestions + 1) {
+                    prevCardElement = document.getElementById('card-final');
+                }
+                
+                if (prevCardElement) {
+                    prevCardElement.classList.add('active');
+                    updateProgressBar();
+                    updateBackButton();
+                }
+            }
+        }
+
+        // Actualizar barra de progreso
+        function updateProgressBar() {
+            const progress = (currentCard / (totalQuestions + 2)) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        // Actualizar botón de regreso
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard > 0 && currentCard <= totalQuestions) {
+                backBtn.classList.add('show');
+            } else {
+                backBtn.classList.remove('show');
+            }
+        }
+
+        // Calcular puntuación
+        function calculateScore() {
+            let totalScore = 0;
+            let subscaleScores = {
+                social: 0,
+                communication: 0,
+                imagination: 0,
+                attention_detail: 0,
+                attention_switching: 0
+            };
+
+            questions.forEach(question => {
+                const response = responses[question.id];
+                if (response !== undefined) {
+                    let score;
+                    if (question.reverse) {
+                        // Para ítems inversos, invertir la puntuación
+                        score = 3 - response;
+                    } else {
+                        score = response;
+                    }
+                    
+                    totalScore += score;
+                    subscaleScores[question.subscale] += score;
+                }
+            });
+
+            return { totalScore, subscaleScores };
+        }
+
+        // Obtener interpretación
+        function getInterpretation(totalScore) {
+            if (totalScore >= 76) {
+                return {
+                    level: "Alto",
+                    description: "Puntuación superior al punto de corte (≥76). Se recomienda evaluación diagnóstica especializada.",
+                    recommendation: "Los resultados sugieren la presencia de rasgos autistas significativos que justifican una valoración diagnóstica por parte de un profesional especializado en TEA.",
+                    color: "#f56565"
+                };
+            } else if (totalScore >= 65) {
+                return {
+                    level: "Moderado-Alto",
+                    description: "Puntuación en rango moderado-alto. Seguimiento clínico recomendado.",
+                    recommendation: "Se sugiere monitoreo clínico y considerar evaluación especializada si hay otras preocupaciones del desarrollo.",
+                    color: "#f6ad55"
+                };
+            } else if (totalScore >= 50) {
+                return {
+                    level: "Moderado",
+                    description: "Puntuación en rango moderado. Algunos rasgos presentes.",
+                    recommendation: "Seguimiento del desarrollo y observación de la evolución de los rasgos identificados.",
+                    color: "#ed8936"
+                };
+            } else {
+                return {
+                    level: "Bajo",
+                    description: "Puntuación en rango típico. Rasgos autistas mínimos o ausentes.",
+                    recommendation: "Los resultados sugieren un desarrollo típico en las áreas evaluadas.",
+                    color: "#48bb78"
+                };
+            }
+        }
+
+        // Mostrar resultados
+        function showResults() {
+            // Verificar que los elementos existen antes de acceder a ellos
+            const cardFinal = document.getElementById('card-final');
+            const cardResults = document.getElementById('card-results');
+            
+            if (!cardFinal || !cardResults) {
+                console.error('Error: No se pueden encontrar las tarjetas necesarias');
+                return;
+            }
+
+            cardFinal.classList.remove('active');
+            cardResults.classList.add('active');
+            currentCard = totalQuestions + 2;
+            updateProgressBar();
+
+            const { totalScore, subscaleScores } = calculateScore();
+            const interpretation = getInterpretation(totalScore);
+
+            // Mostrar puntuación total
+            const scoreDisplay = document.getElementById('score-display');
+            if (scoreDisplay) {
+                scoreDisplay.innerHTML = `
+                    <h3>Puntuación Total: ${totalScore}/150</h3>
+                    <p>Nivel: ${interpretation.level}</p>
+                `;
+            }
+
+            // Mostrar interpretación
+            const interpretationDiv = document.getElementById('interpretation');
+            if (interpretationDiv) {
+                interpretationDiv.innerHTML = `
+                    <h4 style="color: ${interpretation.color};">🎯 Interpretación Clínica:</h4>
+                    <p><strong>${interpretation.description}</strong></p>
+                    <p><em>Recomendación:</em> ${interpretation.recommendation}</p>
+                `;
+            }
+
+            // Mostrar resultados por subescala
+            const subscaleNames = {
+                social: "Habilidades Sociales",
+                communication: "Comunicación", 
+                imagination: "Imaginación",
+                attention_detail: "Atención al Detalle",
+                attention_switching: "Cambios de Atención"
+            };
+
+            let subscaleHTML = '';
+            let alerts = '';
+
+            Object.entries(subscaleScores).forEach(([key, score]) => {
+                const maxScore = 30; // 10 ítems × 3 puntos máximo
+                const percentage = (score / maxScore) * 100;
+                const isHigh = percentage >= 66;
+
+                subscaleHTML += `
+                    <div class="subscale ${isHigh ? 'high' : ''}">
+                        <h5>${subscaleNames[key]}</h5>
+                        <p>Puntuación: ${score}/30 (${percentage.toFixed(1)}%)</p>
+                    </div>
+                `;
+
+                if (isHigh) {
+                    alerts += `
+                        <div class="alert">
+                            <strong>⚠️ Atención:</strong> Puntuación elevada en ${subscaleNames[key]} (${score}/30). 
+                            Considerar evaluación detallada de esta área.
+                        </div>
+                    `;
+                }
+            });
+
+            const subscaleResults = document.getElementById('subscale-results');
+            if (subscaleResults) {
+                subscaleResults.innerHTML = subscaleHTML;
+            }
+
+            const alertsDiv = document.getElementById('alerts');
+            if (alertsDiv) {
+                alertsDiv.innerHTML = alerts;
+            }
+        }
+
+        // Exportar a PDF
+        function exportToPDF() {
+            window.print();
+        }
+
+        // Exportar a JPG
+        function exportToJPG() {
+            html2canvas(document.getElementById('card-results')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'AQ-Child-Resultados.jpg';
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+            });
+        }
+
+        // Nueva evaluación
+        function newEvaluation() {
+            responses = {};
+            currentCard = 0;
+            
+            // Ocultar todas las tarjetas
+            document.querySelectorAll('.card').forEach(card => {
+                if (card) card.classList.remove('active');
+            });
+            
+            // Mostrar tarjeta inicial
+            const initialCard = document.getElementById('card-0');
+            if (initialCard) {
+                initialCard.classList.add('active');
+            }
+            
+            // Limpiar selecciones
+            document.querySelectorAll('.option').forEach(option => {
+                if (option) option.classList.remove('selected');
+            });
+            
+            updateProgressBar();
+            updateBackButton();
+        }
+
+        // Inicializar aplicación cuando se carga la página
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+
+    <!-- Script para exportar imágenes (solo para funcionalidad completa) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>

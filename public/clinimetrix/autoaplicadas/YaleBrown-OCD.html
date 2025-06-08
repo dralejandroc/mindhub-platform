@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala Dimensional Yale-Brown de TOC (DY-BOCS) - Versión Completa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #666;
+            -webkit-text-fill-color: #666;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 20px;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #112F33;
+            padding: 15px;
+            background: rgba(41, 169, 140, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .symptom-item {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .symptom-item:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.05);
+        }
+
+        .symptom-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #112F33;
+        }
+
+        .symptom-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .response-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .response-option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .response-option:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+        }
+
+        .response-option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .severity-scale {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .severity-option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .severity-option:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+        }
+
+        .severity-option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .severity-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.3);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .checkbox-item {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+        }
+
+        .checkbox-item.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .results-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            border-left: 5px solid #29A98C;
+        }
+
+        .alert-high {
+            background: rgba(245, 101, 101, 0.1);
+            border-left-color: #f56565;
+        }
+
+        .alert-medium {
+            background: rgba(246, 173, 85, 0.1);
+            border-left-color: #f6ad55;
+        }
+
+        .dimension-result {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .dimension-score {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #29A98C;
+        }
+
+        .export-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #29A98C;
+        }
+
+        .instructions h3 {
+            color: #29A98C;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #112F33;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .age-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .age-input:focus {
+            border-color: #29A98C;
+            outline: none;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .text-input:focus {
+            border-color: #29A98C;
+            outline: none;
+        }
+
+        .severity-slider {
+            margin: 20px 0;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #29A98C;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .response-options {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            }
+            
+            .severity-scale {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="header">
+                <h1>Escala Dimensional Yale-Brown</h1>
+                <p>Evaluación Completa de Síntomas Obsesivo-Compulsivos (DY-BOCS)</p>
+            </div>
+            
+            <div class="instructions">
+                <h3>Instrucciones importantes:</h3>
+                <ul>
+                    <li><strong>Obsesiones:</strong> Pensamientos repetitivos o imágenes intrusivas que provocan malestar o ansiedad (ej: preocupación recurrente sobre gérmenes, si se cerró la puerta).</li>
+                    <li><strong>Compulsiones:</strong> Actos, comportamientos o rituales mentales repetitivos que siente que debe realizar (ej: lavarse las manos repetidamente, comprobar que la puerta esté cerrada).</li>
+                    <li><strong>Período de evaluación:</strong> Considere la <strong>última semana</strong> para síntomas actuales</li>
+                    <li><strong>Honestidad:</strong> No hay respuestas correctas o incorrectas. Sea preciso en sus respuestas</li>
+                    <li><strong>Proceso:</strong> Primero identificaremos todas las categorías de síntomas, luego evaluaremos en detalle solo las que presenta</li>
+                    <li><strong>Duración:</strong> Esta es la versión completa estandarizada. Puede tomar 20-40 minutos dependiendo de sus síntomas</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="button" onclick="nextCard()">Comenzar Evaluación Completa</button>
+            </div>
+        </div>
+
+        <!-- Card 1: Screening de Dimensiones -->
+        <div class="card" id="card-1">
+            <div class="header">
+                <h1>Identificación de Síntomas</h1>
+                <p>Paso 1: Seleccione todas las categorías que han sido problemáticas</p>
+            </div>
+            
+            <div class="question-text">
+                Marque todas las categorías que describan obsesiones o compulsiones que haya experimentado en la <strong>última semana</strong> o en el <strong>pasado</strong>:
+            </div>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item" onclick="toggleDimension(1)" id="dim-1">
+                    <strong>Dimensión 1: Obsesiones de daño, violencia y agresión</strong><br>
+                    <small>Miedo de hacerse daño o herir a otros, pensamientos violentos, imágenes agresivas, impulsos no deseados</small>
+                </div>
+                
+                <div class="checkbox-item" onclick="toggleDimension(2)" id="dim-2">
+                    <strong>Dimensión 2: Obsesiones sexuales y religiosas</strong><br>
+                    <small>Pensamientos sexuales inapropiados, preocupaciones religiosas, blasfemias, comportamientos inmorales</small>
+                </div>
+                
+                <div class="checkbox-item" onclick="toggleDimension(3)" id="dim-3">
+                    <strong>Dimensión 3: Simetría, orden, conteo y organización</strong><br>
+                    <small>Necesidad de que las cosas estén perfectas, simétricas, en cierto orden, rituales de repetición</small>
+                </div>
+                
+                <div class="checkbox-item" onclick="toggleDimension(4)" id="dim-4">
+                    <strong>Dimensión 4: Contaminación y limpieza</strong><br>
+                    <small>Miedo a gérmenes, suciedad, sustancias tóxicas, necesidad excesiva de lavarse o limpiar</small>
+                </div>
+                
+                <div class="checkbox-item" onclick="toggleDimension(5)" id="dim-5">
+                    <strong>Dimensión 5: Acumulación y coleccionismo</strong><br>
+                    <small>Dificultad para tirar cosas, acumular objetos innecesarios, coleccionar compulsivamente</small>
+                </div>
+                
+                <div class="checkbox-item" onclick="toggleDimension(6)" id="dim-6">
+                    <strong>Dimensión 6: Otros síntomas obsesivo-compulsivos</strong><br>
+                    <small>Supersticiones, rituales diversos, preocupaciones por enfermedades, síntomas de apariencia</small>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="button" onclick="processScreening()" id="continueBtn" disabled>Continuar</button>
+            </div>
+        </div>
+
+        <!-- Cards dinámicas se insertarán aquí -->
+
+        <!-- Card final -->
+        <div class="card" id="card-final">
+            <div class="header">
+                <h1>Evaluación Completada</h1>
+                <p>Muchas gracias por su tiempo y honestidad</p>
+            </div>
+            
+            <div class="question-text">
+                Ha completado exitosamente la Escala Dimensional Yale-Brown de TOC. Sus respuestas han sido registradas y están listas para revisión profesional.
+                <br><br>
+                Por favor entregue el dispositivo a su médico o profesional de salud mental para la interpretación de los resultados.
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="button" onclick="showResults()">Revisar Resultados (Profesional)</button>
+            </div>
+        </div>
+
+        <!-- Card de resultados -->
+        <div class="card" id="card-results">
+            <div class="header">
+                <h1>Resultados DY-BOCS</h1>
+                <p>Interpretación Clínica Profesional</p>
+            </div>
+            
+            <div id="results-content">
+                <!-- Los resultados se insertarán aquí dinámicamente -->
+            </div>
+            
+            <div class="export-buttons">
+                <button class="button" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="button" onclick="exportToImage()">📸 Capturar Imagen</button>
+                <button class="button" onclick="newAssessment()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-button" id="backBtn" onclick="previousCard()" style="display: none;">←</button>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        let selectedDimensions = [];
+        let totalQuestions = 2;
+        let dimensionPhase = 'symptoms'; // 'symptoms' o 'severity'
+        let currentDimensionIndex = 0;
+        let severityResponses = {};
+
+        // Datos completos de las dimensiones según DY-BOCS original
+        const dimensionData = {
+            1: {
+                name: "Obsesiones de daño, violencia y agresión",
+                symptoms: [
+                    {
+                        id: 1,
+                        text: "Tengo obsesiones de poder hacerme daño a mí mismo.",
+                        description: "Por ejemplo, miedo de hacerme daño a mí mismo con un cuchillo o un tenedor, miedo a coger o estar cerca de objetos cortantes, miedo de abalanzarme hacia un coche, o miedo a caminar cerca de ventanas de cristal."
+                    },
+                    {
+                        id: 2,
+                        text: "Tengo obsesiones de que podrían hacerme daño.",
+                        description: "Por ejemplo, miedo a sufrir daño por no ser suficientemente cuidadoso. Miedo a que la gente o ciertos objetos me dañen."
+                    },
+                    {
+                        id: 3,
+                        text: "Compruebo no haberme herido a mí mismo o no haber herido a nadie.",
+                        description: "Por ejemplo, buscar heridas o sangre después de utilizar objetos punzantes o quebradizos, realizar comprobaciones con médicos u otras personas de no haberme hecho daño a mí mismo."
+                    },
+                    {
+                        id: 4,
+                        text: "Tengo obsesiones de que podría hacer daño a otras personas.",
+                        description: "Por ejemplo, miedo a envenenar la comida de otras personas, miedo a hacer daño a un bebé, miedo de empujar a alguien delante de un coche o tren."
+                    },
+                    {
+                        id: 5,
+                        text: "Tengo obsesiones de que heriré a otras personas sin la intención de hacerlo.",
+                        description: "Preocupaciones por verme involucrado en un accidente de coche y darme a la fuga, miedo de ser responsable por no ayudar a alguien en una catástrofe imaginada, miedo de herir los sentimientos de alguien, miedo de causar daño por dar un consejo erróneo."
+                    },
+                    {
+                        id: 6,
+                        text: "Tengo obsesiones de que podría de ser responsable de algo terrible que pudiera suceder.",
+                        description: "Por ejemplo, miedo de iniciar un incendio o ser responsable de un robo o asesinato."
+                    },
+                    {
+                        id: 7,
+                        text: "Compruebo que no he herido a otros o que otros no fueron heridos.",
+                        description: "Por ejemplo, comprobar que usted no ha herido a alguien sin saberlo. Preguntar a otros para asegurarse, o telefonear para estar seguro de que todo está bien."
+                    },
+                    {
+                        id: 8,
+                        text: "Tengo imágenes violentas u horribles en mi mente.",
+                        description: "Por ejemplo, imágenes de asesinatos o accidentes u otras imágenes sangrientas como cuerpos desmembrados."
+                    },
+                    {
+                        id: 9,
+                        text: "Tengo obsesiones de que podría soltar obscenidades o insultos.",
+                        description: "Por ejemplo, miedo a soltar obscenidades en un lugar tranquilo lleno de gente, como una iglesia o una clase. Miedo a escribir obscenidades."
+                    },
+                    {
+                        id: 10,
+                        text: "Tengo obsesiones referentes a hacer otras cosas embarazosas.",
+                        description: "Por ejemplo, quitarme la ropa en público o parecer estúpido/a en situaciones sociales."
+                    },
+                    {
+                        id: 11,
+                        text: "Estoy obsesionado de tener un impulso no deseado.",
+                        description: "Por ejemplo, miedo a apuñalar a un amigo o conducir chocando contra un árbol, o miedo a atropellar a alguien como impulso. Miedo a poder robar algo."
+                    },
+                    {
+                        id: 12,
+                        text: "Comprobar de que nada terrible sucederá o ha sucedido.",
+                        description: "Por ejemplo, buscar en el periódico o escuchar las noticias de la radio o televisión para comprobar si ha ocurrido alguna catástrofe de la que usted se considere culpable. O bien preguntar a la gente para comprobar que no ha pasado nada."
+                    },
+                    {
+                        id: 13,
+                        text: "Compruebo o tomo medidas parar prevenir o evitar daño hacia mí u otros.",
+                        description: "Por ejemplo, intentar estar lejos de objetos punzantes o quebradizos, o evitar usar cuchillos, tijeras u objetos frágiles de cristal. Preguntar a otros para asegurarse o les pide de estar con usted para estar seguro/a de que nadie salga dañado."
+                    },
+                    {
+                        id: 14,
+                        text: "Tengo que repetir actividades rutinarias para prevenir consecuencias terribles.",
+                        description: "Por ejemplo, necesidad de hacer la misma acción una y otra vez tras tener un pensamiento obsesivo 'malo' sobre actos dañinos, con la finalidad de prevenir una consecuencia terrible. Por favor, marque este síntoma solo si este ritual mental se da como respuesta a pensamientos relacionados con violencia, conductas agresivas o desastres naturales."
+                    },
+                    {
+                        id: 15,
+                        text: "Tengo rituales mentales aparte de los de comprobación.",
+                        description: "Por ejemplo, rituales mentales son compulsiones que hace 'en su cabeza', como tener un 'buen pensamiento' para deshacer un 'mal pensamiento', o la necesidad de mantener listas mentales de cosas que deben ser recordadas en un cierto orden. Por favor, marque este ítem solo si estos rituales mentales están específicamente relacionados o si usted los realiza para disminuir obsesiones relacionadas con violencia, comportamientos agresivos o desastres naturales."
+                    }
+                ]
+            },
+            2: {
+                name: "Obsesiones sexuales y religiosas",
+                symptoms: [
+                    {
+                        id: 16,
+                        text: "Tengo pensamientos, imágenes o impulsos sexuales prohibidos o inapropiados.",
+                        description: "Por ejemplo pensamientos sexuales no deseados sobre extraños, miembros de la familia o amigos."
+                    },
+                    {
+                        id: 17,
+                        text: "Tengo obsesiones sexuales con niños o incesto.",
+                        description: "Por ejemplo, pensamientos involuntarios a cerca de abusar sexualmente de sus hijos o de los niños de otras personas."
+                    },
+                    {
+                        id: 18,
+                        text: "Tengo obsesiones acerca de la homosexualidad.",
+                        description: "Por ejemplo, preocupaciones como '¿Soy homosexual?' o '¿Qué pasaría si de repente me volviese homosexual?' cuando no hay motivos para tener estos pensamientos."
+                    },
+                    {
+                        id: 19,
+                        text: "Tengo obsesiones sobre comportamientos sexuales violentos hacia otras personas.",
+                        description: "Por ejemplo, imágenes involuntarias sobre comportamientos sexuales violentos hacia otros adultos, amigos o miembros de la familia."
+                    },
+                    {
+                        id: 20,
+                        text: "Realizo comprobaciones para estar seguro de que no he hecho nada malo de tipo sexual.",
+                        description: "Por ejemplo, comprobar sus partes íntimas, las sábanas o la ropa en busca de pruebas de haber hecho algo malo. Preguntar para asegurarse de que no ha pasado nada malo."
+                    },
+                    {
+                        id: 21,
+                        text: "Evito ciertas acciones, personas, lugares o cosas para evitar que ocurran obsesiones y compulsiones sexuales.",
+                        description: "Por ejemplo, no va a la sección de revistas de una librería a causa de algunos títulos o imágenes."
+                    },
+                    {
+                        id: 22,
+                        text: "Estoy obsesionado con el sacrilegio y la blasfemia.",
+                        description: "Por ejemplo, preocupaciones acerca de tener ideas blasfemas, de decir cosas malvadas o de ser castigado por estas cosas."
+                    },
+                    {
+                        id: 23,
+                        text: "Estoy obsesionado con lo que está bien y lo que está mal desde el punto de vista moral.",
+                        description: "Por ejemplo, preocupaciones acerca de siempre hacer las cosas de forma moralmente correcta o preocupaciones acerca de haber mentido o haber engañado a alguien."
+                    },
+                    {
+                        id: 24,
+                        text: "Tengo miedo de decir ciertas cosas.",
+                        description: "Por ejemplo, miedo a decir algo terrible o inapropiado que podría ser considerado poco respetuoso para alguien vivo o muerto; miedo de dar un consejo erróneo."
+                    },
+                    {
+                        id: 25,
+                        text: "Compruebo para estar seguro de que no he hecho nada malo de tipo religioso.",
+                        description: "Por ejemplo, comprobar la Biblia u otros objetos sagrados, o preguntar a un sacerdote o similar si ha hecho algo malo."
+                    },
+                    {
+                        id: 26,
+                        text: "Tengo compulsiones que implican objetos u obligaciones religiosas.",
+                        description: "Por ejemplo, comprobación o lavado excesivo de objetos religiosos. Rezar durante horas o pedir confirmación de líderes religiosos más a menudo de lo que es realmente necesario."
+                    },
+                    {
+                        id: 27,
+                        text: "Evito ciertas acciones, personas, lugares o cosas para evitar que ocurran ciertas obsesiones y compulsiones de tipo moral o religioso.",
+                        description: "Por ejemplo, no ir a la iglesia o no mirar ciertos programas de televisión porque podrían provocar pensamientos de malas influencias o de ser poseído por el demonio."
+                    },
+                    {
+                        id: 28,
+                        text: "Necesito repetir actividades rutinarias para prevenir consecuencias terribles.",
+                        description: "Por ejemplo, necesidad de repetir una y otra vez la misma acción, tras tener un pensamiento obsesivo 'malo' de tipo sexual o religioso para prevenir alguna consecuencia terrible. Por favor, no marque este síntoma a menos que la repetición sea en respuesta a pensamientos de ese tipo."
+                    },
+                    {
+                        id: 29,
+                        text: "Necesito explicar, preguntar o confesar cosas.",
+                        description: "Por ejemplo, preguntar a los demás para asegurarse de posibles malas acciones. Confesarse sobre algo falso que no ocurrió o explicar a la gente sus pensamientos privados para sentirse mejor."
+                    },
+                    {
+                        id: 30,
+                        text: "Tengo rituales mentales diferentes de los de comprobación.",
+                        description: "Por ejemplo, rituales mentales son compulsiones que usted realiza 'en su cabeza', como pensar que un 'buen' pensamiento anula un 'mal' pensamiento, o la necesidad de mantener listas mentales que deben ser recordadas en cierto orden. Por favor, marque este ítem solo si estos rituales mentales están específicamente hechos para aliviar obsesiones sexuales o religiosas."
+                    }
+                ]
+            },
+            3: {
+                name: "Simetría, orden, conteo y organización",
+                symptoms: [
+                    {
+                        id: 31,
+                        text: "Tengo obsesiones acerca de la necesidad que las cosas sean perfectas, exactas o 'simplemente correctas'.",
+                        description: "Por ejemplo, preocupaciones o sentimientos de malestar acerca de que los papeles o libros estén bien alineados, preocupaciones acerca de que sus cálculos o su escritura sean perfectos."
+                    },
+                    {
+                        id: 32,
+                        text: "Tengo obsesiones de simetría.",
+                        description: "Por ejemplo, estar totalmente obsesionado o preocupado si ciertas sensaciones, pensamientos o cosas no están ordenadas o simétricas."
+                    },
+                    {
+                        id: 33,
+                        text: "Compruebo que no he cometido errores.",
+                        description: "Por ejemplo, comprobaciones repetidas mientras lee, escribe o realiza cálculos simples para asegurarse que no está cometiendo un error. Comprobación de listas. Ello implica también hacer listas de cosas para hacer y realizar comprobaciones obsesivas de estas listas."
+                    },
+                    {
+                        id: 34,
+                        text: "Releo o reescribo cosas.",
+                        description: "Por ejemplo, le lleva horas leer unas pocas páginas de un libro o escribir un texto corto a causa de quedarse bloqueado en un ciclo de lectura y reescritura. Ello también incluye buscar la palabra o la frase 'perfecta', o preocuparse de que no se ha entendido realmente el significado de lo leído, o tener obsesiones acerca de la forma de ciertas letras."
+                    },
+                    {
+                        id: 35,
+                        text: "Necesito repetir actividades rutinarias (como entrar y salir por una puerta o sentarse y levantarse de una silla).",
+                        description: "Otros ejemplos incluyen repetir actividades rutinarias como encender y apagar electrodomésticos, colocar un objeto en una mesa, peinarse, o mirar en una dirección determinada. No se siente bien a menos que realice estas cosas el número 'correcto' de veces o a menos que cierta uniformidad o simetría se haya logrado. Marque este ítem SOLO en el caso que estos comportamientos repetitivos NO estén relacionados con otras dimensiones."
+                    },
+                    {
+                        id: 36,
+                        text: "Tengo compulsiones de contar.",
+                        description: "Por ejemplo, contar objetos como azulejos en el techo o en el suelo, libros en una estantería, clavos en la pared, o incluso granos de arena en la playa."
+                    },
+                    {
+                        id: 37,
+                        text: "Tengo compulsiones de ordenar.",
+                        description: "Por ejemplo, alinear papeles y lápices en el escritorio o libros en la estantería. Puede que pase Ud. horas ordenando la casa debido a ello, y se molesta mucho si este orden es alterado."
+                    },
+                    {
+                        id: 38,
+                        text: "Tengo compulsiones que implican tocar objetos o personas de manera simétrica y/o conductas de uniformidad.",
+                        description: "Por ejemplo, si toco o hago algo en el lado derecho, necesito tocar lo mismo con el lado izquierdo."
+                    },
+                    {
+                        id: 39,
+                        text: "Necesito tocar, golpear o frotar cosas.",
+                        description: "Por ejemplo, siente la urgencia de tocar superficies ásperas como madera o superficies calientes como la encimera. Sentir la urgencia de tocar ligeramente a otras personas. Sentir la necesidad de tocar un objeto. Necesidad de frotar o tocar cosas."
+                    },
+                    {
+                        id: 40,
+                        text: "Tengo miedo de no decir 'lo correcto'.",
+                        description: "Por ejemplo, sentir que necesita encontrar la palabra o frase 'perfecta o adecuada' antes de decir algo o de responder a alguien."
+                    },
+                    {
+                        id: 41,
+                        text: "Tengo rituales mentales aparte de los de comprobación y uniformidad.",
+                        description: "Por ejemplo, los rituales mentales son compulsiones que usted realiza 'en su cabeza'. Por favor marque este ítem sólo si estos rituales mentales están específicamente relacionados con obsesiones de simetría, exactitud o sensación de que algo tiene que estar 'de una cierta manera'."
+                    },
+                    {
+                        id: 42,
+                        text: "Evito ciertas acciones, personas, lugares o cosas para evitar que ocurran obsesiones y compulsiones acerca de simetría o exactitud.",
+                        description: "Por ejemplo, no mirar ciertos objetos de su hogar porque piensa que le provocarán obsesiones o compulsiones."
+                    }
+                ]
+            },
+            4: {
+                name: "Contaminación y limpieza",
+                symptoms: [
+                    {
+                        id: 43,
+                        text: "Estoy obsesionado con la suciedad o los gérmenes.",
+                        description: "Por ejemplo, coger algún microbio al sentarme en las sillas, al estrechar la mano, o al tocar los pomos de las puertas."
+                    },
+                    {
+                        id: 44,
+                        text: "Estoy exageradamente preocupado o me dan asco los líquidos o secreciones corporales (como el vómito, orina, heces, o saliva).",
+                        description: "Por ejemplo, miedos de estar en contacto con vómito, orina, heces, semen o secreciones vaginales."
+                    },
+                    {
+                        id: 45,
+                        text: "Estoy obsesionado con contaminantes ambientales (como amianto, radiación o residuos tóxicos).",
+                        description: "Por ejemplo, miedo a estar contaminado por amianto o radón, miedo a las sustancias radioactivas, miedo a cosas asociadas con ciudades que tengan fábricas de residuos tóxicos. Miedo a estar contaminado por la polución atmosférica."
+                    },
+                    {
+                        id: 46,
+                        text: "Tengo obsesiones con insectos o animales.",
+                        description: "Por ejemplo, miedo a estar contaminado por moscas o estar en contacto con un perro, gato u otros animales."
+                    },
+                    {
+                        id: 47,
+                        text: "Me molestan las sustancias o residuos pegajosos.",
+                        description: "Por ejemplo, miedo al celofán, la savia, la pasta de dientes u otras sustancias pegajosas en las que podría haber sustancias contaminantes atrapadas."
+                    },
+                    {
+                        id: 48,
+                        text: "Me preocupa la posibilidad de contagiarme de alguna enfermedad.",
+                        description: "Por ejemplo, miedo de enfermar como consecuencia directa de contaminarme. Incluye miedos sobre contraer enfermedades específicas tales como SIDA o cáncer específicamente a causa de la contaminación."
+                    },
+                    {
+                        id: 49,
+                        text: "Tengo lavado de manos compulsivo o ritualizado.",
+                        description: "Por ejemplo, necesidad de lavar una y otra vez sus manos a causa de preocupaciones sobre suciedad o gérmenes o porque no siente sus manos suficientemente limpias. A menudo si la secuencia del lavado es interrumpida, el proceso entero tiene que ser reiniciado. El ritual podría incluir la necesidad de lavarse las manos un número determinado de veces o de ciertas maneras."
+                    },
+                    {
+                        id: 50,
+                        text: "Tengo rutinas de baño, ducha o lavabo compulsivas o ritualizadas.",
+                        description: "Por ejemplo, sus duchas, baños u otras rutinas de lavabo deben ser hechas en un cierto orden. Debe usar una excesiva cantidad de papel higiénico. A menudo si la secuencia de lavado o limpiado es interrumpida, el proceso entero debe ser reiniciado."
+                    },
+                    {
+                        id: 51,
+                        text: "Estoy completamente preocupado o con malestar por las cosas de casa u otros objetos inanimados.",
+                        description: "Por ejemplo, preocupación o miedo a ser contaminado por grifos, lavabos, suelos, utensilios de cocina o productos de limpieza. También, incluye malestar por la idea de entrar en contacto con estos objetos."
+                    },
+                    {
+                        id: 52,
+                        text: "Tengo compulsiones que implican la limpieza compulsiva de las cosas de casa o de objetos inanimados.",
+                        description: "Por ejemplo, excesiva y / o repetitiva limpieza de grifos, lavabos, suelos, encimera o utensilios de cocina."
+                    },
+                    {
+                        id: 53,
+                        text: "Tengo rituales mentales aparte de los de comprobación.",
+                        description: "Por ejemplo, rituales mentales son compulsiones que hace 'en su cabeza'. Por favor, marque este ítem sólo si estos rituales mentales están específicamente relacionados con preocupaciones de contaminación."
+                    },
+                    {
+                        id: 54,
+                        text: "Hago otras cosas para evitar el contacto o eliminar las sustancias contaminantes, o bien evito hacer ciertas cosas o ir a determinados lugares a causa de preocupaciones por la contaminación.",
+                        description: "Por ejemplo, pedir a miembros de la familia que eliminen insecticidas, basura, latas de gasolina, carne cruda, pinturas, barnices, fármacos en el botiquín, basura de cocina, si no puede evitar estas cosas. O bien pedir a miembros de la familia que abran las puertas, o llevar guantes o usar pañuelos de papel o guantes para evitar tocar directamente estas cosas. O bien no va a lavabos públicos, no usa toallas de hotel, o no estrecha la mano."
+                    }
+                ]
+            },
+            5: {
+                name: "Acumulación y coleccionismo",
+                symptoms: [
+                    {
+                        id: 55,
+                        text: "Tengo obsesiones acerca de la necesidad de guardar o acumular cosas para el futuro.",
+                        description: "Por ejemplo, preocupaciones acerca de tirar cosas (papeles, documentos, tickets) porque podría necesitarlos en el futuro."
+                    },
+                    {
+                        id: 56,
+                        text: "Tengo obsesiones acerca de tirar cosas a la basura.",
+                        description: "Por ejemplo, Quedarse con montones de cosas a causa de su valor sentimental, o a causa de una necesidad por recoger o coleccionar cosas."
+                    },
+                    {
+                        id: 57,
+                        text: "Tengo obsesiones acerca de perder cosas.",
+                        description: "Por ejemplo, preocupaciones acerca de perder una baratija u objetos no importantes como un trozo de papel."
+                    },
+                    {
+                        id: 58,
+                        text: "Tengo dificultades para decidir si debo guardar algo o no.",
+                        description: "Por ejemplo, recoger algo sin razón alguna y lo guardo porque no puedo decidir tirarlo."
+                    },
+                    {
+                        id: 59,
+                        text: "Tengo compulsiones de acumular o coleccionar cosas.",
+                        description: "Por ejemplo, puede tener habitaciones llenas de papeles de periódico viejos, notas, latas, toallas de papel, envoltorios y botellas vacías – no tira estas cosas porque piensa que algún día podría necesitarlas. También recoge objetos o basura de la calle o de los contenedores de basura."
+                    },
+                    {
+                        id: 60,
+                        text: "Tengo rituales mentales referidos a la acumulación y a guardar cosas.",
+                        description: "Por ejemplo, los rituales mentales son compulsiones que hace 'en su cabeza' como pensar que 'un buen pensamiento deshace un mal pensamiento' o la necesidad de mantener listas mentales que deben ser recordadas en un cierto orden. Por favor, marque este ítem sólo en el caso de que estos rituales mentales estén específicamente relacionados con obsesiones de acumulación."
+                    },
+                    {
+                        id: 61,
+                        text: "Evito ciertas acciones, gente, lugares, para impedir compulsiones de acumulación.",
+                        description: "Por ejemplo, no caminar por determinadas tiendas o mercados, o no leer el periódico. Pedir a otras personas que limpien su armario y tiren sus cosas."
+                    }
+                ]
+            },
+            6: {
+                name: "Otros síntomas obsesivo-compulsivos",
+                symptoms: [
+                    {
+                        id: 62,
+                        text: "Me preocupan las enfermedades.",
+                        description: "Por ejemplo, preocupaciones acerca de tener una enfermedad como cáncer, enfermedad cardíaca, SIDA, a pesar de que los médicos le indican lo contrario."
+                    },
+                    {
+                        id: 63,
+                        text: "Tengo rituales de comprobación relacionados con obsesiones acerca de las enfermedades.",
+                        description: "Por ejemplo, buscar que sus amigos o los médicos le confirmen que usted no tiene una enfermedad grave como enfermedad cardíaca, tumor cerebral o alguna otra forma de cáncer. Necesidad de comprobar repetidamente una parte de su cuerpo o tomarse compulsivamente el pulso, la tensión arterial o la temperatura."
+                    },
+                    {
+                        id: 64,
+                        text: "Tengo rituales mentales aparte de los de comprobación.",
+                        description: "Por ejemplo, rituales mentales son rituales que usted realiza 'en su cabeza'. Por favor marque éste ítem sólo si estos rituales mentales están específicamente relacionados con preocupaciones sobre enfermedades."
+                    },
+                    {
+                        id: 65,
+                        text: "Evito ciertas acciones, gente, lugares o cosas para prevenir que ocurran obsesiones y compulsiones acerca de las enfermedades.",
+                        description: "Por ejemplo, no conducir por delante de un hospital porque provocaría pensamientos de enfermedad."
+                    },
+                    {
+                        id: 66,
+                        text: "Necesito saber o recordar ciertas cosas.",
+                        description: "Por ejemplo, necesidad de recordar cosas insignificantes como números de matrículas, adhesivos en los parachoques o eslógans en las camisetas."
+                    },
+                    {
+                        id: 67,
+                        text: "Tengo miedos supersticiosos.",
+                        description: "Por ejemplo, miedos de pasar por un cementerio, cerca de un coche fúnebre, un gato negro, caminar bajo una escalera, romper un espejo, o miedo a presagios relacionados con la muerte."
+                    },
+                    {
+                        id: 68,
+                        text: "Tengo comportamientos supersticiosos.",
+                        description: "Por ejemplo, no poder coger un autobús o tren si su número contiene números de 'mala suerte' como el trece. Tener dificultades para abandonar su casa en el día trece del mes. Tener que tirar la ropa que lleva puesto después de pasar por un funeral o cementerio."
+                    },
+                    {
+                        id: 69,
+                        text: "Tengo números de suerte o mala suerte.",
+                        description: "Por ejemplo, preocupaciones por números comunes como el trece, tener que hacer actividades un número concreto de veces."
+                    },
+                    {
+                        id: 70,
+                        text: "Tengo obsesiones y/o compulsiones con algunos colores que tienen un significado especial.",
+                        description: "Por ejemplo, el negro asociado con la muerte, rojo asociado a sangre y daño. Usted evita la utilización de objetos con estos colores."
+                    },
+                    {
+                        id: 71,
+                        text: "Me vienen a la mente sonidos, nombres, palabras o música intrusivos y sin sentido.",
+                        description: "Por ejemplo, oír voces, canciones o música en su mente que no puede parar. Quedarse fijado en el sonido de ciertos nombres o palabras."
+                    },
+                    {
+                        id: 72,
+                        text: "Me vienen a la mente imágenes intrusivas no violentas.",
+                        description: "Por ejemplo, tener imágenes intrusivas con escenas neutras (de contenido no violento ni sexual). Quedarse enganchado en detalles visuales o escenas de unas determinadas imágenes."
+                    },
+                    {
+                        id: 73,
+                        text: "Evito ciertas acciones, gente, lugares o cosas para prevenir que ocurran alguna de estas obsesiones y compulsiones misceláneas.",
+                        description: "Por ejemplo, no pisar encima de grietas o no escribir ciertos números."
+                    },
+                    {
+                        id: 74,
+                        text: "Me quedo fijado haciendo comportamientos rutinarios y éstos me hacen enlentecer.",
+                        description: "Por ejemplo, ducharme o vestirme o salir de casa me puede llevar horas. Otros como quedarme fijado comiendo o hablando de manera que las actividades del día a día necesitan mucho más tiempo para llevarlas a cabo."
+                    },
+                    {
+                        id: 75,
+                        text: "Hago muchas más listas de las que en realidad necesito.",
+                        description: "Hago muchas listas de cosas para hacer o comprobar."
+                    },
+                    {
+                        id: 76,
+                        text: "Estoy obsesionado en posibilidad de ser separado de un miembro de mi familia.",
+                        description: "Por ejemplo, preocupaciones de que algo terrible le pueda suceder a un pariente o un niño o alguien querido y que no lo vuelva a ver nunca más."
+                    },
+                    {
+                        id: 77,
+                        text: "Tengo compulsiones o rituales que se dan con el fin de prevenir la pérdida de alguien (o ser separado de alguien) muy importante para mí.",
+                        description: "Por ejemplo, seguir a una persona de habitación en habitación o llamarlo una y otra vez por teléfono; tener que rezar o hacer unos rituales específicos con el fin de evitar que ocurran cosas malas a alguien."
+                    },
+                    {
+                        id: 78,
+                        text: "Estoy obsesionado con la posibilidad de convertirme en una persona particular.",
+                        description: "Por ejemplo, tener el pensamiento de que usted se convertirá en una persona en particular o bien incluso que se podría convertir en esta otra persona; miedo a que una parte de su cuerpo no pertenezca a usted."
+                    },
+                    {
+                        id: 79,
+                        text: "Tengo compulsiones para intentar no pensar demasiado en otra persona con la que estoy obsesionado/a.",
+                        description: "Por ejemplo, apartar los pensamientos no deseados o hacer un ritual para liberarme de estos pensamientos."
+                    },
+                    {
+                        id: 80,
+                        text: "Tengo rituales de mirar fijamente a objetos o tener que parpadear.",
+                        description: "Por ejemplo, necesidad de mirar cosas para que los bordes estén alineados o tener que mirar cosas en un cierto orden o durante un cierto tiempo."
+                    },
+                    {
+                        id: 81,
+                        text: "Tengo la necesidad de repetir algo que yo o alguien ha dicho.",
+                        description: "Esto podría ser una determinada palabra que no se puede sacar de su mente o podría ser el final de una frase que acaba de decir usted o acaba de oír de alguien."
+                    },
+                    {
+                        id: 82,
+                        text: "Estoy excesivamente preocupado con una parte de mi cuerpo o un aspecto de mi apariencia.",
+                        description: "Preocupaciones acerca de la apariencia, la seguridad o el funcionamiento de su cara, orejas, nariz, ojos u otra parte de su cuerpo. Preocupaciones de que alguna parte de su cuerpo es fea o deforme, a pesar de que le han dicho que está bien."
+                    },
+                    {
+                        id: 83,
+                        text: "Compruebo cosas relacionadas con obsesiones sobre mi apariencia.",
+                        description: "Por ejemplo, preguntar a amigos acerca de su apariencia. Comprobar repetidamente los olores de su cuerpo o comprobar su apariencia (aspectos faciales u otros aspectos físicos) mirándose al espejo buscando aspectos feos. Necesidad de arreglarse continuamente o comparar algunos aspectos de su cuerpo con los de otra gente; puede que Ud. tenga que llevar cierta ropa en determinados días. Estar obsesionado con su peso."
+                    },
+                    {
+                        id: 84,
+                        text: "Tengo obsesiones con la comida.",
+                        description: "Por ejemplo, estar obsesionado con recetas, calorías y/o dietas."
+                    },
+                    {
+                        id: 85,
+                        text: "Tengo obsesiones y/o compulsiones con el ejercicio físico.",
+                        description: "Por ejemplo, estar obsesionado con la necesidad de hacer ejercicio para quemar calorías. Compulsiones relacionadas que incluyen hacer ejercicio según determinadas reglas o durante un determinado tiempo."
+                    },
+                    {
+                        id: 86,
+                        text: "Tengo rituales con el comer.",
+                        description: "Necesidad de preparar su comida, cuchillo y tenedor en un orden particular antes de comer. Comer de acuerdo a un ritual estricto, o no poder comer hasta que las manillas del reloj marquen una determinada hora."
+                    },
+                    {
+                        id: 87,
+                        text: "Me arranco el pelo (obsesiones y compulsiones).",
+                        description: "Por ejemplo, arrancarse el pelo del cráneo, pestañas, cejas o vello púbico. Usar sus dedos o pinzas para arrancarse el pelo. Típicamente esto incluye buscar el cabello correcto. Inspeccionar visualmente el pelo o hacer algo más (extraer el folículo o morder el pelo). Como consecuencia pueden producirse zonas vacías en su cuero cabelludo que requieren una peluca o maquillarse los párpados o la sombra de los ojos suavemente."
+                    },
+                    {
+                        id: 88,
+                        text: "Me araño o despellejo la piel (obsesiones y compulsiones).",
+                        description: "Por ejemplo, arrancarse la piel alrededor de las uñas o los pellejos. Herirse o empeorar sus pellejos."
+                    }
+                ]
+            }
+        };
+
+        const responseOptions = [
+            { value: 'never', text: 'Nunca', color: '#e2e8f0' },
+            { value: 'past', text: 'Pasado', color: '#f6ad55' },
+            { value: 'current', text: 'Actual (última semana)', color: '#29A98C' }
+        ];
+
+        function updateProgress() {
+            const progress = (currentCard / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('backBtn');
+            if (currentCard === 0 || document.getElementById('card-results').classList.contains('active')) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.style.display = 'block';
+            }
+        }
+
+        function toggleDimension(dimensionId) {
+            const element = document.getElementById(`dim-${dimensionId}`);
+            const index = selectedDimensions.indexOf(dimensionId);
+            const continueBtn = document.getElementById('continueBtn');
+            
+            if (index > -1) {
+                selectedDimensions.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                selectedDimensions.push(dimensionId);
+                element.classList.add('selected');
+            }
+            
+            continueBtn.disabled = selectedDimensions.length === 0;
+        }
+
+        function processScreening() {
+            if (selectedDimensions.length === 0) {
+                alert('Por favor seleccione al menos una categoría de síntomas.');
+                return;
+            }
+            
+            createDimensionCards();
+            nextCard();
+        }
+
+        function createDimensionCards() {
+            const container = document.querySelector('.container');
+            const finalCard = document.getElementById('card-final');
+            
+            let cardIndex = 2;
+            
+            // Crear cards para síntomas de cada dimensión
+            selectedDimensions.forEach(dimId => {
+                const dimension = dimensionData[dimId];
+                
+                // Card para síntomas de la dimensión
+                const symptomsCardHtml = `
+                    <div class="card" id="card-${cardIndex}">
+                        <div class="question-number">${cardIndex - 1}</div>
+                        <div class="header">
+                            <h1>${dimension.name}</h1>
+                            <p>Parte A: Cuestionario de síntomas</p>
+                        </div>
+                        <div class="question-text">
+                            Marque para cada síntoma si lo ha experimentado <strong>nunca</strong>, en el <strong>pasado</strong>, o <strong>actualmente</strong> (última semana). 
+                            Si marca "Actual", también indique la edad aproximada de inicio.
+                        </div>
+                        <div id="symptoms-${dimId}">
+                            ${dimension.symptoms.map(symptom => `
+                                <div class="symptom-item">
+                                    <div class="symptom-text">${symptom.text}</div>
+                                    <div class="symptom-description">${symptom.description}</div>
+                                    <div class="response-options">
+                                        ${responseOptions.map(option => `
+                                            <div class="response-option" onclick="selectSymptomResponse(${dimId}, ${symptom.id}, '${option.value}')">
+                                                ${option.text}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div style="margin-top: 10px; display: none;" id="age-${symptom.id}">
+                                        <label style="font-size: 0.9rem; color: #666;">Edad de inicio:</label>
+                                        <input type="number" class="age-input" min="0" max="100" 
+                                               onchange="setSymptomAge(${dimId}, ${symptom.id}, this.value)"
+                                               placeholder="Años">
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="button" onclick="processDimensionSymptoms(${dimId}, ${cardIndex})">Continuar</button>
+                        </div>
+                    </div>
+                `;
+                
+                container.insertBefore(createElementFromHTML(symptomsCardHtml), finalCard);
+                cardIndex++;
+                
+                // Inicializar respuestas para esta dimensión
+                if (!responses[dimId]) {
+                    responses[dimId] = { symptoms: {}, severity: {} };
+                }
+            });
+            
+            totalQuestions = cardIndex;
+        }
+
+        function createElementFromHTML(htmlString) {
+            const div = document.createElement('div');
+            div.innerHTML = htmlString.trim();
+            return div.firstChild;
+        }
+
+        function selectSymptomResponse(dimId, symptomId, value) {
+            // Limpiar selecciones previas
+            const options = document.querySelectorAll(`#symptoms-${dimId} .symptom-item`);
+            options.forEach(item => {
+                if (item.querySelector('.symptom-text').textContent.includes(getSymptomById(dimId, symptomId).text)) {
+                    const responseOptions = item.querySelectorAll('.response-option');
+                    responseOptions.forEach(opt => opt.classList.remove('selected'));
+                }
+            });
+            
+            // Seleccionar la nueva opción
+            event.target.classList.add('selected');
+            
+            // Guardar respuesta
+            if (!responses[dimId].symptoms[symptomId]) {
+                responses[dimId].symptoms[symptomId] = {};
+            }
+            responses[dimId].symptoms[symptomId].status = value;
+            
+            // Mostrar/ocultar campo de edad
+            const ageDiv = document.getElementById(`age-${symptomId}`);
+            if (value === 'current' || value === 'past') {
+                ageDiv.style.display = 'block';
+            } else {
+                ageDiv.style.display = 'none';
+            }
+        }
+
+        function setSymptomAge(dimId, symptomId, age) {
+            if (!responses[dimId].symptoms[symptomId]) {
+                responses[dimId].symptoms[symptomId] = {};
+            }
+            responses[dimId].symptoms[symptomId].age = parseInt(age);
+        }
+
+        function getSymptomById(dimId, symptomId) {
+            return dimensionData[dimId].symptoms.find(s => s.id === symptomId);
+        }
+
+        function processDimensionSymptoms(dimId, cardIndex) {
+            // Verificar si hay síntomas actuales para crear card de severidad
+            const currentSymptoms = Object.values(responses[dimId].symptoms).filter(s => s.status === 'current');
+            
+            if (currentSymptoms.length > 0) {
+                createSeverityCard(dimId, cardIndex);
+            }
+            
+            nextCard();
+        }
+
+        function createSeverityCard(dimId, insertAfterCard) {
+            const container = document.querySelector('.container');
+            const currentCard = document.getElementById(`card-${insertAfterCard}`);
+            const dimension = dimensionData[dimId];
+            
+            const severityCardHtml = `
+                <div class="card" id="card-${insertAfterCard + 0.5}">
+                    <div class="question-number">S${dimId}</div>
+                    <div class="header">
+                        <h1>${dimension.name}</h1>
+                        <p>Parte B: Puntuación de gravedad</p>
+                    </div>
+                    <div class="question-text">
+                        Ahora evaluaremos la gravedad de los síntomas que marcó como "actuales" en esta dimensión durante la última semana.
+                    </div>
+                    
+                    <div class="severity-section">
+                        <h3 style="color: #29A98C; margin: 20px 0 15px 0;">1. Severidad global (1-10)</h3>
+                        <p style="margin-bottom: 15px; font-size: 0.95rem;">Califique la severidad de estos síntomas donde "10" es la mayor severidad que ha tenido nunca y "1" la menor:</p>
+                        <div class="slider-container">
+                            <span>1</span>
+                            <input type="range" min="1" max="10" value="5" class="slider" id="severity-${dimId}" 
+                                   onchange="setSeverityValue(${dimId}, 'global', this.value)">
+                            <span>10</span>
+                            <div class="slider-value" id="severity-value-${dimId}">5</div>
+                        </div>
+                    </div>
+
+                    <div class="severity-section">
+                        <h3 style="color: #29A98C; margin: 20px 0 15px 0;">2. ¿Evita situaciones por estos síntomas?</h3>
+                        <div class="response-options" style="grid-template-columns: 1fr 1fr;">
+                            <div class="response-option" onclick="setAvoidance(${dimId}, true)">Sí</div>
+                            <div class="response-option" onclick="setAvoidance(${dimId}, false)">No</div>
+                        </div>
+                        <div style="margin-top: 15px; display: none;" id="avoidance-text-${dimId}">
+                            <textarea class="text-input" placeholder="Describa qué evita..." 
+                                      onchange="setAvoidanceText(${dimId}, this.value)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="severity-section">
+                        <h3 style="color: #29A98C; margin: 20px 0 15px 0;">3. Frecuencia</h3>
+                        <p style="margin-bottom: 15px; font-size: 0.95rem;">¿Cuánto tiempo pasa ocupado por estos síntomas?</p>
+                        <div class="severity-scale">
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'frequency', 0)">
+                                <div class="severity-number">0</div>
+                                <div>Ningún tiempo</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'frequency', 1)">
+                                <div class="severity-number">1</div>
+                                <div>Escaso (&lt;3h/semana)</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'frequency', 2)">
+                                <div class="severity-number">2</div>
+                                <div>Ocasional (3h/sem a 1h/día)</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'frequency', 3)">
+                                <div class="severity-number">3</div>
+                                <div>Frecuente (1-3h/día)</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'frequency', 4)">
+                                <div class="severity-number">4</div>
+                                <div>Casi siempre (3-8h/día)</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'frequency', 5)">
+                                <div class="severity-number">5</div>
+                                <div>Constante (&gt;8h/día)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="severity-section">
+                        <h3 style="color: #29A98C; margin: 20px 0 15px 0;">4. Malestar</h3>
+                        <p style="margin-bottom: 15px; font-size: 0.95rem;">¿Cuánto malestar le causan estos síntomas?</p>
+                        <div class="severity-scale">
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'distress', 0)">
+                                <div class="severity-number">0</div>
+                                <div>Ningún malestar</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'distress', 1)">
+                                <div class="severity-number">1</div>
+                                <div>Mínimo</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'distress', 2)">
+                                <div class="severity-number">2</div>
+                                <div>Leve</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'distress', 3)">
+                                <div class="severity-number">3</div>
+                                <div>Moderado</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'distress', 4)">
+                                <div class="severity-number">4</div>
+                                <div>Grave</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'distress', 5)">
+                                <div class="severity-number">5</div>
+                                <div>Extremo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="severity-section">
+                        <h3 style="color: #29A98C; margin: 20px 0 15px 0;">5. Interferencia</h3>
+                        <p style="margin-bottom: 15px; font-size: 0.95rem;">¿En qué medida interfieren con su vida diaria?</p>
+                        <div class="severity-scale">
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'interference', 0)">
+                                <div class="severity-number">0</div>
+                                <div>Ninguna interferencia</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'interference', 1)">
+                                <div class="severity-number">1</div>
+                                <div>Mínima</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'interference', 2)">
+                                <div class="severity-number">2</div>
+                                <div>Leve</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'interference', 3)">
+                                <div class="severity-number">3</div>
+                                <div>Moderada</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'interference', 4)">
+                                <div class="severity-number">4</div>
+                                <div>Grave</div>
+                            </div>
+                            <div class="severity-option" onclick="setSeverityScale(${dimId}, 'interference', 5)">
+                                <div class="severity-number">5</div>
+                                <div>Extrema</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="button" onclick="nextCard()">Continuar</button>
+                    </div>
+                </div>
+            `;
+            
+            const newCard = createElementFromHTML(severityCardHtml);
+            container.insertBefore(newCard, currentCard.nextSibling);
+            
+            // Incrementar totalQuestions
+            totalQuestions++;
+            
+            // Renumerar las cards siguientes
+            renumberCards();
+        }
+
+        function renumberCards() {
+            const cards = document.querySelectorAll('.card');
+            let cardNumber = 0;
+            
+            cards.forEach(card => {
+                if (card.id.startsWith('card-') && card.id !== 'card-0' && card.id !== 'card-final' && card.id !== 'card-results') {
+                    if (!card.id.includes('.')) {
+                        cardNumber++;
+                        const questionNumber = card.querySelector('.question-number');
+                        if (questionNumber && !questionNumber.textContent.startsWith('S')) {
+                            questionNumber.textContent = cardNumber;
+                        }
+                    }
+                }
+            });
+        }
+
+        function setSeverityValue(dimId, type, value) {
+            if (!responses[dimId].severity) responses[dimId].severity = {};
+            responses[dimId].severity[type] = parseInt(value);
+            document.getElementById(`severity-value-${dimId}`).textContent = value;
+        }
+
+        function setAvoidance(dimId, avoids) {
+            if (!responses[dimId].severity) responses[dimId].severity = {};
+            responses[dimId].severity.avoids = avoids;
+            
+            // Limpiar selecciones previas
+            const options = document.querySelectorAll(`#card-${getCurrentCardNumber()} .response-option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Mostrar/ocultar campo de texto
+            const textDiv = document.getElementById(`avoidance-text-${dimId}`);
+            textDiv.style.display = avoids ? 'block' : 'none';
+        }
+
+        function setAvoidanceText(dimId, text) {
+            if (!responses[dimId].severity) responses[dimId].severity = {};
+            responses[dimId].severity.avoidanceText = text;
+        }
+
+        function setSeverityScale(dimId, type, value) {
+            if (!responses[dimId].severity) responses[dimId].severity = {};
+            responses[dimId].severity[type] = value;
+            
+            // Limpiar selecciones previas en esta escala
+            const currentCard = document.querySelector('.card.active');
+            const scaleOptions = currentCard.querySelectorAll('.severity-scale .severity-option');
+            scaleOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Seleccionar la nueva opción
+            event.target.classList.add('selected');
+        }
+
+        function getCurrentCardNumber() {
+            const activeCard = document.querySelector('.card.active');
+            return activeCard ? activeCard.id.replace('card-', '') : 0;
+        }
+
+        function nextCard() {
+            const current = document.querySelector('.card.active');
+            if (current) current.classList.remove('active');
+            
+            currentCard++;
+            
+            let next;
+            if (currentCard >= totalQuestions) {
+                next = document.getElementById('card-final');
+            } else {
+                // Buscar la próxima card existente
+                let cardId = `card-${currentCard}`;
+                next = document.getElementById(cardId);
+                
+                // Si no existe, buscar la siguiente
+                while (!next && currentCard < totalQuestions + 10) {
+                    currentCard++;
+                    cardId = `card-${currentCard}`;
+                    next = document.getElementById(cardId);
+                    if (cardId === 'card-final') {
+                        next = document.getElementById('card-final');
+                        break;
+                    }
+                }
+                
+                if (!next) {
+                    next = document.getElementById('card-final');
+                }
+            }
+            
+            if (next) next.classList.add('active');
+            
+            updateProgress();
+            updateBackButton();
+        }
+
+        function previousCard() {
+            if (currentCard <= 0) return;
+            
+            const current = document.querySelector('.card.active');
+            if (current) current.classList.remove('active');
+            
+            currentCard--;
+            
+            let previous = document.getElementById(`card-${currentCard}`);
+            
+            // Si no existe, buscar la anterior
+            while (!previous && currentCard > 0) {
+                currentCard--;
+                previous = document.getElementById(`card-${currentCard}`);
+            }
+            
+            if (previous) previous.classList.add('active');
+            
+            updateProgress();
+            updateBackButton();
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let dimensionScores = {};
+            let alerts = [];
+            let globalSeverity = 0;
+            
+            selectedDimensions.forEach(dimId => {
+                if (responses[dimId] && responses[dimId].severity) {
+                    const severity = responses[dimId].severity;
+                    const frequency = severity.frequency || 0;
+                    const distress = severity.distress || 0;
+                    const interference = severity.interference || 0;
+                    const global = severity.global || 0;
+                    
+                    const dimensionTotal = frequency + distress + interference;
+                    dimensionScores[dimId] = {
+                        frequency,
+                        distress,
+                        interference,
+                        global,
+                        total: dimensionTotal,
+                        name: dimensionData[dimId].name,
+                        currentSymptoms: Object.values(responses[dimId].symptoms || {}).filter(s => s.status === 'current').length,
+                        avoids: severity.avoids,
+                        avoidanceText: severity.avoidanceText
+                    };
+                    
+                    totalScore += dimensionTotal;
+                    globalSeverity += global;
+                    
+                    // Alertas para puntuaciones altas
+                    if (dimensionTotal >= 10) { // 67% de 15
+                        alerts.push({
+                            dimension: dimensionData[dimId].name,
+                            score: dimensionTotal,
+                            level: 'high',
+                            type: 'Puntuación total alta'
+                        });
+                    } else if (dimensionTotal >= 7) { // 47% de 15
+                        alerts.push({
+                            dimension: dimensionData[dimId].name,
+                            score: dimensionTotal,
+                            level: 'medium',
+                            type: 'Puntuación moderada-alta'
+                        });
+                    }
+                    
+                    // Alertas por severidad global alta
+                    if (global >= 8) {
+                        alerts.push({
+                            dimension: dimensionData[dimId].name,
+                            score: global,
+                            level: 'high',
+                            type: 'Severidad global muy alta'
+                        });
+                    }
+                }
+            });
+            
+            return {
+                totalScore,
+                dimensionScores,
+                alerts,
+                numberOfDimensions: selectedDimensions.length,
+                globalSeverity: globalSeverity / selectedDimensions.length
+            };
+        }
+
+        function getInterpretation(results) {
+            const { totalScore, numberOfDimensions, alerts, globalSeverity } = results;
+            let severity = 'Mínima';
+            let recommendations = [];
+            
+            // Interpretación basada en la puntuación promedio y severidad global
+            const averageScore = totalScore / numberOfDimensions;
+            
+            if (averageScore >= 12 || globalSeverity >= 8) {
+                severity = 'Grave';
+                recommendations.push('Síntomas obsesivo-compulsivos graves con interferencia significativa en el funcionamiento');
+                recommendations.push('Indicación prioritaria para terapia cognitivo-conductual especializada en TOC (ERP)');
+                recommendations.push('Evaluación inmediata para tratamiento farmacológico con ISRS');
+                recommendations.push('Considerar terapia intensiva o parcial hospitalización si hay múltiples dimensiones afectadas');
+                recommendations.push('Evaluación del riesgo de deterioro funcional y laboral');
+            } else if (averageScore >= 8 || globalSeverity >= 6) {
+                severity = 'Moderada';
+                recommendations.push('Síntomas obsesivo-compulsivos clínicamente significativos que requieren tratamiento');
+                recommendations.push('Terapia cognitivo-conductual con exposición y prevención de respuesta (ERP) como primera línea');
+                recommendations.push('Considerar medicación ISRS si no hay respuesta a TCC en 12-16 sesiones');
+                recommendations.push('Psicoeducación familiar sobre TOC y estrategias de no acomodación');
+                recommendations.push('Monitoreo regular de la evolución con escalas estandarizadas');
+            } else if (averageScore >= 4 || globalSeverity >= 3) {
+                severity = 'Leve';
+                recommendations.push('Síntomas obsesivo-compulsivos presentes que pueden beneficiarse de intervención');
+                recommendations.push('Psicoeducación sobre TOC y técnicas de autoayuda basadas en TCC');
+                recommendations.push('Terapia cognitivo-conductual si los síntomas interfieren con el funcionamiento');
+                recommendations.push('Técnicas de mindfulness y manejo de ansiedad');
+                recommendations.push('Seguimiento para prevenir escalada de síntomas');
+            } else {
+                severity = 'Mínima o Subclínica';
+                recommendations.push('Síntomas obsesivo-compulsivos mínimos o subclínicos');
+                recommendations.push('Estrategias preventivas y educación sobre factores de riesgo');
+                recommendations.push('Monitoreo periódico especialmente en períodos de estrés');
+                recommendations.push('Técnicas de higiene mental y manejo del estrés');
+            }
+            
+            return { severity, recommendations };
+        }
+
+        function showResults() {
+            const results = calculateScore();
+            const interpretation = getInterpretation(results);
+            
+            document.getElementById('card-final').classList.remove('active');
+            document.getElementById('card-results').classList.add('active');
+            
+            let resultsHTML = `
+                <div class="results-section">
+                    <h3>📊 Resumen Ejecutivo</h3>
+                    <p><strong>Puntuación Total:</strong> ${results.totalScore} puntos</p>
+                    <p><strong>Severidad Global:</strong> ${interpretation.severity}</p>
+                    <p><strong>Dimensiones Evaluadas:</strong> ${results.numberOfDimensions}</p>
+                    <p><strong>Promedio de Severidad:</strong> ${results.globalSeverity.toFixed(1)}/10</p>
+                </div>
+            `;
+            
+            // Puntuaciones detalladas por dimensión
+            resultsHTML += '<div class="results-section"><h3>📋 Puntuaciones por Dimensión:</h3>';
+            Object.values(results.dimensionScores).forEach(dim => {
+                const alertClass = dim.total >= 10 ? 'alert-high' : dim.total >= 7 ? 'alert-medium' : '';
+                resultsHTML += `
+                    <div class="dimension-result ${alertClass}">
+                        <div class="dimension-score">${dim.name}: ${dim.total}/15 puntos</div>
+                        <small><strong>Desglose:</strong> Frecuencia: ${dim.frequency} | Malestar: ${dim.distress} | Interferencia: ${dim.interference}</small><br>
+                        <small><strong>Severidad Global:</strong> ${dim.global}/10 | <strong>Síntomas Actuales:</strong> ${dim.currentSymptoms}</small>
+                        ${dim.avoids ? `<br><small><strong>Evitación:</strong> ${dim.avoidanceText || 'Sí'}</small>` : ''}
+                    </div>
+                `;
+            });
+            resultsHTML += '</div>';
+            
+            // Alertas clínicas
+            if (results.alerts.length > 0) {
+                resultsHTML += '<div class="results-section alert-high"><h3>⚠️ Alertas Clínicas Importantes:</h3>';
+                results.alerts.forEach(alert => {
+                    resultsHTML += `<p><strong>${alert.dimension}:</strong> ${alert.type} (${alert.score} puntos) - Requiere atención clínica prioritaria</p>`;
+                });
+                resultsHTML += '</div>';
+            }
+            
+            // Interpretación y recomendaciones
+            resultsHTML += '<div class="results-section"><h3>🎯 Interpretación Clínica:</h3>';
+            interpretation.recommendations.forEach(rec => {
+                resultsHTML += `<p>• ${rec}</p>`;
+            });
+            resultsHTML += '</div>';
+            
+            // Información técnica
+            resultsHTML += `
+                <div class="results-section">
+                    <h3>📋 Información Técnica:</h3>
+                    <p>• <strong>Escala:</strong> Dimensional Yale-Brown Obsessive-Compulsive Scale (DY-BOCS)</p>
+                    <p>• <strong>Versión:</strong> Completa estandarizada con todos los ítems originales</p>
+                    <p>• <strong>Rango por dimensión:</strong> 0-15 puntos (Frecuencia + Malestar + Interferencia)</p>
+                    <p>• <strong>Severidad global:</strong> 1-10 puntos por dimensión</p>
+                    <p>• <strong>Puntos de corte orientativos:</strong> 0-3 (Mínima), 4-7 (Leve), 8-11 (Moderada), 12-15 (Grave)</p>
+                    <p>• <strong>Validez:</strong> Escala validada internacionalmente para TOC</p>
+                    <p>• <strong>Fecha de evaluación:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+                    <p>• <strong>Tiempo de aplicación:</strong> Completo según protocolo estándar</p>
+                </div>
+            `;
+            
+            document.getElementById('results-content').innerHTML = resultsHTML;
+            updateBackButton();
+        }
+
+        function exportToPDF() {
+            window.print();
+        }
+
+        function exportToImage() {
+            html2canvas(document.getElementById('card-results')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `DY-BOCS_Completa_${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        function newAssessment() {
+            location.reload();
+        }
+
+        // Inicialización
+        updateProgress();
+        updateBackButton();
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>

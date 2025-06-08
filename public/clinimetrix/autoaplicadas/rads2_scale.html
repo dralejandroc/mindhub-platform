@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RADS-2 - Escala de Depresión para Adolescentes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #112F33;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(41, 169, 140, 0.1);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: #112F33;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: rgba(41, 169, 140, 0.2);
+            border-color: #29A98C;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #112F33;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .complete-btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .results-container {
+            margin-top: 20px;
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #112F33;
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: #29A98C;
+            margin-bottom: 10px;
+        }
+
+        .interpretation {
+            font-size: 16px;
+            color: #112F33;
+            line-height: 1.5;
+        }
+
+        .alert-high {
+            background: #f56565;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .alert-medium {
+            background: #f6ad55;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .alert-low {
+            background: #48bb78;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            flex: 1;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .option {
+                font-size: 14px;
+                padding: 14px 16px;
+            }
+
+            .back-btn {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="header">
+                <h1>RADS-2</h1>
+                <p>Escala de Depresión para Adolescentes - Segunda Edición</p>
+            </div>
+            <div class="instructions">
+                <p><strong>Instrucciones:</strong></p>
+                <p>A continuación encontrarás una serie de frases que describen cómo te puedes sentir. Lee cada frase cuidadosamente y selecciona la opción que mejor describe cómo te has sentido <strong>en las últimas dos semanas</strong>.</p>
+                <br>
+                <p>Las opciones son:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Casi nunca:</strong> Prácticamente no me he sentido así</li>
+                    <li><strong>Pocas veces:</strong> Me he sentido así algunas pocas veces</li>
+                    <li><strong>A veces:</strong> Me he sentido así de vez en cuando</li>
+                    <li><strong>La mayoría del tiempo:</strong> Me he sentido así frecuentemente</li>
+                </ul>
+                <br>
+                <p>No hay respuestas correctas o incorrectas. Es importante que respondas con honestidad cómo realmente te has sentido.</p>
+            </div>
+            <button class="complete-btn" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Card 1-30: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">Pregunta 1 de 30</div>
+            <div class="question-text">Me siento triste.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(1, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(1, 3)">A veces</div>
+                <div class="option" onclick="selectOption(1, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">Pregunta 2 de 30</div>
+            <div class="question-text">Me preocupo por las cosas que van mal.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(2, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(2, 3)">A veces</div>
+                <div class="option" onclick="selectOption(2, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">Pregunta 3 de 30</div>
+            <div class="question-text">Siento que quiero llorar.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(3, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(3, 3)">A veces</div>
+                <div class="option" onclick="selectOption(3, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">Pregunta 4 de 30</div>
+            <div class="question-text">Tengo problemas para dormir por la noche.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(4, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(4, 3)">A veces</div>
+                <div class="option" onclick="selectOption(4, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">Pregunta 5 de 30</div>
+            <div class="question-text">Siento que no vale la pena vivir.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(5, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(5, 3)">A veces</div>
+                <div class="option" onclick="selectOption(5, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">Pregunta 6 de 30</div>
+            <div class="question-text">Siento que soy una mala persona.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(6, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(6, 3)">A veces</div>
+                <div class="option" onclick="selectOption(6, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">Pregunta 7 de 30</div>
+            <div class="question-text">Me siento solo/a.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(7, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(7, 3)">A veces</div>
+                <div class="option" onclick="selectOption(7, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">Pregunta 8 de 30</div>
+            <div class="question-text">Me gusta salir con mis amigos.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 4)">Casi nunca</div>
+                <div class="option" onclick="selectOption(8, 3)">Pocas veces</div>
+                <div class="option" onclick="selectOption(8, 2)">A veces</div>
+                <div class="option" onclick="selectOption(8, 1)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">Pregunta 9 de 30</div>
+            <div class="question-text">Quiero hacerme daño a mí mismo/a.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(9, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(9, 3)">A veces</div>
+                <div class="option" onclick="selectOption(9, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">Pregunta 10 de 30</div>
+            <div class="question-text">Tengo problemas para concentrarme.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(10, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(10, 3)">A veces</div>
+                <div class="option" onclick="selectOption(10, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">Pregunta 11 de 30</div>
+            <div class="question-text">Me siento cansado/a.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(11, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(11, 3)">A veces</div>
+                <div class="option" onclick="selectOption(11, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">Pregunta 12 de 30</div>
+            <div class="question-text">Creo que nadie me quiere.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(12, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(12, 3)">A veces</div>
+                <div class="option" onclick="selectOption(12, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">Pregunta 13 de 30</div>
+            <div class="question-text">No me gusta estar con otras personas.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(13, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(13, 3)">A veces</div>
+                <div class="option" onclick="selectOption(13, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">Pregunta 14 de 30</div>
+            <div class="question-text">Tengo ganas de huir.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(14, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(14, 3)">A veces</div>
+                <div class="option" onclick="selectOption(14, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">Pregunta 15 de 30</div>
+            <div class="question-text">Tengo dolores y malestares.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(15, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(15, 3)">A veces</div>
+                <div class="option" onclick="selectOption(15, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">Pregunta 16 de 30</div>
+            <div class="question-text">Me siento aburrido/a.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(16, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(16, 3)">A veces</div>
+                <div class="option" onclick="selectOption(16, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">Pregunta 17 de 30</div>
+            <div class="question-text">Me gusta comer.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 4)">Casi nunca</div>
+                <div class="option" onclick="selectOption(17, 3)">Pocas veces</div>
+                <div class="option" onclick="selectOption(17, 2)">A veces</div>
+                <div class="option" onclick="selectOption(17, 1)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">Pregunta 18 de 30</div>
+            <div class="question-text">Me preocupa cómo me veo.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(18, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(18, 3)">A veces</div>
+                <div class="option" onclick="selectOption(18, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">Pregunta 19 de 30</div>
+            <div class="question-text">Tengo que esforzarme para hacer las cosas.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(19, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(19, 3)">A veces</div>
+                <div class="option" onclick="selectOption(19, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">Pregunta 20 de 30</div>
+            <div class="question-text">Siento que no soy tan bueno/a como otros adolescentes.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(20, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(20, 3)">A veces</div>
+                <div class="option" onclick="selectOption(20, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-number">Pregunta 21 de 30</div>
+            <div class="question-text">Siento que todo es mi culpa.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(21, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(21, 3)">A veces</div>
+                <div class="option" onclick="selectOption(21, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-number">Pregunta 22 de 30</div>
+            <div class="question-text">No tengo apetito.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(22, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(22, 3)">A veces</div>
+                <div class="option" onclick="selectOption(22, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="question-number">Pregunta 23 de 30</div>
+            <div class="question-text">Duermo bien por la noche.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(23, 4)">Casi nunca</div>
+                <div class="option" onclick="selectOption(23, 3)">Pocas veces</div>
+                <div class="option" onclick="selectOption(23, 2)">A veces</div>
+                <div class="option" onclick="selectOption(23, 1)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-24">
+            <div class="question-number">Pregunta 24 de 30</div>
+            <div class="question-text">Disfruto de las cosas que hago.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(24, 4)">Casi nunca</div>
+                <div class="option" onclick="selectOption(24, 3)">Pocas veces</div>
+                <div class="option" onclick="selectOption(24, 2)">A veces</div>
+                <div class="option" onclick="selectOption(24, 1)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="question-number">Pregunta 25 de 30</div>
+            <div class="question-text">Tengo dolores de cabeza.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(25, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(25, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(25, 3)">A veces</div>
+                <div class="option" onclick="selectOption(25, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="question-number">Pregunta 26 de 30</div>
+            <div class="question-text">Me siento bien conmigo mismo/a.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(26, 4)">Casi nunca</div>
+                <div class="option" onclick="selectOption(26, 3)">Pocas veces</div>
+                <div class="option" onclick="selectOption(26, 2)">A veces</div>
+                <div class="option" onclick="selectOption(26, 1)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-27">
+            <div class="question-number">Pregunta 27 de 30</div>
+            <div class="question-text">Creo que mi vida va mal.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(27, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(27, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(27, 3)">A veces</div>
+                <div class="option" onclick="selectOption(27, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-28">
+            <div class="question-number">Pregunta 28 de 30</div>
+            <div class="question-text">Tengo problemas de estómago.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(28, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(28, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(28, 3)">A veces</div>
+                <div class="option" onclick="selectOption(28, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-29">
+            <div class="question-number">Pregunta 29 de 30</div>
+            <div class="question-text">Tengo tan poca energía que no puedo hacer las cosas.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(29, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(29, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(29, 3)">A veces</div>
+                <div class="option" onclick="selectOption(29, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-30">
+            <div class="question-number">Pregunta 30 de 30</div>
+            <div class="question-text">Creo que soy feo/a.</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(30, 1)">Casi nunca</div>
+                <div class="option" onclick="selectOption(30, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(30, 3)">A veces</div>
+                <div class="option" onclick="selectOption(30, 4)">La mayoría del tiempo</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="header">
+                <h1>Evaluación Completada</h1>
+                <p>¡Gracias por completar la escala!</p>
+            </div>
+            <div class="instructions">
+                <p>Has completado exitosamente la Escala de Depresión para Adolescentes RADS-2.</p>
+                <br>
+                <p><strong>Por favor, entrega el dispositivo a tu médico o profesional de la salud mental para la revisión de los resultados.</strong></p>
+                <br>
+                <p>Los resultados de esta evaluación deben ser interpretados por un profesional calificado en el contexto de una evaluación clínica completa.</p>
+            </div>
+            <button class="complete-btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <div class="header">
+                <h1>Resultados RADS-2</h1>
+                <p>Interpretación Clínica Profesional</p>
+            </div>
+            
+            <div class="results-container">
+                <div class="result-section">
+                    <div class="result-title">Puntuación Total de Depresión</div>
+                    <div class="score-display" id="total-score">--</div>
+                    <div class="interpretation" id="total-interpretation">--</div>
+                </div>
+
+                <div class="result-section">
+                    <div class="result-title">Subescalas</div>
+                    <div id="subscales-container">
+                        <div style="margin-bottom: 15px;">
+                            <strong>Estado de Ánimo Disfórico:</strong> <span id="dysphoric-score">--</span>
+                            <div id="dysphoric-interpretation" style="font-size: 14px; color: #666; margin-top: 5px;">--</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Anhedonia/Afecto Negativo:</strong> <span id="anhedonia-score">--</span>
+                            <div id="anhedonia-interpretation" style="font-size: 14px; color: #666; margin-top: 5px;">--</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Autoevaluación Negativa:</strong> <span id="negative-score">--</span>
+                            <div id="negative-interpretation" style="font-size: 14px; color: #666; margin-top: 5px;">--</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Quejas Somáticas:</strong> <span id="somatic-score">--</span>
+                            <div id="somatic-interpretation" style="font-size: 14px; color: #666; margin-top: 5px;">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <div class="result-title">Ítems Críticos y Alertas</div>
+                    <div id="alerts-container">
+                        <!-- Las alertas se generarán dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <div class="result-title">Recomendaciones Clínicas</div>
+                    <div class="interpretation" id="clinical-recommendations">--</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="action-btn" onclick="generatePDF()">Generar PDF</button>
+                <button class="action-btn" onclick="captureScreen()">Captura</button>
+                <button class="action-btn" onclick="newEvaluation()">Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="back-btn" onclick="previousCard()">← Regresar</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 30;
+
+        // Configuración de subescalas según RADS-2
+        const subscales = {
+            dysphoric: [1, 3, 7, 13, 16, 21, 27], // Estado de Ánimo Disfórico
+            anhedonia: [8, 17, 24, 26], // Anhedonia/Afecto Negativo (ítems inversos)
+            negative: [5, 6, 9, 12, 14, 18, 20, 30], // Autoevaluación Negativa
+            somatic: [4, 10, 11, 15, 19, 22, 23, 25, 28, 29, 2] // Quejas Somáticas
+        };
+
+        // Ítems críticos identificados en la literatura
+        const criticalItems = [5, 9, 12, 14, 20, 21];
+
+        function updateProgress() {
+            const progress = (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard === 0 || currentCard === totalQuestions + 1 || currentCard === totalQuestions + 2) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.style.display = 'block';
+            }
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const targetCard = document.getElementById(`card-${cardNumber}`);
+            if (targetCard) {
+                targetCard.classList.add('active');
+            }
+            
+            updateProgress();
+            updateBackButton();
+        }
+
+        function nextCard() {
+            if (currentCard < totalQuestions + 2) {
+                currentCard++;
+                showCard(currentCard);
+            }
+        }
+
+        function previousCard() {
+            if (currentCard > 1) {
+                currentCard--;
+                showCard(currentCard);
+            }
+        }
+
+        function selectOption(questionNumber, value) {
+            responses[questionNumber] = value;
+            
+            // Marcar opción seleccionada
+            const currentCardElement = document.getElementById(`card-${questionNumber}`);
+            const options = currentCardElement.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                if (questionNumber < totalQuestions) {
+                    nextCard();
+                } else {
+                    // Última pregunta, ir a card-final
+                    currentCard = totalQuestions + 1;
+                    showCard('final');
+                }
+            }, 150);
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let subscaleScores = {
+                dysphoric: 0,
+                anhedonia: 0,
+                negative: 0,
+                somatic: 0
+            };
+
+            // Calcular puntuaciones
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (responses[i]) {
+                    totalScore += responses[i];
+                    
+                    // Calcular subescalas
+                    Object.keys(subscales).forEach(subscale => {
+                        if (subscales[subscale].includes(i)) {
+                            subscaleScores[subscale] += responses[i];
+                        }
+                    });
+                }
+            }
+
+            return { totalScore, subscaleScores };
+        }
+
+        function getInterpretation(totalScore) {
+            // Puntos de corte basados en la literatura (T-score 61 = raw score 76)
+            if (totalScore >= 76) {
+                return {
+                    level: "Severo",
+                    description: "Síntomas depresivos clínicamente significativos. Se recomienda evaluación y tratamiento inmediato por profesional de salud mental.",
+                    class: "alert-high"
+                };
+            } else if (totalScore >= 61) {
+                return {
+                    level: "Moderado",
+                    description: "Síntomas depresivos moderados que requieren atención profesional. Se recomienda evaluación clínica.",
+                    class: "alert-medium"
+                };
+            } else if (totalScore >= 46) {
+                return {
+                    level: "Leve",
+                    description: "Síntomas depresivos leves. Se sugiere monitoreo y consideración de apoyo profesional.",
+                    class: "alert-medium"
+                };
+            } else {
+                return {
+                    level: "Normal",
+                    description: "Puntuación dentro del rango normal. No se observan síntomas depresivos significativos.",
+                    class: "alert-low"
+                };
+            }
+        }
+
+        function getSubscaleInterpretation(score, maxScore) {
+            const percentage = (score / maxScore) * 100;
+            if (percentage >= 75) return "Elevado";
+            if (percentage >= 50) return "Moderado";
+            if (percentage >= 25) return "Leve";
+            return "Bajo";
+        }
+
+        function checkCriticalItems() {
+            let alerts = [];
+            
+            criticalItems.forEach(item => {
+                if (responses[item] >= 3) { // 66% del máximo (4 puntos)
+                    let itemText = "";
+                    switch(item) {
+                        case 5: itemText = "Ideación de falta de valor de la vida"; break;
+                        case 9: itemText = "Pensamientos de autolesión"; break;
+                        case 12: itemText = "Sentimientos de rechazo"; break;
+                        case 14: itemText = "Impulsos de escape"; break;
+                        case 20: itemText = "Baja autoestima comparativa"; break;
+                        case 21: itemText = "Autoculpabilización excesiva"; break;
+                    }
+                    alerts.push({
+                        item: item,
+                        text: itemText,
+                        score: responses[item],
+                        severity: responses[item] === 4 ? "alta" : "media"
+                    });
+                }
+            });
+
+            return alerts;
+        }
+
+        function showResults() {
+            const { totalScore, subscaleScores } = calculateScore();
+            const interpretation = getInterpretation(totalScore);
+            const alerts = checkCriticalItems();
+
+            // Mostrar puntuación total
+            document.getElementById('total-score').textContent = totalScore;
+            document.getElementById('total-interpretation').innerHTML = `
+                <div class="${interpretation.class}">
+                    <strong>Nivel: ${interpretation.level}</strong><br>
+                    ${interpretation.description}
+                </div>
+            `;
+
+            // Mostrar subescalas
+            const maxScores = {
+                dysphoric: 7 * 4, // 7 ítems × 4 puntos máximo
+                anhedonia: 4 * 4, // 4 ítems × 4 puntos máximo
+                negative: 8 * 4, // 8 ítems × 4 puntos máximo
+                somatic: 11 * 4  // 11 ítems × 4 puntos máximo
+            };
+
+            document.getElementById('dysphoric-score').textContent = `${subscaleScores.dysphoric}/${maxScores.dysphoric}`;
+            document.getElementById('dysphoric-interpretation').textContent = getSubscaleInterpretation(subscaleScores.dysphoric, maxScores.dysphoric);
+
+            document.getElementById('anhedonia-score').textContent = `${subscaleScores.anhedonia}/${maxScores.anhedonia}`;
+            document.getElementById('anhedonia-interpretation').textContent = getSubscaleInterpretation(subscaleScores.anhedonia, maxScores.anhedonia);
+
+            document.getElementById('negative-score').textContent = `${subscaleScores.negative}/${maxScores.negative}`;
+            document.getElementById('negative-interpretation').textContent = getSubscaleInterpretation(subscaleScores.negative, maxScores.negative);
+
+            document.getElementById('somatic-score').textContent = `${subscaleScores.somatic}/${maxScores.somatic}`;
+            document.getElementById('somatic-interpretation').textContent = getSubscaleInterpretation(subscaleScores.somatic, maxScores.somatic);
+
+            // Mostrar alertas
+            const alertsContainer = document.getElementById('alerts-container');
+            if (alerts.length > 0) {
+                let alertsHTML = "";
+                alerts.forEach(alert => {
+                    const alertClass = alert.severity === "alta" ? "alert-high" : "alert-medium";
+                    alertsHTML += `
+                        <div class="${alertClass}">
+                            <strong>ATENCIÓN:</strong> Ítem ${alert.item} - ${alert.text} (Puntuación: ${alert.score}/4)
+                        </div>
+                    `;
+                });
+                alertsContainer.innerHTML = alertsHTML;
+            } else {
+                alertsContainer.innerHTML = '<div class="alert-low">No se identificaron ítems críticos elevados.</div>';
+            }
+
+            // Recomendaciones clínicas
+            let recommendations = "";
+            if (totalScore >= 76) {
+                recommendations = `
+                    <strong>Recomendaciones Urgentes:</strong><br>
+                    • Evaluación psiquiátrica inmediata<br>
+                    • Evaluación de riesgo suicida<br>
+                    • Consideración de tratamiento farmacológico<br>
+                    • Psicoterapia especializada<br>
+                    • Seguimiento intensivo<br>
+                    • Involucrar sistema de apoyo familiar
+                `;
+            } else if (totalScore >= 61) {
+                recommendations = `
+                    <strong>Recomendaciones Clínicas:</strong><br>
+                    • Evaluación clínica completa<br>
+                    • Psicoterapia cognitivo-conductual<br>
+                    • Monitoreo regular de síntomas<br>
+                    • Evaluación de factores de riesgo<br>
+                    • Apoyo familiar y psicoeducación
+                `;
+            } else if (totalScore >= 46) {
+                recommendations = `
+                    <strong>Recomendaciones Preventivas:</strong><br>
+                    • Monitoreo periódico<br>
+                    • Técnicas de manejo del estrés<br>
+                    • Actividades de autocuidado<br>
+                    • Fortalecimiento de red de apoyo<br>
+                    • Reevaluación en 4-6 semanas
+                `;
+            } else {
+                recommendations = `
+                    <strong>Recomendaciones Generales:</strong><br>
+                    • Mantener hábitos saludables<br>
+                    • Continuar actividades sociales<br>
+                    • Técnicas de prevención de depresión<br>
+                    • Reevaluación si aparecen síntomas
+                `;
+            }
+
+            document.getElementById('clinical-recommendations').innerHTML = recommendations;
+
+            // Mostrar card de resultados
+            currentCard = totalQuestions + 2;
+            showCard('results');
+        }
+
+        function generatePDF() {
+            const results = document.getElementById('card-results');
+            const { totalScore, subscaleScores } = calculateScore();
+            const interpretation = getInterpretation(totalScore);
+            const alerts = checkCriticalItems();
+            const fecha = new Date().toLocaleDateString('es-ES');
+            const hora = new Date().toLocaleTimeString('es-ES');
+            
+            // Crear ventana de impresión
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Resultados RADS-2 - ${fecha}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #29A98C; padding-bottom: 20px; }
+                        .header h1 { color: #29A98C; margin-bottom: 10px; font-size: 28px; }
+                        .header p { color: #666; margin: 5px 0; }
+                        .score-display { background: #29A98C; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+                        .score-display h2 { font-size: 2.5em; margin: 0; }
+                        .score-display p { margin: 10px 0 0 0; font-size: 1.2em; }
+                        .result-section { margin: 20px 0; padding: 15px; border-left: 4px solid #29A98C; background: #f8f9fa; }
+                        .result-section h3 { color: #112F33; margin-bottom: 15px; }
+                        .subscale-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+                        .subscale-score { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #29A98C; }
+                        .subscale-score h4 { color: #112F33; margin-bottom: 10px; font-size: 14px; }
+                        .subscale-score .score { font-size: 18px; font-weight: bold; color: #29A98C; }
+                        .subscale-score .level { font-size: 12px; color: #666; margin-top: 5px; }
+                        .alert-section { background: #ffe5e5; border: 1px solid #f56565; padding: 15px; margin: 15px 0; border-radius: 8px; }
+                        .alert-section h4 { color: #742a2a; margin-bottom: 10px; }
+                        .alert-item { background: #f56565; color: white; padding: 10px; margin: 5px 0; border-radius: 5px; }
+                        .level-indicator { padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9em; color: white; }
+                        .level-normal { background: #48bb78; }
+                        .level-leve { background: #f6ad55; }
+                        .level-moderado { background: #ed8936; }
+                        .level-severo { background: #f56565; }
+                        .recommendations { background: #FFF8EE; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                        .recommendations h4 { color: #112F33; margin-bottom: 10px; }
+                        .recommendations ul { margin: 10px 0; padding-left: 20px; }
+                        .recommendations li { margin: 5px 0; }
+                        .technical-info { background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #29A98C; }
+                        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; }
+                        @media print {
+                            body { margin: 0; }
+                            .header { page-break-after: avoid; }
+                            .subscale-scores { grid-template-columns: 1fr; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>RADS-2</h1>
+                        <p><strong>Escala de Depresión para Adolescentes - Segunda Edición</strong></p>
+                        <p>Fecha: ${fecha} - Hora: ${hora}</p>
+                    </div>
+
+                    <div class="score-display">
+                        <h2>${totalScore}/120</h2>
+                        <p>Puntuación Total de Depresión</p>
+                    </div>
+
+                    <div class="result-section">
+                        <h3>Interpretación Clínica</h3>
+                        <p><strong>Nivel de Severidad:</strong> <span class="level-indicator level-${interpretation.level.toLowerCase()}">${interpretation.level}</span></p>
+                        <p><strong>Descripción:</strong> ${interpretation.description.replace(/<[^>]*>/g, '')}</p>
+                    </div>
+
+                    <div class="result-section">
+                        <h3>Puntuaciones por Subescalas</h3>
+                        <div class="subscale-scores">
+                            <div class="subscale-score">
+                                <h4>Estado de Ánimo Disfórico</h4>
+                                <div class="score">${subscaleScores.dysphoric}/28</div>
+                                <div class="level">${getSubscaleInterpretation(subscaleScores.dysphoric, 28)}</div>
+                            </div>
+                            <div class="subscale-score">
+                                <h4>Anhedonia/Afecto Negativo</h4>
+                                <div class="score">${subscaleScores.anhedonia}/16</div>
+                                <div class="level">${getSubscaleInterpretation(subscaleScores.anhedonia, 16)}</div>
+                            </div>
+                            <div class="subscale-score">
+                                <h4>Autoevaluación Negativa</h4>
+                                <div class="score">${subscaleScores.negative}/32</div>
+                                <div class="level">${getSubscaleInterpretation(subscaleScores.negative, 32)}</div>
+                            </div>
+                            <div class="subscale-score">
+                                <h4>Quejas Somáticas</h4>
+                                <div class="score">${subscaleScores.somatic}/44</div>
+                                <div class="level">${getSubscaleInterpretation(subscaleScores.somatic, 44)}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${alerts.length > 0 ? `
+                    <div class="alert-section">
+                        <h4>⚠️ Ítems Críticos Identificados</h4>
+                        ${alerts.map(alert => `
+                            <div class="alert-item">
+                                <strong>Ítem ${alert.item}:</strong> ${alert.text} (Puntuación: ${alert.score}/4)
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : '<div class="alert-section"><h4>✅ No se identificaron ítems críticos elevados</h4></div>'}
+
+                    <div class="recommendations">
+                        <h4>Recomendaciones Clínicas</h4>
+                        ${document.getElementById('clinical-recommendations').innerHTML}
+                    </div>
+
+                    <div class="technical-info">
+                        <h4>Información Técnica</h4>
+                        <ul>
+                            <li><strong>Instrumento:</strong> Reynolds Adolescent Depression Scale - Segunda Edición (RADS-2)</li>
+                            <li><strong>Autor:</strong> William M. Reynolds, PhD</li>
+                            <li><strong>Puntos de corte:</strong> Normal (&lt;46), Leve (46-60), Moderado (61-75), Severo (≥76)</li>
+                            <li><strong>Punto de corte clínico:</strong> T-score ≥61 (Raw score ≥76)</li>
+                            <li><strong>Sensibilidad:</strong> 91% | <strong>Especificidad:</strong> 84%</li>
+                            <li><strong>Población objetivo:</strong> Adolescentes de 11 a 20 años</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer">
+                        <p><strong>IMPORTANTE:</strong> Esta evaluación debe ser interpretada por un profesional de la salud mental calificado.</p>
+                        <p>Los resultados deben considerarse en el contexto de una evaluación clínica completa.</p>
+                        <p>Generado automáticamente por el sistema RADS-2 - ${fecha} ${hora}</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // Esperar a que cargue y luego imprimir
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+
+        function captureScreen() {
+            // Simular captura de pantalla
+            const resultsCard = document.getElementById('card-results');
+            const { totalScore, subscaleScores } = calculateScore();
+            const interpretation = getInterpretation(totalScore);
+            const fecha = new Date().toLocaleDateString('es-ES');
+            const hora = new Date().toLocaleTimeString('es-ES');
+            
+            // Método alternativo: crear canvas temporal
+            try {
+                // Crear un elemento temporal para mostrar
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = `
+                    position: fixed; top: -9999px; left: -9999px; 
+                    background: white; padding: 20px; 
+                    font-family: Arial, sans-serif; width: 800px;
+                    border: 1px solid #ddd; border-radius: 10px;
+                `;
+                
+                tempDiv.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #29A98C; padding-bottom: 20px;">
+                        <h1 style="color: #29A98C; margin-bottom: 10px;">RADS-2 - Resultados</h1>
+                        <p style="color: #666;">Escala de Depresión para Adolescentes</p>
+                        <p style="color: #666;">Fecha: ${fecha} - Hora: ${hora}</p>
+                    </div>
+                    
+                    <div style="background: #29A98C; color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                        <h2 style="font-size: 2.5em; margin: 0;">${totalScore}/120</h2>
+                        <p style="margin: 10px 0 0 0;">Puntuación Total</p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #29A98C; margin: 20px 0;">
+                        <h3 style="color: #112F33;">Interpretación: ${interpretation.level.toUpperCase()}</h3>
+                        <p>${interpretation.description.replace(/<[^>]*>/g, '')}</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h4 style="color: #112F33; margin-bottom: 10px;">Estado de Ánimo Disfórico</h4>
+                            <div style="font-size: 18px; font-weight: bold; color: #29A98C;">${subscaleScores.dysphoric}/28</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h4 style="color: #112F33; margin-bottom: 10px;">Anhedonia/Afecto Negativo</h4>
+                            <div style="font-size: 18px; font-weight: bold; color: #29A98C;">${subscaleScores.anhedonia}/16</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h4 style="color: #112F33; margin-bottom: 10px;">Autoevaluación Negativa</h4>
+                            <div style="font-size: 18px; font-weight: bold; color: #29A98C;">${subscaleScores.negative}/32</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h4 style="color: #112F33; margin-bottom: 10px;">Quejas Somáticas</h4>
+                            <div style="font-size: 18px; font-weight: bold; color: #29A98C;">${subscaleScores.somatic}/44</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px; color: #666; font-size: 12px;">
+                        <p><strong>RADS-2</strong> - Reynolds Adolescent Depression Scale, 2nd Edition</p>
+                        <p>Evaluación debe ser interpretada por profesional calificado</p>
+                    </div>
+                `;
+                
+                document.body.appendChild(tempDiv);
+                
+                // En un entorno real, aquí usaríamos html2canvas
+                alert('📸 Captura de resultados lista.\n\nEn un entorno de producción, esto generaría una imagen PNG/JPG de alta calidad con todos los resultados de la evaluación RADS-2.\n\nLa imagen incluiría:\n• Puntuación total y nivel de severidad\n• Puntuaciones por subescalas\n• Interpretación clínica\n• Fecha y hora de evaluación');
+                
+                document.body.removeChild(tempDiv);
+                
+            } catch (error) {
+                alert('Error al capturar imagen. Funcionalidad disponible en entorno de producción con html2canvas.');
+            }
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                currentCard = 0;
+                responses = {};
+                showCard(0);
+                
+                // Limpiar selecciones
+                document.querySelectorAll('.option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+            }
+        }
+
+        // Inicialización
+        updateProgress();
+        updateBackButton();
+    </script>
+</body>
+</html>

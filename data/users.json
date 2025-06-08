@@ -1,0 +1,26 @@
+[
+  {
+    "id": "test_admin_1749403414612",
+    "email": "admin@mindhub.com",
+    "password": "admin123",
+    "nombre": "Admin",
+    "apellido": "Sistema",
+    "institucion": "MindHub",
+    "role": "admin",
+    "createdAt": "2025-06-08T17:23:34.612Z",
+    "lastLogin": null,
+    "isActive": true
+  },
+  {
+    "id": "test_user_1749403414613",
+    "email": "usuario@test.com",
+    "password": "user123",
+    "nombre": "Usuario",
+    "apellido": "Prueba",
+    "institucion": "Hospital Test",
+    "role": "free",
+    "createdAt": "2025-06-08T17:23:34.613Z",
+    "lastLogin": null,
+    "isActive": true
+  }
+]

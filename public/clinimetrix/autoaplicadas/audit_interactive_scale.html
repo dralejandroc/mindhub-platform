@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AUDIT - Identificación de Trastornos por Consumo de Alcohol</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .card {
+            background: rgba(255, 248, 238, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(17, 47, 51, 0.37);
+            border: 1px solid rgba(41, 169, 140, 0.18);
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card h1 {
+            color: #29A98C;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(17, 47, 51, 0.3);
+        }
+
+        .card h2 {
+            color: #29A98C;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(17, 47, 51, 0.3);
+        }
+
+        .card h3 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .card p, .card li {
+            color: #112F33;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .ube-info {
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #29A98C;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: #FFF8EE;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .option {
+            background: rgba(255, 248, 238, 0.3);
+            border: 2px solid rgba(41, 169, 140, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #112F33;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .option:hover {
+            background: rgba(41, 169, 140, 0.15);
+            border-color: rgba(41, 169, 140, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(41, 169, 140, 0.2);
+        }
+
+        .option.selected {
+            background: linear-gradient(45deg, #29A98C, #112F33);
+            border-color: #29A98C;
+            color: #FFF8EE;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(41, 169, 140, 0.4);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: #FFF8EE;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(17, 47, 51, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 47, 51, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 248, 238, 0.2);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .results-section {
+            background: rgba(255, 248, 238, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+            color: #29A98C;
+            text-shadow: 2px 2px 4px rgba(17, 47, 51, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .interpretation {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .low-risk {
+            background: rgba(41, 169, 140, 0.3);
+            color: #29A98C;
+            border: 2px solid #29A98C;
+        }
+
+        .medium-risk {
+            background: rgba(41, 169, 140, 0.2);
+            color: #112F33;
+            border: 2px solid #29A98C;
+        }
+
+        .high-risk {
+            background: rgba(236, 115, 103, 0.3);
+            color: #EC7367;
+            border: 2px solid #EC7367;
+        }
+
+        .subscale-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .subscale {
+            background: rgba(255, 248, 238, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .alert-item {
+            background: rgba(236, 115, 103, 0.2);
+            border: 1px solid #EC7367;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #EC7367;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100%;
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 25px;
+                border-radius: 15px;
+            }
+            
+            .card h1 {
+                font-size: 1.8em;
+            }
+            
+            .card h2 {
+                font-size: 1.5em;
+            }
+            
+            .option {
+                padding: 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>Test AUDIT</h1>
+            <h2>Identificación de Trastornos por Consumo de Alcohol</h2>
+            
+            <p>El Test AUDIT es un cuestionario desarrollado por la Organización Mundial de la Salud para identificar el consumo de riesgo, consumo perjudicial y dependencia del alcohol.</p>
+            
+            <div class="ube-info">
+                <h3>📋 Instrucciones Importantes:</h3>
+                <ul>
+                    <li><strong>Todas las preguntas se refieren al consumo en los últimos 12 meses</strong></li>
+                    <li>Una "consumición" equivale a una Unidad de Bebida Estándar (UBE):</li>
+                    <ul>
+                        <li>🍷 1 copa de vino (100-125ml)</li>
+                        <li>🍺 1 cerveza o caña (200-250ml)</li>
+                        <li>🥃 1/2 copa de destilados (whisky, ron, ginebra, etc.)</li>
+                    </ul>
+                    <li>Responda de manera honesta y reflexiva</li>
+                    <li>El cuestionario es completamente confidencial</li>
+                    <li>Tardará aproximadamente 2-3 minutos en completarlo</li>
+                </ul>
+            </div>
+            
+            <p>Este test le ayudará a usted y a su profesional de salud a evaluar su patrón de consumo de alcohol y identificar posibles riesgos para su salud.</p>
+            
+            <div class="center">
+                <button class="btn btn-success" onclick="startTest()">Comenzar Test</button>
+            </div>
+        </div>
+
+        <!-- Preguntas 1-10 -->
+        <div class="card" id="card-1">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 10%"></div>
+            </div>
+            <div class="question-number">1</div>
+            <h3>¿Con qué frecuencia consume alguna bebida alcohólica?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(1, 1)">Una o menos veces al mes</div>
+                <div class="option" onclick="selectOption(1, 2)">De 2 a 4 veces al mes</div>
+                <div class="option" onclick="selectOption(1, 3)">De 2 a 3 veces a la semana</div>
+                <div class="option" onclick="selectOption(1, 4)">Cuatro o más veces a la semana</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 20%"></div>
+            </div>
+            <div class="question-number">2</div>
+            <h3>¿Cuántas consumiciones de bebidas alcohólicas suele realizar en un día de consumo normal?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">1 o 2</div>
+                <div class="option" onclick="selectOption(2, 1)">3 o 4</div>
+                <div class="option" onclick="selectOption(2, 2)">5 o 6</div>
+                <div class="option" onclick="selectOption(2, 3)">De 7 a 9</div>
+                <div class="option" onclick="selectOption(2, 4)">10 o más</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 30%"></div>
+            </div>
+            <div class="question-number">3</div>
+            <h3>¿Con qué frecuencia toma 6 o más bebidas alcohólicas en una sola ocasión de consumo?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(3, 1)">Menos de una vez al mes</div>
+                <div class="option" onclick="selectOption(3, 2)">Mensualmente</div>
+                <div class="option" onclick="selectOption(3, 3)">Semanalmente</div>
+                <div class="option" onclick="selectOption(3, 4)">A diario o casi a diario</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 40%"></div>
+            </div>
+            <div class="question-number">4</div>
+            <h3>¿Con qué frecuencia en el curso del último año ha sido incapaz de parar de beber una vez había empezado?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(4, 1)">Menos de una vez al mes</div>
+                <div class="option" onclick="selectOption(4, 2)">Mensualmente</div>
+                <div class="option" onclick="selectOption(4, 3)">Semanalmente</div>
+                <div class="option" onclick="selectOption(4, 4)">A diario o casi a diario</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 50%"></div>
+            </div>
+            <div class="question-number">5</div>
+            <h3>¿Con qué frecuencia en el curso del último año no pudo hacer lo que se esperaba de usted porque había bebido?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(5, 1)">Menos de una vez al mes</div>
+                <div class="option" onclick="selectOption(5, 2)">Mensualmente</div>
+                <div class="option" onclick="selectOption(5, 3)">Semanalmente</div>
+                <div class="option" onclick="selectOption(5, 4)">A diario o casi a diario</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 60%"></div>
+            </div>
+            <div class="question-number">6</div>
+            <h3>¿Con qué frecuencia en el curso del último año ha necesitado beber en ayunas para recuperarse después de haber bebido mucho el día anterior?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(6, 1)">Menos de una vez al mes</div>
+                <div class="option" onclick="selectOption(6, 2)">Mensualmente</div>
+                <div class="option" onclick="selectOption(6, 3)">Semanalmente</div>
+                <div class="option" onclick="selectOption(6, 4)">A diario o casi a diario</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 70%"></div>
+            </div>
+            <div class="question-number">7</div>
+            <h3>¿Con qué frecuencia en el curso del último año ha tenido remordimientos o sentimientos de culpa después de haber bebido?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(7, 1)">Menos de una vez al mes</div>
+                <div class="option" onclick="selectOption(7, 2)">Mensualmente</div>
+                <div class="option" onclick="selectOption(7, 3)">Semanalmente</div>
+                <div class="option" onclick="selectOption(7, 4)">A diario o casi a diario</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 80%"></div>
+            </div>
+            <div class="question-number">8</div>
+            <h3>¿Con qué frecuencia en el curso del último año no ha podido recordar lo que sucedió la noche anterior porque había estado bebiendo?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(8, 1)">Menos de una vez al mes</div>
+                <div class="option" onclick="selectOption(8, 2)">Mensualmente</div>
+                <div class="option" onclick="selectOption(8, 3)">Semanalmente</div>
+                <div class="option" onclick="selectOption(8, 4)">A diario o casi a diario</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 90%"></div>
+            </div>
+            <div class="question-number">9</div>
+            <h3>¿Usted o alguna otra persona han resultado heridos porque usted había bebido?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">No</div>
+                <div class="option" onclick="selectOption(9, 2)">Sí, pero no en el curso del último año</div>
+                <div class="option" onclick="selectOption(9, 4)">Sí, el último año</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%"></div>
+            </div>
+            <div class="question-number">10</div>
+            <h3>¿Algún familiar, amigo, médico o profesional sanitario ha mostrado preocupación por su consumo de bebidas alcohólicas o le ha sugerido que deje de beber?</h3>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">No</div>
+                <div class="option" onclick="selectOption(10, 2)">Sí, pero no en el curso del último año</div>
+                <div class="option" onclick="selectOption(10, 4)">Sí, el último año</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h2>✅ Escala completada</h2>
+            <p>Muchas gracias por completar el Test AUDIT.</p>
+            <p>Por favor pase el dispositivo a su médico o profesional de salud mental para su revisión.</p>
+            <div class="center">
+                <button class="btn btn-success" onclick="showResults()">Revisar resultados (Médico)</button>
+            </div>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h1>📊 Resultados Test AUDIT</h1>
+            
+            <div class="results-section">
+                <div class="score-display" id="total-score">0</div>
+                <div class="interpretation" id="interpretation-level">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <div class="subscale-results">
+                <div class="subscale">
+                    <h3>🍺 Consumo de Alcohol (Ítems 1-3)</h3>
+                    <p><strong>Puntaje:</strong> <span id="consumption-score">0</span>/12</p>
+                    <p id="consumption-interpretation"></p>
+                </div>
+                
+                <div class="subscale">
+                    <h3>⚠️ Dependencia (Ítems 4-6)</h3>
+                    <p><strong>Puntaje:</strong> <span id="dependence-score">0</span>/12</p>
+                    <p id="dependence-interpretation"></p>
+                </div>
+                
+                <div class="subscale">
+                    <h3>🧠 Problemas Psicológicos (Ítems 7-8)</h3>
+                    <p><strong>Puntaje:</strong> <span id="psychological-score">0</span>/8</p>
+                    <p id="psychological-interpretation"></p>
+                </div>
+                
+                <div class="subscale">
+                    <h3>👥 Problemas Sociales (Ítems 9-10)</h3>
+                    <p><strong>Puntaje:</strong> <span id="social-score">0</span>/8</p>
+                    <p id="social-interpretation"></p>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h3>🔍 Interpretación Clínica</h3>
+                <div id="clinical-interpretation">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <div id="alerts-section">
+                <!-- Se llenará si hay alertas -->
+            </div>
+
+            <div class="results-section">
+                <h3>💡 Consideraciones para la Evaluación</h3>
+                <div id="clinical-considerations">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <div class="center">
+                <button class="btn btn-secondary" onclick="exportResults()">📄 Exportar Resultados</button>
+                <button class="btn btn-success" onclick="newScale()">🔄 Nueva Escala</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        let totalQuestions = 10;
+
+        function startTest() {
+            currentCard = 1;
+            showCard(currentCard);
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`card-${cardNumber}`).classList.add('active');
+        }
+
+        function selectOption(questionNumber, value) {
+            responses[questionNumber] = value;
+            
+            // Marcar la opción seleccionada
+            const card = document.getElementById(`card-${questionNumber}`);
+            const options = card.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                if (questionNumber < totalQuestions) {
+                    currentCard = questionNumber + 1;
+                    showCard(currentCard);
+                } else {
+                    showCard('final');
+                }
+            }, 150);
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let consumptionScore = 0;
+            let dependenceScore = 0;
+            let psychologicalScore = 0;
+            let socialScore = 0;
+
+            // Calcular puntajes por subescala
+            for (let i = 1; i <= 10; i++) {
+                const score = responses[i] || 0;
+                totalScore += score;
+                
+                if (i >= 1 && i <= 3) {
+                    consumptionScore += score;
+                } else if (i >= 4 && i <= 6) {
+                    dependenceScore += score;
+                } else if (i >= 7 && i <= 8) {
+                    psychologicalScore += score;
+                } else if (i >= 9 && i <= 10) {
+                    socialScore += score;
+                }
+            }
+
+            return {
+                total: totalScore,
+                consumption: consumptionScore,
+                dependence: dependenceScore,
+                psychological: psychologicalScore,
+                social: socialScore
+            };
+        }
+
+        function getInterpretation(scores) {
+            let level, levelClass, description, clinicalInterpretation, considerations;
+
+            if (scores.total <= 7) {
+                level = "Consumo de Bajo Riesgo";
+                levelClass = "low-risk";
+                description = "El patrón de consumo actual presenta mínimo riesgo para la salud";
+                clinicalInterpretation = "El paciente presenta un patrón de consumo que no sugiere problemas relacionados con el alcohol. Los resultados indican que el consumo actual no constituye un factor de riesgo significativo para el desarrollo de trastornos por uso de alcohol.";
+                considerations = [
+                    "Mantener estrategias de consumo responsable",
+                    "Continuar con pautas de prevención primaria",
+                    "Aprovechar para reforzar hábitos saludables"
+                ];
+            } else if (scores.total <= 14) {
+                level = "Consumo de Riesgo";
+                levelClass = "medium-risk";
+                description = "El patrón de consumo presenta riesgo para la salud y requiere intervención";
+                clinicalInterpretation = "Los resultados sugieren un patrón de consumo que incrementa el riesgo de desarrollar problemas relacionados con el alcohol. Se recomienda intervención breve para reducir el consumo y prevenir la progresión hacia patrones más problemáticos.";
+                considerations = [
+                    "Implementar intervención breve estructurada",
+                    "Establecer objetivos de reducción del consumo",
+                    "Seguimiento en 1-3 meses para evaluar evolución",
+                    "Educación sobre límites de consumo de bajo riesgo"
+                ];
+            } else {
+                level = "Consumo Problemático";
+                levelClass = "high-risk";
+                description = "Probable trastorno por uso de alcohol - Requiere evaluación especializada";
+                clinicalInterpretation = "Los resultados indican un patrón de consumo altamente problemático que sugiere la posible presencia de un trastorno por uso de alcohol. Se requiere evaluación diagnóstica integral y consideración de derivación a servicios especializados en adicciones.";
+                considerations = [
+                    "Realizar evaluación diagnóstica completa (DSM-5/CIE-11)",
+                    "Considerar derivación a especialista en adicciones",
+                    "Evaluar necesidad de desintoxicación médica supervisada",
+                    "Implementar plan de tratamiento individualizado",
+                    "Considerar intervenciones farmacológicas si está indicado"
+                ];
+            }
+
+            return { level, levelClass, description, clinicalInterpretation, considerations };
+        }
+
+        function getSubscaleInterpretations(scores) {
+            const interpretations = {};
+
+            // Consumo
+            if (scores.consumption <= 3) {
+                interpretations.consumption = "Frecuencia y cantidad de consumo dentro de parámetros de bajo riesgo";
+            } else if (scores.consumption <= 6) {
+                interpretations.consumption = "Patrón de consumo que sugiere riesgo moderado. Considerar estrategias de reducción";
+            } else {
+                interpretations.consumption = "Patrón de consumo de alto riesgo con frecuencia y/o cantidad elevada";
+            }
+
+            // Dependencia
+            if (scores.dependence === 0) {
+                interpretations.dependence = "No se evidencian síntomas de dependencia física o psicológica";
+            } else if (scores.dependence <= 3) {
+                interpretations.dependence = "Síntomas leves de dependencia. Monitorizar evolución";
+            } else {
+                interpretations.dependence = "Síntomas significativos de dependencia. Requiere intervención específica";
+            }
+
+            // Problemas psicológicos
+            if (scores.psychological === 0) {
+                interpretations.psychological = "No se reportan consecuencias psicológicas negativas";
+            } else if (scores.psychological <= 2) {
+                interpretations.psychological = "Consecuencias psicológicas leves asociadas al consumo";
+            } else {
+                interpretations.psychological = "Consecuencias psicológicas significativas (culpa, lagunas de memoria)";
+            }
+
+            // Problemas sociales
+            if (scores.social === 0) {
+                interpretations.social = "No se reportan lesiones ni preocupación social";
+            } else {
+                interpretations.social = "Presencia de consecuencias sociales graves (lesiones, preocupación familiar/profesional)";
+            }
+
+            return interpretations;
+        }
+
+        function getAlerts(scores) {
+            const alerts = [];
+
+            // Alertas específicas basadas en literatura
+            if (responses[4] >= 2 || responses[5] >= 2 || responses[6] >= 2) {
+                alerts.push("⚠️ ALERTA DEPENDENCIA: Puntaje ≥2 en ítems de dependencia (4-6) requiere intervención de máxima intensidad independientemente del puntaje total");
+            }
+
+            if (responses[9] === 4) {
+                alerts.push("🚨 ALERTA CRÍTICA: Lesiones relacionadas con alcohol en el último año - Riesgo inmediato para la seguridad");
+            }
+
+            if (responses[10] === 4) {
+                alerts.push("👨‍⚕️ ALERTA SOCIAL: Preocupación familiar/profesional reciente - Indicador de impacto social significativo");
+            }
+
+            if (responses[3] >= 3) {
+                alerts.push("🍺 ALERTA CONSUMO EPISÓDICO: Patrón de binge drinking (≥6 bebidas) semanal o mayor frecuencia");
+            }
+
+            if (responses[8] >= 2) {
+                alerts.push("🧠 ALERTA NEUROLÓGICA: Lagunas de memoria frecuentes - Evaluar posible daño neurológico");
+            }
+
+            return alerts;
+        }
+
+        function showResults() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores);
+            const subscaleInterpretations = getSubscaleInterpretations(scores);
+            const alerts = getAlerts(scores);
+
+            // Mostrar puntaje total
+            document.getElementById('total-score').textContent = `${scores.total}/40`;
+            
+            // Mostrar interpretación principal
+            const interpretationDiv = document.getElementById('interpretation-level');
+            interpretationDiv.textContent = interpretation.level;
+            interpretationDiv.className = `interpretation ${interpretation.levelClass}`;
+
+            // Mostrar puntajes por subescala
+            document.getElementById('consumption-score').textContent = scores.consumption;
+            document.getElementById('dependence-score').textContent = scores.dependence;
+            document.getElementById('psychological-score').textContent = scores.psychological;
+            document.getElementById('social-score').textContent = scores.social;
+
+            // Mostrar interpretaciones de subescalas
+            document.getElementById('consumption-interpretation').textContent = subscaleInterpretations.consumption;
+            document.getElementById('dependence-interpretation').textContent = subscaleInterpretations.dependence;
+            document.getElementById('psychological-interpretation').textContent = subscaleInterpretations.psychological;
+            document.getElementById('social-interpretation').textContent = subscaleInterpretations.social;
+
+            // Mostrar interpretación clínica
+            document.getElementById('clinical-interpretation').innerHTML = `
+                <p>${interpretation.description}</p>
+                <p style="margin-top: 15px;"><strong>Interpretación:</strong> ${interpretation.clinicalInterpretation}</p>
+            `;
+
+            // Mostrar consideraciones clínicas
+            const considerationsList = interpretation.considerations.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('clinical-considerations').innerHTML = `<ul>${considerationsList}</ul>`;
+
+            // Mostrar alertas si las hay
+            const alertsSection = document.getElementById('alerts-section');
+            if (alerts.length > 0) {
+                const alertsHtml = alerts.map(alert => `<div class="alert-item">${alert}</div>`).join('');
+                alertsSection.innerHTML = `
+                    <div class="results-section">
+                        <h3>🚨 Alertas Clínicas</h3>
+                        ${alertsHtml}
+                    </div>
+                `;
+            } else {
+                alertsSection.innerHTML = '';
+            }
+
+            showCard('results');
+        }
+
+        function exportResults() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores);
+            
+            // Crear contenido para exportar
+            const exportContent = `
+                TEST AUDIT - RESULTADOS
+                ========================
+                
+                Fecha: ${new Date().toLocaleDateString('es-ES')}
+                
+                PUNTAJE TOTAL: ${scores.total}/40
+                INTERPRETACIÓN: ${interpretation.level}
+                
+                SUBESCALAS:
+                - Consumo de Alcohol (1-3): ${scores.consumption}/12
+                - Dependencia (4-6): ${scores.dependence}/12
+                - Problemas Psicológicos (7-8): ${scores.psychological}/8
+                - Problemas Sociales (9-10): ${scores.social}/8
+                
+                INTERPRETACIÓN CLÍNICA:
+                ${interpretation.clinicalInterpretation}
+                
+                ${interpretation.description}
+            `;
+            
+            // Crear y descargar archivo
+            const blob = new Blob([exportContent], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AUDIT_Resultados_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function newScale() {
+            currentCard = 0;
+            responses = {};
+            showCard(currentCard);
+            
+            // Limpiar selecciones
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+        }
+    </script>
+</body>
+</html>

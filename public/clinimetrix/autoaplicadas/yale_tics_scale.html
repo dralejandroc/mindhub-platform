@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Yale para la Severidad Global de los Tics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .card-header .question-number {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            color: #112F33;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(41, 169, 140, 0.1);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            color: #112F33;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: rgba(41, 169, 140, 0.2);
+            border-color: #29A98C;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #112F33;
+        }
+
+        .instructions h3 {
+            color: #29A98C;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button.hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .results-section {
+            margin-bottom: 25px;
+        }
+
+        .results-section h3 {
+            color: #29A98C;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #29A98C;
+            padding-bottom: 5px;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .interpretation {
+            background: rgba(41, 169, 140, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #29A98C;
+            margin-bottom: 20px;
+        }
+
+        .interpretation h4 {
+            color: #29A98C;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .alert-high {
+            background: rgba(245, 101, 101, 0.1);
+            border-left-color: #f56565;
+            color: #742a2a;
+        }
+
+        .alert-high h4 {
+            color: #f56565;
+        }
+
+        .alert-moderate {
+            background: rgba(246, 173, 85, 0.1);
+            border-left-color: #f6ad55;
+            color: #744210;
+        }
+
+        .alert-moderate h4 {
+            color: #ed8936;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            flex: 1;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(41, 169, 140, 0.3);
+        }
+
+        .subscore {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .subscore strong {
+            color: #112F33;
+        }
+
+        .score-value {
+            background: #29A98C;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100%;
+                padding: 0 10px;
+            }
+            
+            .card {
+                padding: 20px;
+                margin: 10px 0;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+            
+            .export-btn {
+                min-width: 100%;
+            }
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="card-header">
+                <h2>Escala de Yale para la Severidad Global de los Tics</h2>
+                <div class="question-number">Instrucciones de aplicación</div>
+            </div>
+            
+            <div class="instructions">
+                <h3>Información importante para el paciente/familia:</h3>
+                <p><strong>Esta escala evalúa la severidad de los tics</strong> considerando aspectos como el número, frecuencia, intensidad, complejidad e interferencia en la vida diaria.</p>
+                
+                <p><strong>Período de evaluación:</strong> Las preguntas se refieren a la <strong>última semana</strong>.</p>
+                
+                <p><strong>Tipos de tics a considerar:</strong></p>
+                <ul>
+                    <li><strong>Tics motores simples:</strong> Movimientos rápidos y sin sentido aparente (parpadeo, muecas, encogimiento de hombros)</li>
+                    <li><strong>Tics motores complejos:</strong> Movimientos más elaborados con aparente propósito (gestos, posturas, secuencias)</li>
+                    <li><strong>Tics fónicos simples:</strong> Sonidos rápidos sin sentido (carraspeo, olfateo, gruñidos)</li>
+                    <li><strong>Tics fónicos complejos:</strong> Palabras, frases o expresiones</li>
+                </ul>
+                
+                <p><strong>Instrucciones:</strong> Responda cada pregunta seleccionando la opción que mejor describa la situación en la última semana. No hay respuestas correctas o incorrectas.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="export-btn" onclick="nextCard()">Comenzar Evaluación</button>
+            </div>
+        </div>
+
+        <!-- Card 1: Tics Motores - Número -->
+        <div class="card" id="card-1">
+            <div class="card-header">
+                <h2>Tics Motores - Número</h2>
+                <div class="question-number">Pregunta 1 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Cuántos tipos diferentes de tics motores ha presentado en la última semana?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0, 'Ningún tic motor')">
+                    Ningún tic motor
+                </div>
+                <div class="option" onclick="selectOption(1, 1, 'Un único tipo de tic motor')">
+                    Un único tipo de tic motor
+                </div>
+                <div class="option" onclick="selectOption(1, 2, 'Diferentes tipos de tics motores (2-5)')">
+                    Diferentes tipos de tics motores (2-5)
+                </div>
+                <div class="option" onclick="selectOption(1, 3, 'Diferentes tipos de tics motores (más de 5)')">
+                    Diferentes tipos de tics motores (más de 5)
+                </div>
+                <div class="option" onclick="selectOption(1, 4, 'Múltiples tics con al menos un patrón organizado')">
+                    Múltiples tics con al menos un patrón organizado complejo
+                </div>
+                <div class="option" onclick="selectOption(1, 5, 'Múltiples tics con varios patrones organizados')">
+                    Múltiples tics con varios patrones organizados complejos
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Tics Motores - Frecuencia -->
+        <div class="card" id="card-2">
+            <div class="card-header">
+                <h2>Tics Motores - Frecuencia</h2>
+                <div class="question-number">Pregunta 2 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Con qué frecuencia han aparecido los tics motores en la última semana?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0, 'Ninguno')">
+                    Ninguno
+                </div>
+                <div class="option" onclick="selectOption(2, 1, 'Raramente (no diarios, episódicos)')">
+                    Raramente (no diarios, episódicos)
+                </div>
+                <div class="option" onclick="selectOption(2, 2, 'Ocasionalmente (diarios con intervalos libres largos)')">
+                    Ocasionalmente (diarios con intervalos libres largos)
+                </div>
+                <div class="option" onclick="selectOption(2, 3, 'Frecuentemente (diarios, intervalos libres de hasta 3 horas)')">
+                    Frecuentemente (diarios, intervalos libres de hasta 3 horas)
+                </div>
+                <div class="option" onclick="selectOption(2, 4, 'Casi siempre (prácticamente todas las horas de vigilia)')">
+                    Casi siempre (prácticamente todas las horas de vigilia)
+                </div>
+                <div class="option" onclick="selectOption(2, 5, 'Siempre (intervalos libres máximo de 5-10 minutos)')">
+                    Siempre (intervalos libres máximo de 5-10 minutos)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Tics Motores - Intensidad -->
+        <div class="card" id="card-3">
+            <div class="card-header">
+                <h2>Tics Motores - Intensidad</h2>
+                <div class="question-number">Pregunta 3 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Qué tan intensos o enérgicos son los tics motores?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0, 'Ausente')">
+                    Ausente
+                </div>
+                <div class="option" onclick="selectOption(3, 1, 'Mínima (apenas perceptibles, no llamativos)')">
+                    Mínima (apenas perceptibles, no llamativos)
+                </div>
+                <div class="option" onclick="selectOption(3, 2, 'Leve (similares a movimientos voluntarios normales)')">
+                    Leve (similares a movimientos voluntarios normales)
+                </div>
+                <div class="option" onclick="selectOption(3, 3, 'Moderada (más enérgicos pero dentro del rango normal)')">
+                    Moderada (más enérgicos pero dentro del rango normal)
+                </div>
+                <div class="option" onclick="selectOption(3, 4, 'Marcada (exagerados, llaman la atención)')">
+                    Marcada (exagerados, llaman la atención)
+                </div>
+                <div class="option" onclick="selectOption(3, 5, 'Severa (extremadamente enérgicos, riesgo de lesión)')">
+                    Severa (extremadamente enérgicos, riesgo de lesión)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Tics Motores - Complejidad -->
+        <div class="card" id="card-4">
+            <div class="card-header">
+                <h2>Tics Motores - Complejidad</h2>
+                <div class="question-number">Pregunta 4 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Qué tan complejos son los tics motores?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0, 'Ninguna complejidad')">
+                    Ninguna complejidad
+                </div>
+                <div class="option" onclick="selectOption(4, 1, 'En el límite (algunos no claramente simples)')">
+                    En el límite (algunos no claramente simples)
+                </div>
+                <div class="option" onclick="selectOption(4, 2, 'Leve (algunos complejos pero fáciles de disimular)')">
+                    Leve (algunos complejos pero fáciles de disimular)
+                </div>
+                <div class="option" onclick="selectOption(4, 3, 'Moderada (complejos, difíciles de disimular pero justificables)')">
+                    Moderada (complejos, difíciles de disimular pero justificables)
+                </div>
+                <div class="option" onclick="selectOption(4, 4, 'Marcada (muy complejos, duraderos, inusuales)')">
+                    Marcada (muy complejos, duraderos, inusuales)
+                </div>
+                <div class="option" onclick="selectOption(4, 5, 'Severa (brotes prolongados, imposibles de disimular)')">
+                    Severa (brotes prolongados, imposibles de disimular)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Tics Motores - Interferencia -->
+        <div class="card" id="card-5">
+            <div class="card-header">
+                <h2>Tics Motores - Interferencia</h2>
+                <div class="question-number">Pregunta 5 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Cómo interfieren los tics motores con las actividades diarias?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0, 'Ninguna interferencia')">
+                    Ninguna interferencia
+                </div>
+                <div class="option" onclick="selectOption(5, 1, 'Mínima (no interrumpen comportamientos)')">
+                    Mínima (no interrumpen comportamientos)
+                </div>
+                <div class="option" onclick="selectOption(5, 2, 'Leve (ocasionalmente interrumpen comportamientos)')">
+                    Leve (ocasionalmente interrumpen comportamientos)
+                </div>
+                <div class="option" onclick="selectOption(5, 3, 'Moderada (frecuentemente interrumpen comportamientos)')">
+                    Moderada (frecuentemente interrumpen comportamientos)
+                </div>
+                <div class="option" onclick="selectOption(5, 4, 'Marcada (interrumpen y ocasionalmente interfieren con acciones intencionales)')">
+                    Marcada (interrumpen y ocasionalmente interfieren con acciones intencionales)
+                </div>
+                <div class="option" onclick="selectOption(5, 5, 'Severa (frecuentemente interfieren con acciones intencionales)')">
+                    Severa (frecuentemente interfieren con acciones intencionales)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6: Tics Fónicos - Número -->
+        <div class="card" id="card-6">
+            <div class="card-header">
+                <h2>Tics Fónicos - Número</h2>
+                <div class="question-number">Pregunta 6 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Cuántos tipos diferentes de tics fónicos ha presentado en la última semana?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0, 'Ningún tic fónico')">
+                    Ningún tic fónico
+                </div>
+                <div class="option" onclick="selectOption(6, 1, 'Un único tipo de tic fónico')">
+                    Un único tipo de tic fónico
+                </div>
+                <div class="option" onclick="selectOption(6, 2, 'Diferentes tipos de tics fónicos (2-5)')">
+                    Diferentes tipos de tics fónicos (2-5)
+                </div>
+                <div class="option" onclick="selectOption(6, 3, 'Diferentes tipos de tics fónicos (más de 5)')">
+                    Diferentes tipos de tics fónicos (más de 5)
+                </div>
+                <div class="option" onclick="selectOption(6, 4, 'Múltiples tics con al menos un patrón organizado')">
+                    Múltiples tics con al menos un patrón organizado complejo
+                </div>
+                <div class="option" onclick="selectOption(6, 5, 'Múltiples tics con varios patrones organizados')">
+                    Múltiples tics con varios patrones organizados complejos
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 7: Tics Fónicos - Frecuencia -->
+        <div class="card" id="card-7">
+            <div class="card-header">
+                <h2>Tics Fónicos - Frecuencia</h2>
+                <div class="question-number">Pregunta 7 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Con qué frecuencia han aparecido los tics fónicos en la última semana?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0, 'Ninguno')">
+                    Ninguno
+                </div>
+                <div class="option" onclick="selectOption(7, 1, 'Raramente (no diarios, episódicos)')">
+                    Raramente (no diarios, episódicos)
+                </div>
+                <div class="option" onclick="selectOption(7, 2, 'Ocasionalmente (diarios con intervalos libres largos)')">
+                    Ocasionalmente (diarios con intervalos libres largos)
+                </div>
+                <div class="option" onclick="selectOption(7, 3, 'Frecuentemente (diarios, intervalos libres de hasta 3 horas)')">
+                    Frecuentemente (diarios, intervalos libres de hasta 3 horas)
+                </div>
+                <div class="option" onclick="selectOption(7, 4, 'Casi siempre (prácticamente todas las horas de vigilia)')">
+                    Casi siempre (prácticamente todas las horas de vigilia)
+                </div>
+                <div class="option" onclick="selectOption(7, 5, 'Siempre (intervalos libres máximo de 5-10 minutos)')">
+                    Siempre (intervalos libres máximo de 5-10 minutos)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 8: Tics Fónicos - Intensidad -->
+        <div class="card" id="card-8">
+            <div class="card-header">
+                <h2>Tics Fónicos - Intensidad</h2>
+                <div class="question-number">Pregunta 8 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Qué tan intensos o llamativos son los tics fónicos?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0, 'Ausente')">
+                    Ausente
+                </div>
+                <div class="option" onclick="selectOption(8, 1, 'Mínima (apenas audibles, no llamativos)')">
+                    Mínima (apenas audibles, no llamativos)
+                </div>
+                <div class="option" onclick="selectOption(8, 2, 'Leve (similares a sonidos voluntarios normales)')">
+                    Leve (similares a sonidos voluntarios normales)
+                </div>
+                <div class="option" onclick="selectOption(8, 3, 'Moderada (más fuertes pero dentro del rango normal)')">
+                    Moderada (más fuertes pero dentro del rango normal)
+                </div>
+                <div class="option" onclick="selectOption(8, 4, 'Marcada (llamativos y exagerados)')">
+                    Marcada (llamativos y exagerados)
+                </div>
+                <div class="option" onclick="selectOption(8, 5, 'Severa (extremadamente fuertes y llamativos)')">
+                    Severa (extremadamente fuertes y llamativos)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 9: Tics Fónicos - Complejidad -->
+        <div class="card" id="card-9">
+            <div class="card-header">
+                <h2>Tics Fónicos - Complejidad</h2>
+                <div class="question-number">Pregunta 9 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Qué tan complejos son los tics fónicos?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0, 'Ninguna complejidad')">
+                    Ninguna complejidad
+                </div>
+                <div class="option" onclick="selectOption(9, 1, 'En el límite (algunos no claramente simples)')">
+                    En el límite (algunos no claramente simples)
+                </div>
+                <div class="option" onclick="selectOption(9, 2, 'Leve (algunos complejos pero fáciles de disimular)')">
+                    Leve (algunos complejos pero fáciles de disimular)
+                </div>
+                <div class="option" onclick="selectOption(9, 3, 'Moderada (complejos, difíciles de disimular pero justificables)')">
+                    Moderada (complejos, difíciles de disimular pero justificables)
+                </div>
+                <div class="option" onclick="selectOption(9, 4, 'Marcada (muy complejos, duraderos, inusuales)')">
+                    Marcada (muy complejos, duraderos, inusuales)
+                </div>
+                <div class="option" onclick="selectOption(9, 5, 'Severa (brotes prolongados, imposibles de disimular)')">
+                    Severa (brotes prolongados, imposibles de disimular)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 10: Tics Fónicos - Interferencia -->
+        <div class="card" id="card-10">
+            <div class="card-header">
+                <h2>Tics Fónicos - Interferencia</h2>
+                <div class="question-number">Pregunta 10 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Cómo interfieren los tics fónicos con las actividades diarias?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0, 'Ninguna interferencia')">
+                    Ninguna interferencia
+                </div>
+                <div class="option" onclick="selectOption(10, 1, 'Mínima (no interrumpen el lenguaje)')">
+                    Mínima (no interrumpen el lenguaje)
+                </div>
+                <div class="option" onclick="selectOption(10, 2, 'Leve (ocasionalmente interrumpen el lenguaje)')">
+                    Leve (ocasionalmente interrumpen el lenguaje)
+                </div>
+                <div class="option" onclick="selectOption(10, 3, 'Moderada (frecuentemente interrumpen el lenguaje)')">
+                    Moderada (frecuentemente interrumpen el lenguaje)
+                </div>
+                <div class="option" onclick="selectOption(10, 4, 'Marcada (interrumpen y ocasionalmente interfieren con comunicación intencional)')">
+                    Marcada (interrumpen y ocasionalmente interfieren con comunicación intencional)
+                </div>
+                <div class="option" onclick="selectOption(10, 5, 'Severa (frecuentemente interfieren con comunicación intencional)')">
+                    Severa (frecuentemente interfieren con comunicación intencional)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 11: Discapacidad Global -->
+        <div class="card" id="card-11">
+            <div class="card-header">
+                <h2>Discapacidad Global</h2>
+                <div class="question-number">Pregunta 11 de 11</div>
+            </div>
+            <div class="question-text">
+                ¿Cómo han afectado los tics la calidad de vida global (autoestima, vida familiar, aceptación social, desempeño escolar/laboral)?
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 0, 'Ninguna afectación')">
+                    Ninguna afectación
+                </div>
+                <div class="option" onclick="selectOption(11, 10, 'Mínima (dificultades sutiles ocasionales)')">
+                    Mínima (dificultades sutiles ocasionales)
+                </div>
+                <div class="option" onclick="selectOption(11, 20, 'Leve (dificultades menores pero manejables)')">
+                    Leve (dificultades menores pero manejables)
+                </div>
+                <div class="option" onclick="selectOption(11, 30, 'Moderada (problemas claros en funcionamiento diario)')">
+                    Moderada (problemas claros en funcionamiento diario)
+                </div>
+                <div class="option" onclick="selectOption(11, 40, 'Marcada (dificultades importantes en múltiples áreas)')">
+                    Marcada (dificultades importantes en múltiples áreas)
+                </div>
+                <div class="option" onclick="selectOption(11, 50, 'Severa (dificultades extremas, vida muy restringida)')">
+                    Severa (dificultades extremas, vida muy restringida)
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="card-header">
+                <h2>Evaluación Completada</h2>
+                <div class="question-number">Muchas gracias por su tiempo</div>
+            </div>
+            <div class="question-text">
+                La evaluación ha sido completada exitosamente. Por favor, entregue el dispositivo a su médico o profesional de salud para la revisión de los resultados.
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="export-btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+            </div>
+        </div>
+
+        <!-- Card Resultados -->
+        <div class="card" id="card-results">
+            <div class="card-header">
+                <h2>Resultados - Escala de Yale para Tics</h2>
+                <div class="question-number">Interpretación Clínica</div>
+            </div>
+
+            <div class="results-section">
+                <div class="score-display" id="total-score">
+                    Puntuación Total: <span id="total-value">0</span>/100
+                </div>
+
+                <h3>Puntuaciones por Subescala</h3>
+                <div class="subscore">
+                    <strong>Tics Motores:</strong>
+                    <span class="score-value" id="motor-score">0/25</span>
+                </div>
+                <div class="subscore">
+                    <strong>Tics Fónicos:</strong>
+                    <span class="score-value" id="phonic-score">0/25</span>
+                </div>
+                <div class="subscore">
+                    <strong>Discapacidad Global:</strong>
+                    <span class="score-value" id="global-score">0/50</span>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h3>Interpretación Clínica</h3>
+                <div class="interpretation" id="main-interpretation">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+            </div>
+
+            <div class="results-section" id="alerts-section" style="display:none;">
+                <h3>Alertas Clínicas</h3>
+                <div id="alerts-content">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h3>Consideraciones para el Seguimiento</h3>
+                <div class="interpretation">
+                    <h4>Recomendaciones Basadas en la Evaluación:</h4>
+                    <div id="recommendations">
+                        <!-- Se llenará con JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="export-btn" onclick="exportToImage()">📸 Capturar Imagen</button>
+                <button class="export-btn" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-button" id="back-btn" onclick="previousCard()">← Regresar</button>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        let totalQuestions = 11;
+
+        function selectOption(questionId, value, text) {
+            responses[questionId] = { value: value, text: text };
+            
+            // Marcar opción como seleccionada
+            const options = document.querySelectorAll(`#card-${questionId} .option`);
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function nextCard() {
+            if (currentCard < totalQuestions + 2) { // +2 para card-0 y card-final
+                document.getElementById(`card-${currentCard}`).classList.remove('active');
+                currentCard++;
+                
+                if (currentCard <= totalQuestions) {
+                    document.getElementById(`card-${currentCard}`).classList.add('active');
+                } else if (currentCard === totalQuestions + 1) {
+                    document.getElementById('card-final').classList.add('active');
+                }
+                
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                document.getElementById(`card-${currentCard}`).classList.remove('active');
+                if (currentCard === totalQuestions + 1) {
+                    document.getElementById('card-final').classList.remove('active');
+                }
+                currentCard--;
+                document.getElementById(`card-${currentCard}`).classList.add('active');
+                
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard === 0 || currentCard > totalQuestions + 1) {
+                backBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+            }
+        }
+
+        function calculateScore() {
+            let motorScore = 0;
+            let phonicScore = 0;
+            let globalScore = 0;
+
+            // Tics motores (preguntas 1-5)
+            for (let i = 1; i <= 5; i++) {
+                if (responses[i]) {
+                    motorScore += responses[i].value;
+                }
+            }
+
+            // Tics fónicos (preguntas 6-10)
+            for (let i = 6; i <= 10; i++) {
+                if (responses[i]) {
+                    phonicScore += responses[i].value;
+                }
+            }
+
+            // Discapacidad global (pregunta 11)
+            if (responses[11]) {
+                globalScore = responses[11].value;
+            }
+
+            return {
+                motor: motorScore,
+                phonic: phonicScore,
+                global: globalScore,
+                total: motorScore + phonicScore + globalScore
+            };
+        }
+
+        function getInterpretation(scores) {
+            const { total, motor, phonic, global } = scores;
+            
+            let severity = '';
+            let interpretation = '';
+            let className = '';
+
+            if (total <= 25) {
+                severity = 'Tics de Severidad Mínima a Leve';
+                className = '';
+                interpretation = `
+                    <p><strong>Interpretación:</strong> Los tics presentes tienen un impacto mínimo en el funcionamiento diario. Esta puntuación sugiere tics que pueden estar bien controlados o en remisión parcial.</p>
+                    <p><strong>Características típicas:</strong> Tics ocasionales, de baja intensidad, que no interfieren significativamente con las actividades cotidianas.</p>
+                `;
+            } else if (total <= 50) {
+                severity = 'Tics de Severidad Moderada';
+                className = 'alert-moderate';
+                interpretation = `
+                    <p><strong>Interpretación:</strong> Los tics tienen un impacto moderado que puede requerir estrategias de manejo específicas. Se recomienda monitoreo regular.</p>
+                    <p><strong>Características típicas:</strong> Tics más frecuentes o complejos que pueden llamar la atención y ocasionar alguna interferencia social o académica.</p>
+                `;
+            } else if (total <= 75) {
+                severity = 'Tics de Severidad Marcada';
+                className = 'alert-high';
+                interpretation = `
+                    <p><strong>Interpretación:</strong> Los tics tienen un impacto significativo en el funcionamiento diario. Se recomienda intervención terapéutica activa.</p>
+                    <p><strong>Características típicas:</strong> Tics frecuentes, intensos o complejos que interfieren notablemente con las actividades diarias y relaciones sociales.</p>
+                `;
+            } else {
+                severity = 'Tics de Severidad Severa';
+                className = 'alert-high';
+                interpretation = `
+                    <p><strong>Interpretación:</strong> Los tics tienen un impacto severo que requiere intervención inmediata y manejo especializado intensivo.</p>
+                    <p><strong>Características típicas:</strong> Tics muy frecuentes, intensos y complejos que interfieren significativamente con el funcionamiento en múltiples áreas de la vida.</p>
+                `;
+            }
+
+            return { severity, interpretation, className };
+        }
+
+        function generateRecommendations(scores) {
+            const { total, motor, phonic, global } = scores;
+            let recommendations = [];
+
+            // Recomendaciones basadas en puntuación total
+            if (total >= 50) {
+                recommendations.push('Considerar intervenciones farmacológicas específicas para tics');
+                recommendations.push('Evaluación de terapia conductual (CBIT - Comprehensive Behavioral Intervention for Tics)');
+            }
+
+            // Recomendaciones específicas por tipo de tic
+            if (motor >= 15) {
+                recommendations.push('Tics motores significativos: evaluar interferencia con actividades académicas/laborales');
+            }
+
+            if (phonic >= 15) {
+                recommendations.push('Tics fónicos prominentes: considerar impacto en comunicación social');
+            }
+
+            if (global >= 30) {
+                recommendations.push('Discapacidad funcional significativa: evaluación psicosocial integral');
+                recommendations.push('Considerar apoyo psicológico para el paciente y la familia');
+            }
+
+            // Recomendaciones generales
+            if (total >= 25) {
+                recommendations.push('Seguimiento clínico regular cada 3-6 meses');
+                recommendations.push('Educación al paciente y familia sobre el trastorno de tics');
+            }
+
+            if (recommendations.length === 0) {
+                recommendations.push('Seguimiento clínico de rutina');
+                recommendations.push('Monitoreo de la evolución natural de los tics');
+            }
+
+            return recommendations;
+        }
+
+        function showResults() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores);
+            const recommendations = generateRecommendations(scores);
+
+            // Actualizar puntuaciones
+            document.getElementById('total-value').textContent = scores.total;
+            document.getElementById('motor-score').textContent = `${scores.motor}/25`;
+            document.getElementById('phonic-score').textContent = `${scores.phonic}/25`;
+            document.getElementById('global-score').textContent = `${scores.global}/50`;
+
+            // Actualizar interpretación principal
+            const mainInterpretation = document.getElementById('main-interpretation');
+            mainInterpretation.className = `interpretation ${interpretation.className}`;
+            mainInterpretation.innerHTML = `
+                <h4>${interpretation.severity}</h4>
+                ${interpretation.interpretation}
+            `;
+
+            // Generar alertas si hay puntuaciones altas
+            const alertsSection = document.getElementById('alerts-section');
+            const alertsContent = document.getElementById('alerts-content');
+            let alerts = [];
+
+            // Verificar alertas por subescala (≥66% del máximo)
+            if (scores.motor >= 17) { // 66% de 25
+                alerts.push({
+                    title: 'Alerta: Tics Motores Severos',
+                    content: 'Los tics motores presentan alta severidad. Evaluar riesgo de lesiones y limitaciones funcionales.',
+                    class: 'alert-high'
+                });
+            }
+
+            if (scores.phonic >= 17) { // 66% de 25
+                alerts.push({
+                    title: 'Alerta: Tics Fónicos Severos',
+                    content: 'Los tics fónicos presentan alta severidad. Evaluar impacto en comunicación y funcionamiento social.',
+                    class: 'alert-high'
+                });
+            }
+
+            if (scores.global >= 33) { // 66% de 50
+                alerts.push({
+                    title: 'Alerta: Discapacidad Global Significativa',
+                    content: 'Alto impacto en calidad de vida. Considerar intervención multidisciplinaria inmediata.',
+                    class: 'alert-high'
+                });
+            }
+
+            if (alerts.length > 0) {
+                alertsSection.style.display = 'block';
+                alertsContent.innerHTML = alerts.map(alert => `
+                    <div class="interpretation ${alert.class}">
+                        <h4>${alert.title}</h4>
+                        <p>${alert.content}</p>
+                    </div>
+                `).join('');
+            } else {
+                alertsSection.style.display = 'none';
+            }
+
+            // Actualizar recomendaciones
+            document.getElementById('recommendations').innerHTML = `
+                <ul>
+                    ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+            `;
+
+            // Mostrar card de resultados
+            document.getElementById('card-final').classList.remove('active');
+            document.getElementById('card-results').classList.add('active');
+            currentCard = totalQuestions + 2;
+            updateBackButton();
+        }
+
+        function exportToPDF() {
+            window.print();
+        }
+
+        function exportToImage() {
+            // Crear canvas para capturar solo los resultados
+            const resultsCard = document.getElementById('card-results');
+            
+            // Usar html2canvas si está disponible, sino usar print
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(resultsCard).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'resultados-escala-yale-tics.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            } else {
+                // Fallback: abrir ventana de impresión
+                window.print();
+            }
+        }
+
+        function newEvaluation() {
+            // Reiniciar variables
+            currentCard = 0;
+            responses = {};
+            
+            // Limpiar selecciones
+            document.querySelectorAll('.option.selected').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Volver a la primera card
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById('card-0').classList.add('active');
+            
+            updateProgress();
+            updateBackButton();
+        }
+
+        // Inicialización
+        updateProgress();
+        updateBackButton();
+
+        // Evitar navegación accidental
+        window.addEventListener('beforeunload', function(e) {
+            if (currentCard > 0 && currentCard <= totalQuestions) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>

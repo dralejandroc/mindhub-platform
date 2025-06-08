@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTQ-SF - Cuestionario de Acontecimientos Traumáticos en la Infancia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-height: 400px;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: #112F33;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            color: #112F33;
+        }
+
+        .option:hover {
+            border-color: #29A98C;
+            background: #f8fffe;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+        }
+
+        .back-button.hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .instructions {
+            text-align: left;
+            color: #112F33;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .instructions strong {
+            color: #29A98C;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: scale(1.05);
+        }
+
+        .results-section {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .subscale-result {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .subscale-name {
+            font-weight: bold;
+            color: #112F33;
+            margin-bottom: 5px;
+        }
+
+        .score-display {
+            font-size: 1.1rem;
+            margin: 5px 0;
+        }
+
+        .interpretation {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .alert-high {
+            background: #f56565;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .level-none { color: #48bb78; }
+        .level-low { color: #f6ad55; }
+        .level-moderate { color: #ed8936; }
+        .level-severe { color: #f56565; }
+
+        .clinical-notes {
+            background: #f7fafc;
+            border-left: 4px solid #29A98C;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #112F33;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 30px 20px;
+                border-radius: 15px;
+            }
+            
+            .card-header {
+                font-size: 1.5rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .back-button {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="card-header">CTQ-SF</div>
+            <h2 style="color: #112F33; margin-bottom: 20px;">Cuestionario de Acontecimientos Traumáticos en la Infancia - Forma Breve</h2>
+            
+            <div class="instructions">
+                <p><strong>Instrucciones:</strong></p>
+                <br>
+                <p>Este cuestionario pregunta sobre algunas de sus experiencias mientras crecía como niño(a) y adolescente. Aunque algunas de estas preguntas son de naturaleza personal, trate de responder con la mayor honestidad posible.</p>
+                <br>
+                <p><strong>Para cada afirmación, seleccione la opción que mejor describa cómo se sintió durante su infancia y adolescencia:</strong></p>
+                <br>
+                <ul style="text-align: left; margin-left: 20px;">
+                    <li><strong>Nunca:</strong> Esto nunca me pasó</li>
+                    <li><strong>Pocas veces:</strong> Esto me pasó muy pocas veces</li>
+                    <li><strong>A veces:</strong> Esto me pasó algunas veces</li>
+                    <li><strong>Muchas veces:</strong> Esto me pasó frecuentemente</li>
+                    <li><strong>Siempre:</strong> Esto me pasó muy frecuentemente</li>
+                </ul>
+                <br>
+                <p><strong>Importante:</strong> Todas las preguntas se refieren a experiencias antes de los 18 años de edad. Sus respuestas son confidenciales.</p>
+                <br>
+                <p>El cuestionario consta de 28 preguntas y tomará aproximadamente 5-7 minutos completarlo.</p>
+            </div>
+            
+            <button class="action-button" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-28: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">1</div>
+            <div class="question-text">Cuando era niño(a)... No tenía suficiente para comer</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(1, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(1, 3)">A veces</div>
+                <div class="option" onclick="selectOption(1, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(1, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">2</div>
+            <div class="question-text">Cuando era niño(a)... Sabía que había alguien que me cuidara y protegiera</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(2, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(2, 3)">A veces</div>
+                <div class="option" onclick="selectOption(2, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(2, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">3</div>
+            <div class="question-text">Cuando era niño(a)... Mis familiares me decían cosas como "estúpido(a)", "perezoso(a)" o "feo(a)"</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(3, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(3, 3)">A veces</div>
+                <div class="option" onclick="selectOption(3, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(3, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">4</div>
+            <div class="question-text">Cuando era niño(a)... Mis padres estaban demasiado borrachos o drogados para cuidar a mi familia</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(4, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(4, 3)">A veces</div>
+                <div class="option" onclick="selectOption(4, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(4, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">5</div>
+            <div class="question-text">Cuando era niño(a)... Había alguien en mi familia que me ayudaba a sentirme importante o especial</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(5, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(5, 3)">A veces</div>
+                <div class="option" onclick="selectOption(5, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(5, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">6</div>
+            <div class="question-text">Cuando era niño(a)... Tuve que usar ropa sucia</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(6, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(6, 3)">A veces</div>
+                <div class="option" onclick="selectOption(6, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(6, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">7</div>
+            <div class="question-text">Cuando era niño(a)... Me sentía querido(a)</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(7, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(7, 3)">A veces</div>
+                <div class="option" onclick="selectOption(7, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(7, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">8</div>
+            <div class="question-text">Cuando era niño(a)... Pensé que mis padres deseaban que yo nunca hubiera nacido</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(8, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(8, 3)">A veces</div>
+                <div class="option" onclick="selectOption(8, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(8, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">9</div>
+            <div class="question-text">Cuando era niño(a)... Me golpearon tan fuerte que tuve que ir al médico o al hospital</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(9, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(9, 3)">A veces</div>
+                <div class="option" onclick="selectOption(9, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(9, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">10</div>
+            <div class="question-text">Cuando era niño(a)... No había nada que quisiera cambiar de mi familia</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(10, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(10, 3)">A veces</div>
+                <div class="option" onclick="selectOption(10, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(10, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">11</div>
+            <div class="question-text">Cuando era niño(a)... Los miembros de mi familia me golpearon tanto que me dejaron moretones o marcas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(11, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(11, 3)">A veces</div>
+                <div class="option" onclick="selectOption(11, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(11, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">12</div>
+            <div class="question-text">Cuando era niño(a)... Me castigaron con un cinturón, tabla, cuerda u otro objeto duro</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(12, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(12, 3)">A veces</div>
+                <div class="option" onclick="selectOption(12, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(12, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">13</div>
+            <div class="question-text">Cuando era niño(a)... Los miembros de mi familia se cuidaban mutuamente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(13, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(13, 3)">A veces</div>
+                <div class="option" onclick="selectOption(13, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(13, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">14</div>
+            <div class="question-text">Cuando era niño(a)... Los miembros de mi familia me dijeron cosas hirientes o insultantes</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(14, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(14, 3)">A veces</div>
+                <div class="option" onclick="selectOption(14, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(14, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">15</div>
+            <div class="question-text">Cuando era niño(a)... Creo que fui maltratado(a) físicamente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(15, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(15, 3)">A veces</div>
+                <div class="option" onclick="selectOption(15, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(15, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">16</div>
+            <div class="question-text">Cuando era niño(a)... Tuve la infancia perfecta</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(16, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(16, 3)">A veces</div>
+                <div class="option" onclick="selectOption(16, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(16, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">17</div>
+            <div class="question-text">Cuando era niño(a)... Me golpearon tanto que un maestro, vecino u otro adulto se dio cuenta</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(17, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(17, 3)">A veces</div>
+                <div class="option" onclick="selectOption(17, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(17, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">18</div>
+            <div class="question-text">Cuando era niño(a)... Sentí que alguien en mi familia me odiaba</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(18, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(18, 3)">A veces</div>
+                <div class="option" onclick="selectOption(18, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(18, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">19</div>
+            <div class="question-text">Cuando era niño(a)... Los miembros de mi familia se sentían cercanos entre sí</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(19, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(19, 3)">A veces</div>
+                <div class="option" onclick="selectOption(19, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(19, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">20</div>
+            <div class="question-text">Cuando era niño(a)... Alguien trató de tocarme de manera sexual o trató de hacerme tocar a esa persona</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(20, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(20, 3)">A veces</div>
+                <div class="option" onclick="selectOption(20, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(20, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-number">21</div>
+            <div class="question-text">Cuando era niño(a)... Alguien amenazó con lastimarme o decir mentiras sobre mí a menos que hiciera algo sexual</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(21, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(21, 3)">A veces</div>
+                <div class="option" onclick="selectOption(21, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(21, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-number">22</div>
+            <div class="question-text">Cuando era niño(a)... Tuve la mejor familia del mundo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(22, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(22, 3)">A veces</div>
+                <div class="option" onclick="selectOption(22, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(22, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="question-number">23</div>
+            <div class="question-text">Cuando era niño(a)... Alguien trató de hacerme hacer cosas sexuales o mirar cosas sexuales</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(23, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(23, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(23, 3)">A veces</div>
+                <div class="option" onclick="selectOption(23, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(23, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-24">
+            <div class="question-number">24</div>
+            <div class="question-text">Cuando era niño(a)... Alguien me molestó sexualmente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(24, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(24, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(24, 3)">A veces</div>
+                <div class="option" onclick="selectOption(24, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(24, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="question-number">25</div>
+            <div class="question-text">Cuando era niño(a)... Creo que fui maltratado(a) emocionalmente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(25, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(25, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(25, 3)">A veces</div>
+                <div class="option" onclick="selectOption(25, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(25, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="question-number">26</div>
+            <div class="question-text">Cuando era niño(a)... Había alguien que me llevara al médico si lo necesitaba</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(26, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(26, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(26, 3)">A veces</div>
+                <div class="option" onclick="selectOption(26, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(26, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-27">
+            <div class="question-number">27</div>
+            <div class="question-text">Cuando era niño(a)... Creo que fui abusado(a) sexualmente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(27, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(27, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(27, 3)">A veces</div>
+                <div class="option" onclick="selectOption(27, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(27, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-28">
+            <div class="question-number">28</div>
+            <div class="question-text">Cuando era niño(a)... Mi familia fue una fuente de fortaleza y apoyo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(28, 1)">Nunca</div>
+                <div class="option" onclick="selectOption(28, 2)">Pocas veces</div>
+                <div class="option" onclick="selectOption(28, 3)">A veces</div>
+                <div class="option" onclick="selectOption(28, 4)">Muchas veces</div>
+                <div class="option" onclick="selectOption(28, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="card-header">Evaluación Completada</div>
+            <h2 style="color: #112F33; margin-bottom: 30px;">¡Muchas gracias!</h2>
+            <p style="color: #112F33; font-size: 1.1rem; margin-bottom: 30px;">
+                Ha completado exitosamente el Cuestionario de Acontecimientos Traumáticos en la Infancia (CTQ-SF).
+            </p>
+            <p style="color: #112F33; margin-bottom: 30px;">
+                Por favor, pase el dispositivo a su médico o profesional de salud mental para la revisión de resultados.
+            </p>
+            <button class="action-button" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <div class="card-header">Resultados CTQ-SF</div>
+            <h3 style="color: #112F33; margin-bottom: 20px;">Informe Clínico Profesional</h3>
+            
+            <div id="results-content" class="results-section">
+                <!-- Los resultados se generarán dinámicamente -->
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px;">
+                <button class="action-button" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="action-button" onclick="captureResults()">📸 Capturar Imagen</button>
+                <button class="action-button" onclick="startNewEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-button" id="back-btn" onclick="goBack()">← Regresar</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        // Variables globales
+        let currentCard = 0;
+        let responses = {};
+        let totalQuestions = 28;
+
+        // Configuración de subescalas
+        const subscales = {
+            emotional_abuse: [3, 8, 14, 18, 25],
+            physical_abuse: [9, 11, 12, 15, 17],
+            sexual_abuse: [20, 21, 23, 24, 27],
+            emotional_neglect: [5, 7, 13, 19, 28],
+            physical_neglect: [1, 2, 4, 6, 26],
+            minimization_denial: [10, 16, 22]
+        };
+
+        // Ítems que se invierten
+        const reversedItems = [2, 5, 7, 13, 19, 26, 28, 10, 16, 22];
+
+        // Puntos de corte
+        const cutoffs = {
+            emotional_abuse: { low: 9, moderate: 13, severe: 16 },
+            physical_abuse: { low: 8, moderate: 10, severe: 13 },
+            sexual_abuse: { low: 6, moderate: 8, severe: 13 },
+            emotional_neglect: { low: 10, moderate: 15, severe: 18 },
+            physical_neglect: { low: 8, moderate: 10, severe: 13 }
+        };
+
+        // Nombres de subescalas
+        const subscaleNames = {
+            emotional_abuse: "Abuso Emocional",
+            physical_abuse: "Abuso Físico",
+            sexual_abuse: "Abuso Sexual",
+            emotional_neglect: "Negligencia Emocional",
+            physical_neglect: "Negligencia Física",
+            minimization_denial: "Minimización/Negación"
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            updateBackButton();
+        });
+
+        function selectOption(questionNum, value) {
+            responses[questionNum] = value;
+            
+            // Marcar la opción seleccionada
+            const card = document.getElementById(`card-${questionNum}`);
+            const options = card.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                option.classList.remove('selected');
+                if (index + 1 === value) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function nextCard() {
+            const currentCardElement = document.getElementById(`card-${currentCard}`);
+            currentCardElement.classList.remove('active');
+            
+            currentCard++;
+            
+            let nextCardElement;
+            if (currentCard <= totalQuestions) {
+                nextCardElement = document.getElementById(`card-${currentCard}`);
+            } else {
+                nextCardElement = document.getElementById('card-final');
+            }
+            
+            nextCardElement.classList.add('active');
+            updateProgress();
+            updateBackButton();
+        }
+
+        function goBack() {
+            if (currentCard > 0) {
+                const currentCardElement = document.getElementById(`card-${currentCard}`) || 
+                                          document.getElementById('card-final') || 
+                                          document.getElementById('card-results');
+                currentCardElement.classList.remove('active');
+                
+                currentCard--;
+                const prevCardElement = document.getElementById(`card-${currentCard}`);
+                prevCardElement.classList.add('active');
+                
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard === 0) {
+                backBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+            }
+        }
+
+        function calculateScore() {
+            const scores = {};
+            
+            // Calcular puntuaciones por subescala
+            for (const [subscale, items] of Object.entries(subscales)) {
+                let sum = 0;
+                for (const item of items) {
+                    let value = responses[item] || 1;
+                    
+                    // Invertir ítems si es necesario
+                    if (reversedItems.includes(item)) {
+                        value = 6 - value;
+                    }
+                    
+                    sum += value;
+                }
+                scores[subscale] = sum;
+            }
+            
+            return scores;
+        }
+
+        function getInterpretation(subscale, score) {
+            if (subscale === 'minimization_denial') {
+                if (score >= 2) {
+                    return { level: 'high', text: 'Posible minimización o negación de experiencias traumáticas. Interpretar resultados con precaución.' };
+                }
+                return { level: 'normal', text: 'Sin indicadores significativos de minimización.' };
+            }
+            
+            const cutoff = cutoffs[subscale];
+            if (score < cutoff.low) {
+                return { level: 'none', text: 'Sin indicadores o mínimo' };
+            } else if (score < cutoff.moderate) {
+                return { level: 'low', text: 'Leve a moderado' };
+            } else if (score < cutoff.severe) {
+                return { level: 'moderate', text: 'Moderado a severo' };
+            } else {
+                return { level: 'severe', text: 'Severo a extremo' };
+            }
+        }
+
+        function showResults() {
+            // Ocultar card actual
+            document.getElementById('card-final').classList.remove('active');
+            
+            // Calcular puntuaciones
+            const scores = calculateScore();
+            
+            // Obtener fecha y hora actual
+            const now = new Date();
+            const fechaAplicacion = now.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const horaAplicacion = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Generar contenido de resultados
+            let resultsHTML = '';
+            
+            // Fecha y hora de aplicación
+            resultsHTML += `
+                <div style="background: linear-gradient(135deg, #29A98C, #112F33); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                    <strong>Fecha de aplicación:</strong> ${fechaAplicacion}<br>
+                    <strong>Hora de aplicación:</strong> ${horaAplicacion}
+                </div>
+            `;
+            
+            // Información general
+            resultsHTML += `
+                <div class="clinical-notes">
+                    <strong>Información del Instrumento:</strong><br>
+                    El CTQ-SF es un instrumento validado para evaluar retrospectivamente experiencias de trauma infantil. 
+                    Las puntuaciones elevadas indican mayor severidad de experiencias traumáticas antes de los 18 años.
+                </div>
+            `;
+
+            // Puntuaciones por subescala
+            const clinicalSubscales = ['emotional_abuse', 'physical_abuse', 'sexual_abuse', 'emotional_neglect', 'physical_neglect'];
+            
+            for (const subscale of clinicalSubscales) {
+                const score = scores[subscale];
+                const interpretation = getInterpretation(subscale, score);
+                const percentage = (score / 25) * 100;
+                
+                resultsHTML += `
+                    <div class="subscale-result">
+                        <div class="subscale-name">${subscaleNames[subscale]}</div>
+                        <div class="score-display">
+                            Puntuación: <strong>${score}/25</strong> 
+                            <span class="level-${interpretation.level}">(${interpretation.text})</span>
+                        </div>
+                        <div class="interpretation">${getDetailedInterpretation(subscale, score, interpretation.level)}</div>
+                        ${percentage >= 66 ? `<div class="alert-high">⚠️ ALERTA: Puntuación elevada que requiere atención clínica</div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Escala de validez
+            const mdScore = scores.minimization_denial;
+            const mdInterpretation = getInterpretation('minimization_denial', mdScore);
+            
+            resultsHTML += `
+                <div class="subscale-result">
+                    <div class="subscale-name">${subscaleNames.minimization_denial}</div>
+                    <div class="score-display">
+                        Puntuación: <strong>${mdScore}/3</strong>
+                    </div>
+                    <div class="interpretation">${mdInterpretation.text}</div>
+                </div>
+            `;
+
+            // Consideraciones clínicas
+            resultsHTML += generateClinicalConsiderations(scores);
+
+            document.getElementById('results-content').innerHTML = resultsHTML;
+            document.getElementById('card-results').classList.add('active');
+            
+            // Ocultar botón de regresar en resultados
+            document.getElementById('back-btn').classList.add('hidden');
+        }
+
+        function getDetailedInterpretation(subscale, score, level) {
+            const interpretations = {
+                emotional_abuse: {
+                    none: "No se identifican indicadores significativos de abuso emocional en la infancia.",
+                    low: "Presencia leve de experiencias de abuso emocional. Explorar patrones familiares de comunicación.",
+                    moderate: "Experiencias moderadas de abuso emocional que pueden haber impactado el desarrollo emocional.",
+                    severe: "Historia significativa de abuso emocional severo. Asociado con mayor riesgo de psicopatología."
+                },
+                physical_abuse: {
+                    none: "No se identifican indicadores de abuso físico en la infancia.",
+                    low: "Presencia leve de experiencias de abuso físico. Considerar disciplina física excesiva.",
+                    moderate: "Historia de abuso físico moderado que puede requerir exploración adicional.",
+                    severe: "Historia de abuso físico severo con potencial impacto en el funcionamiento actual."
+                },
+                sexual_abuse: {
+                    none: "No se identifican indicadores de abuso sexual en la infancia.",
+                    low: "Posibles experiencias sexuales inapropiadas. Requiere evaluación cuidadosa.",
+                    moderate: "Historia de abuso sexual que puede estar relacionada con síntomas actuales.",
+                    severe: "Historia de abuso sexual severo. Explorar trauma y síntomas asociados."
+                },
+                emotional_neglect: {
+                    none: "Adecuado apoyo emocional durante la infancia.",
+                    low: "Cierto grado de negligencia emocional. Explorar patrones de apego.",
+                    moderate: "Negligencia emocional significativa que puede afectar la regulación emocional.",
+                    severe: "Negligencia emocional severa con posible impacto en el funcionamiento interpersonal."
+                },
+                physical_neglect: {
+                    none: "Cuidado físico adecuado durante la infancia.",
+                    low: "Algunos indicadores de negligencia física leve.",
+                    moderate: "Negligencia física moderada que puede haber afectado el desarrollo.",
+                    severe: "Negligencia física severa con posibles consecuencias para la salud y desarrollo."
+                }
+            };
+            
+            return interpretations[subscale][level];
+        }
+
+        function generateClinicalConsiderations(scores) {
+            let html = '<div class="clinical-notes"><strong>Consideraciones Clínicas:</strong><br><br>';
+            
+            // Patrón general
+            const clinicalSubscales = ['emotional_abuse', 'physical_abuse', 'sexual_abuse', 'emotional_neglect', 'physical_neglect'];
+            const elevatedScales = clinicalSubscales.filter(subscale => {
+                const cutoff = cutoffs[subscale];
+                return scores[subscale] >= cutoff.moderate;
+            });
+            
+            if (elevatedScales.length === 0) {
+                html += '• No se identifican experiencias traumáticas significativas en la evaluación actual.<br>';
+            } else if (elevatedScales.length === 1) {
+                html += `• Se identifica una forma específica de trauma: ${subscaleNames[elevatedScales[0]].toLowerCase()}.<br>`;
+            } else {
+                html += `• Politraumatización: múltiples formas de trauma identificadas (${elevatedScales.length}/5).<br>`;
+            }
+            
+            // Validez de las respuestas
+            if (scores.minimization_denial >= 2) {
+                html += '• IMPORTANTE: Las puntuaciones pueden estar subestimadas debido a minimización o negación.<br>';
+            }
+            
+            // Recomendaciones específicas
+            html += '<br><strong>Recomendaciones para la evaluación:</strong><br>';
+            
+            if (elevatedScales.includes('emotional_abuse') || elevatedScales.includes('emotional_neglect')) {
+                html += '• Evaluar patrones de apego, autoestima y regulación emocional.<br>';
+            }
+            
+            if (elevatedScales.includes('physical_abuse')) {
+                html += '• Considerar evaluación de trauma físico y sus secuelas.<br>';
+            }
+            
+            if (elevatedScales.includes('sexual_abuse')) {
+                html += '• Evaluación especializada de trauma sexual puede estar indicada.<br>';
+            }
+            
+            if (elevatedScales.length >= 3) {
+                html += '• Considerar evaluación de trastorno de estrés postraumático complejo.<br>';
+            }
+            
+            html += '• Integrar estos hallazgos con la historia clínica completa y otras fuentes de información.<br>';
+            html += '</div>';
+            
+            return html;
+        }
+
+        function exportToPDF() {
+            const content = document.getElementById('results-content').innerHTML;
+            const now = new Date();
+            const fechaCompleta = now.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const horaCompleta = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Resultados CTQ-SF</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                        .header-info { background: #29A98C; color: white; padding: 15px; border-radius: 10px; margin: 15px 0; text-align: center; }
+                        .subscale-result { margin: 15px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+                        .subscale-name { font-weight: bold; margin-bottom: 5px; }
+                        .alert-high { background: #f56565; color: white; padding: 8px; border-radius: 5px; margin: 5px 0; }
+                        .clinical-notes { background: #f7fafc; border-left: 4px solid #29A98C; padding: 15px; margin: 15px 0; }
+                        .level-none { color: #48bb78; }
+                        .level-low { color: #f6ad55; }
+                        .level-moderate { color: #ed8936; }
+                        .level-severe { color: #f56565; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Resultados CTQ-SF - Cuestionario de Acontecimientos Traumáticos en la Infancia</h1>
+                    <div class="header-info">
+                        <strong>Fecha de generación del reporte:</strong> ${fechaCompleta}<br>
+                        <strong>Hora de generación:</strong> ${horaCompleta}
+                    </div>
+                    ${content}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function captureResults() {
+            const resultsCard = document.getElementById('card-results');
+            const now = new Date();
+            const fechaArchivo = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const horaArchivo = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+            
+            // Crear un canvas temporal para la captura
+            html2canvas(resultsCard).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `CTQ-SF_Resultados_${fechaArchivo}_${horaArchivo}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }).catch(() => {
+                // Fallback si html2canvas no está disponible
+                alert('Para capturar como imagen, use la función de impresión de su navegador y seleccione "Guardar como PDF"');
+                window.print();
+            });
+        }
+
+        function startNewEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los resultados actuales.')) {
+                // Reiniciar variables
+                currentCard = 0;
+                responses = {};
+                
+                // Ocultar todas las cartas
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // Limpiar selecciones
+                document.querySelectorAll('.option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Mostrar carta inicial
+                document.getElementById('card-0').classList.add('active');
+                
+                // Actualizar interfaz
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        // Función auxiliar para html2canvas (si está disponible)
+        function html2canvas(element) {
+            return new Promise((resolve, reject) => {
+                if (typeof window.html2canvas !== 'undefined') {
+                    window.html2canvas(element).then(resolve).catch(reject);
+                } else {
+                    reject(new Error('html2canvas not available'));
+                }
+            });
+        }
+    </script>
+</body>
+</html>

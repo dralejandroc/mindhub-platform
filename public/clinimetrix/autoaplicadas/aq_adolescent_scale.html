@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cociente de TEA Adolescente (AQ-Adolescent)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            color: #112F33;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #112F33;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, rgba(41, 169, 140, 0.1), rgba(17, 47, 51, 0.1));
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-left: 4px solid #29A98C;
+        }
+
+        .instructions h3 {
+            color: #29A98C;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .instructions p {
+            color: #112F33;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: #112F33;
+            font-weight: 500;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-button {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #112F33;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .option-button:hover {
+            background: linear-gradient(135deg, rgba(41, 169, 140, 0.1), rgba(17, 47, 51, 0.1));
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.2);
+        }
+
+        .option-button.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(41, 169, 140, 0.3);
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-weight: 600;
+        }
+
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .primary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .results-section {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, rgba(41, 169, 140, 0.1), rgba(17, 47, 51, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .score-title {
+            color: #29A98C;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .score-value {
+            color: #112F33;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .interpretation {
+            background: #fff8ee;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #29A98C;
+        }
+
+        .interpretation h4 {
+            color: #29A98C;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .alert-high {
+            background: linear-gradient(135deg, rgba(236, 115, 103, 0.1), rgba(116, 42, 42, 0.1));
+            border-left: 4px solid #f56565;
+            color: #742a2a;
+        }
+
+        .alert-moderate {
+            background: linear-gradient(135deg, rgba(246, 173, 85, 0.1), rgba(237, 137, 54, 0.1));
+            border-left: 4px solid #f6ad55;
+            color: #ed8936;
+        }
+
+        .normal {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(41, 169, 140, 0.1));
+            border-left: 4px solid #48bb78;
+            color: #29A98C;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .datetime-info {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .card h1 {
+                font-size: 1.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Card 0: Bienvenida -->
+    <div class="container">
+        <div class="card active" id="card-0">
+            <h1>Cociente de TEA Adolescente</h1>
+            <div class="subtitle">AQ-Adolescent (10-16 años)</div>
+            
+            <div class="instructions">
+                <h3>Instrucciones importantes:</h3>
+                <p>A continuación encontrará una lista de afirmaciones acerca de su hijo/a. Por favor lea cada afirmación muy detalladamente y marque cuánto está de acuerdo o en desacuerdo con dicha afirmación.</p>
+                <p><strong>Para cada pregunta, seleccione la opción que mejor describa a su hijo/a:</strong></p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li style="color: #28a745; font-weight: 600;">✅ Definitivamente de acuerdo</li>
+                    <li style="color: #6cb049; font-weight: 500;">☑️ Ligeramente de acuerdo</li>
+                    <li style="color: #dc6545; font-weight: 500;">🤔 Ligeramente en desacuerdo</li>
+                    <li style="color: #dc3545; font-weight: 600;">❌ Definitivamente en desacuerdo</li>
+                </ul>
+                <p><strong>Importante:</strong> Este cuestionario evalúa 5 áreas: Habilidades Sociales, Comunicación, Imaginación, Atención al Detalle y Enganche Atencional. Responda de manera honesta pensando en el comportamiento habitual de su hijo/a.</p>
+                <p style="color: #ec7367; font-weight: 600;">Esta escala NO constituye un diagnóstico. Los resultados deben ser interpretados únicamente por un profesional calificado.</p>
+            </div>
+            
+            <button class="primary-button" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-50: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">1</div>
+            <div class="question-text">Prefiere hacer cosas con otras personas más que solo/a</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(1, 'definitely_agree')">✅ Definitivamente de acuerdo</button>
+                <button class="option-button" onclick="selectOption(1, 'slightly_agree')">☑️ Ligeramente de acuerdo</button>
+                <button class="option-button" onclick="selectOption(1, 'slightly_disagree')">🤔 Ligeramente en desacuerdo</button>
+                <button class="option-button" onclick="selectOption(1, 'definitely_disagree')">❌ Definitivamente en desacuerdo</button>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h2>¡Escala Completada!</h2>
+            <p>Muchas gracias por completar la evaluación.</p>
+            <p style="margin: 20px 0; font-weight: 600;">Por favor, pase el dispositivo a su médico o profesional de la salud para revisar los resultados.</p>
+            <button class="primary-button" onclick="showResults()">Revisar Resultados (Profesional)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h1>Resultados - AQ Adolescent</h1>
+            <div class="datetime-info" id="datetime-info"></div>
+            
+            <div class="results-section" id="results-content">
+                <!-- Los resultados se generarán dinámicamente -->
+            </div>
+            
+            <div class="export-buttons">
+                <button class="primary-button" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="primary-button" onclick="exportToImage()">📷 Capturar Imagen</button>
+                <button class="primary-button" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+
+        <div class="progress-bar" id="progress-bar"></div>
+        <button class="back-button" id="back-button" onclick="previousCard()">← Regresar</button>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 50;
+        
+        // Definición de ítems con texto completo
+        const questions = [
+            "Prefiere hacer cosas con otras personas más que solo/a",
+            "Prefiere hacer las cosas de la misma manera una y otra vez",
+            "Si trata de imaginar algo, le resulta muy fácil crear una imagen en su mente",
+            "Frecuentemente se queda tan absorto/a con alguna cosa que pierde de vista otras cosas",
+            "Suele notar sonidos tenues que otros no escuchan",
+            "Habitualmente se fija en las patentes de los autos o en tipos similares de información",
+            "La gente con frecuencia le dice que ha dicho algo descortés, aunque él/ella piense que ha sido cortés",
+            "Cuando lee un cuento, le resulta fácil imaginar la apariencia de los personajes",
+            "Le fascinan las fechas",
+            "En un grupo social, puede seguir fácilmente varias conversaciones de diferentes personas a la vez",
+            "Le resultan fáciles las situaciones sociales",
+            "Tiende a fijarse en detalles que otros no notan",
+            "Preferiría ir más a una biblioteca que a una fiesta",
+            "Le resulta fácil inventar historias",
+            "Le atraen más las personas que las cosas",
+            "Le interesan mucho ciertos temas y se pone mal si no se puede dedicar a ellos",
+            "Disfruta de la cháchara social",
+            "Mientras habla no es siempre fácil que otros puedan hacer algún comentario intercalado",
+            "Le fascinan los números",
+            "Cuando lee un cuento le resulta difícil darse cuenta de las intenciones de los personajes",
+            "No disfruta particularmente leyendo ficción",
+            "Le resulta difícil hacer nuevos amigos",
+            "Nota patrones en las cosas todo el tiempo",
+            "Preferiría ir más al teatro que a un museo",
+            "No se altera si le cambian la rutina diaria",
+            "Con frecuencia se da cuenta de que no sabe mantener una conversación",
+            "Le resulta fácil \"leer entre líneas\" cuando alguien le habla",
+            "Suele concentrarse más en el cuadro entero que en los pequeños detalles",
+            "No es muy bueno/a para recordar números de teléfono",
+            "No suele notar pequeños cambios en una situación o en el aspecto de una persona",
+            "Se puede dar cuenta si quien lo/a escucha se está aburriendo",
+            "Le resulta fácil hacer más de una cosa a la vez",
+            "Cuando habla por teléfono no está seguro/a de cuándo le toca hablar",
+            "Disfruta de hacer cosas espontáneamente",
+            "Suele ser el/la último/a en entender un chiste",
+            "Le resulta fácil saber lo que el otro piensa o siente con sólo mirarle la cara",
+            "Si hay una interrupción, puede volver rápidamente a lo que estaba haciendo",
+            "Es bueno/a para la cháchara social",
+            "La gente suele decirle que habla persistentemente del mismo tema",
+            "Cuando era más chico/a solía disfrutar jugando a \"hacer como que\" con otros niños (ej, jugar al doctor o a las visitas)",
+            "Le gusta juntar información sobre categorías de cosas (ej, tipos de autos, pájaros, plantas, trenes, etc.)",
+            "Le cuesta imaginar cómo sería ser otra persona",
+            "Le gusta planear cuidadosamente cualquier actividad en la que participe",
+            "Disfruta de los eventos sociales",
+            "Le resulta difícil darse cuenta de las intenciones de la gente",
+            "Las situaciones nuevas le generan ansiedad",
+            "Disfruta conociendo gente nueva",
+            "Es diplomático/a",
+            "No es bueno/a para recordar la fecha de nacimiento de la gente",
+            "Le resulta muy fácil jugar con otros niños a juegos que impliquen \"hacer como que\""
+        ];
+
+        // Definir subescalas
+        const subscales = {
+            social_skills: [1, 11, 13, 15, 22, 36, 44, 45, 47, 48],
+            attention_switching: [2, 4, 10, 16, 25, 32, 34, 37, 43, 46],
+            attention_detail: [5, 6, 9, 12, 19, 23, 28, 29, 30, 49],
+            communication: [7, 17, 18, 26, 27, 31, 33, 35, 38, 39],
+            imagination: [3, 8, 14, 20, 21, 24, 40, 41, 42, 50]
+        };
+
+        // Ítems con puntuación inversa (donde desacuerdo = rasgos autistas)
+        const reverseItems = [1, 3, 8, 10, 11, 14, 15, 17, 24, 25, 27, 28, 31, 32, 34, 36, 37, 38, 40, 43, 44, 47, 48, 50];
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateBackButton();
+            generateQuestionCards();
+        });
+
+        function generateQuestionCards() {
+            const container = document.querySelector('.container');
+            
+            // Generar todas las tarjetas de preguntas
+            for (let i = 2; i <= totalQuestions + 1; i++) {
+                const questionIndex = i - 1;
+                const cardHTML = `
+                    <div class="card" id="card-${i}">
+                        <div class="question-number">${questionIndex}</div>
+                        <div class="question-text">${questions[questionIndex - 1]}</div>
+                        <div class="options-container">
+                            <button class="option-button" onclick="selectOption(${questionIndex}, 'definitely_agree')">✅ Definitivamente de acuerdo</button>
+                            <button class="option-button" onclick="selectOption(${questionIndex}, 'slightly_agree')">☑️ Ligeramente de acuerdo</button>
+                            <button class="option-button" onclick="selectOption(${questionIndex}, 'slightly_disagree')">🤔 Ligeramente en desacuerdo</button>
+                            <button class="option-button" onclick="selectOption(${questionIndex}, 'definitely_disagree')">❌ Definitivamente en desacuerdo</button>
+                        </div>
+                    </div>
+                `;
+                
+                const cardFinal = document.getElementById('card-final');
+                cardFinal.insertAdjacentHTML('beforebegin', cardHTML);
+            }
+        }
+
+        function selectOption(questionNumber, option) {
+            responses[questionNumber] = option;
+            
+            // Marcar visualmente la opción seleccionada
+            const currentCardElement = document.getElementById(`card-${currentCard}`);
+            const buttons = currentCardElement.querySelectorAll('.option-button');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function nextCard() {
+            document.getElementById(`card-${currentCard}`).classList.remove('active');
+            currentCard++;
+            
+            if (currentCard <= totalQuestions) {
+                document.getElementById(`card-${currentCard}`).classList.add('active');
+            } else {
+                document.getElementById('card-final').classList.add('active');
+            }
+            
+            updateProgressBar();
+            updateBackButton();
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                document.getElementById(currentCard === totalQuestions + 1 ? 'card-final' : `card-${currentCard}`).classList.remove('active');
+                currentCard--;
+                document.getElementById(`card-${currentCard}`).classList.add('active');
+                updateProgressBar();
+                updateBackButton();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function updateBackButton() {
+            const backButton = document.getElementById('back-button');
+            if (currentCard === 0 || document.getElementById('card-results').classList.contains('active')) {
+                backButton.style.display = 'none';
+            } else {
+                backButton.style.display = 'block';
+            }
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let subscaleScores = {
+                social_skills: 0,
+                attention_switching: 0,
+                attention_detail: 0,
+                communication: 0,
+                imagination: 0
+            };
+
+            // Calcular puntuaciones por subescala
+            for (const [subscale, items] of Object.entries(subscales)) {
+                for (const item of items) {
+                    if (responses[item]) {
+                        const response = responses[item];
+                        let score = 0;
+                        
+                        if (reverseItems.includes(item)) {
+                            // Ítems inversos: desacuerdo = rasgos autistas
+                            if (response === 'slightly_disagree' || response === 'definitely_disagree') {
+                                score = 1;
+                            }
+                        } else {
+                            // Ítems normales: acuerdo = rasgos autistas
+                            if (response === 'slightly_agree' || response === 'definitely_agree') {
+                                score = 1;
+                            }
+                        }
+                        
+                        subscaleScores[subscale] += score;
+                        totalScore += score;
+                    }
+                }
+            }
+
+            return { totalScore, subscaleScores };
+        }
+
+        function getInterpretation(totalScore, subscaleScores) {
+            let interpretation = {
+                level: '',
+                description: '',
+                recommendations: '',
+                subscaleAlerts: []
+            };
+
+            // Interpretación del puntaje total
+            if (totalScore >= 30) {
+                interpretation.level = 'Elevado (≥30)';
+                interpretation.description = 'Puntaje consistente con presencia significativa de rasgos del espectro autista. El 90% de adolescentes con TEA puntúan en este rango. Requiere evaluación diagnóstica integral.';
+            } else if (totalScore >= 20) {
+                interpretation.level = 'Moderado (20-29)';
+                interpretation.description = 'Puntaje sugiere presencia de algunos rasgos del espectro autista. Monitoreo clínico recomendado y evaluación de funcionamiento adaptativo.';
+            } else {
+                interpretation.level = 'Bajo (<20)';
+                interpretation.description = 'Puntaje dentro del rango neurotípico. Rasgos del espectro autista no prominentes en el perfil actual.';
+            }
+
+            // Alertas por subescala (≥66% del máximo = ≥7 puntos)
+            const subscaleNames = {
+                social_skills: 'Habilidades Sociales',
+                attention_switching: 'Enganche Atencional', 
+                attention_detail: 'Atención al Detalle',
+                communication: 'Comunicación',
+                imagination: 'Imaginación'
+            };
+
+            for (const [subscale, score] of Object.entries(subscaleScores)) {
+                if (score >= 7) {
+                    let description = '';
+                    switch(subscale) {
+                        case 'social_skills':
+                            description = `Dificultades significativas en interacción social y preferencias sociales (${score}/10). Evaluar habilidades de reciprocidad social.`;
+                            break;
+                        case 'attention_switching':
+                            description = `Rigidez cognitiva y dificultades en flexibilidad atencional (${score}/10). Considerar impacto en funcionamiento adaptativo.`;
+                            break;
+                        case 'attention_detail':
+                            description = `Atención hiperfocalizada en detalles específicos (${score}/10). Patrón consistente con procesamiento perceptual autista.`;
+                            break;
+                        case 'communication':
+                            description = `Dificultades en comunicación pragmática y reciprocidad conversacional (${score}/10). Evaluar competencias comunicativas.`;
+                            break;
+                        case 'imagination':
+                            description = `Limitaciones en pensamiento simbólico y juego imaginativo (${score}/10). Patrón de pensamiento concreto predominante.`;
+                            break;
+                    }
+                    interpretation.subscaleAlerts.push({
+                        name: subscaleNames[subscale],
+                        score: score,
+                        description: description
+                    });
+                }
+            }
+
+            return interpretation;
+        }
+
+        function showResults() {
+            const { totalScore, subscaleScores } = calculateScore();
+            const interpretation = getInterpretation(totalScore, subscaleScores);
+            
+            // Ocultar card final y mostrar resultados
+            document.getElementById('card-final').classList.remove('active');
+            document.getElementById('card-results').classList.add('active');
+            
+            // Mostrar fecha y hora
+            const now = new Date();
+            document.getElementById('datetime-info').textContent = 
+                `Evaluación realizada el ${now.toLocaleDateString('es-ES')} a las ${now.toLocaleTimeString('es-ES')}`;
+            
+            // Generar contenido de resultados
+            const resultsContent = document.getElementById('results-content');
+            
+            const subscaleNames = {
+                social_skills: 'Habilidades Sociales',
+                attention_switching: 'Enganche Atencional',
+                attention_detail: 'Atención al Detalle', 
+                communication: 'Comunicación',
+                imagination: 'Imaginación'
+            };
+
+            let alertClass = 'normal';
+            if (totalScore >= 30) alertClass = 'alert-high';
+            else if (totalScore >= 20) alertClass = 'alert-moderate';
+
+            resultsContent.innerHTML = `
+                <div class="score-card ${alertClass}">
+                    <div class="score-title">Puntuación Total</div>
+                    <div class="score-value">${totalScore}/50</div>
+                    <div><strong>Nivel:</strong> ${interpretation.level}</div>
+                </div>
+
+                <div class="interpretation ${alertClass}">
+                    <h4>Interpretación Clínica</h4>
+                    <p>${interpretation.description}</p>
+                </div>
+
+                <div class="score-card">
+                    <div class="score-title">Puntuaciones por Subescala</div>
+                    ${Object.entries(subscaleScores).map(([key, score]) => 
+                        `<div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                            <span>${subscaleNames[key]}:</span>
+                            <span style="font-weight: 600;">${score}/10</span>
+                        </div>`
+                    ).join('')}
+                </div>
+
+                ${interpretation.subscaleAlerts.length > 0 ? `
+                    <div class="interpretation alert-high">
+                        <h4>Indicadores Clínicos Significativos</h4>
+                        ${interpretation.subscaleAlerts.map(alert => 
+                            `<p><strong>${alert.name}:</strong> ${alert.description}</p>`
+                        ).join('')}
+                        <p style="margin-top: 15px; font-style: italic;">Subescalas con puntuaciones ≥70% sugieren dificultades clínicamente significativas en estas áreas específicas del funcionamiento.</p>
+                    </div>
+                ` : ''}
+
+                <div style="background: #e8f4fd; padding: 20px; border-radius: 12px; margin-top: 20px; border-left: 4px solid #29A98C;">
+                    <h4 style="color: #29A98C; margin-bottom: 10px;">Consideraciones Clínicas</h4>
+                    <p style="color: #112F33; font-size: 0.95rem; margin: 0;">
+                        <strong>Punto de corte:</strong> ≥30 puntos indica perfil consistente con TEA (sensibilidad 90%). 
+                        <strong>Subescalas:</strong> Cada dominio se puntúa 0-10. Evaluar funcionamiento adaptativo complementario para diagnóstico diferencial.
+                    </p>
+                </div>
+            `;
+            
+            updateBackButton();
+        }
+
+        function exportToPDF() {
+            window.print();
+        }
+
+        function exportToImage() {
+            // Crear canvas con los resultados
+            const resultsElement = document.getElementById('card-results');
+            
+            if (navigator.share) {
+                // Si está disponible la API de compartir nativa
+                navigator.share({
+                    title: 'Resultados AQ Adolescent',
+                    text: 'Resultados de la evaluación AQ Adolescent'
+                });
+            } else {
+                // Fallback: captura manual
+                alert('Para capturar los resultados, use la función de captura de pantalla de su dispositivo.');
+            }
+        }
+
+        function newEvaluation() {
+            // Reiniciar todas las variables
+            currentCard = 0;
+            responses = {};
+            
+            // Ocultar resultados y mostrar bienvenida
+            document.getElementById('card-results').classList.remove('active');
+            document.getElementById('card-0').classList.add('active');
+            
+            // Limpiar selecciones anteriores
+            document.querySelectorAll('.option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            updateProgressBar();
+            updateBackButton();
+        }
+    </script>
+</body>
+</html>

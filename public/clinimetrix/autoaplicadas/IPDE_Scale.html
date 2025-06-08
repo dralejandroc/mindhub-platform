@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPDE - Examen Internacional de los Trastornos de Personalidad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question-number {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .options-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-button {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .option-button:hover {
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.2);
+        }
+
+        .option-button.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .instructions h3 {
+            color: #112F33;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        .results-container {
+            margin-top: 20px;
+        }
+
+        .cluster-section {
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #29A98C;
+        }
+
+        .cluster-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #112F33;
+            margin-bottom: 15px;
+        }
+
+        .disorder-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .disorder-name {
+            font-weight: bold;
+            color: #112F33;
+            margin-bottom: 5px;
+        }
+
+        .disorder-score {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .alert-high {
+            background: rgba(245, 101, 101, 0.1);
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-moderate {
+            background: rgba(246, 173, 85, 0.1);
+            border-left: 4px solid #f6ad55;
+        }
+
+        .alert-low {
+            background: rgba(72, 187, 120, 0.1);
+            border-left: 4px solid #48bb78;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: 30px;
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .completion-message h3 {
+            color: #112F33;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .medical-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .medical-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(41, 169, 140, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .options-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .option-button {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .back-button {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="card-header">
+                <h2>IPDE</h2>
+                <div class="question-number">Examen Internacional de los Trastornos de Personalidad</div>
+            </div>
+            
+            <div class="instructions">
+                <h3>Instrucciones</h3>
+                <ul>
+                    <li>La intención de este cuestionario es conocer qué tipo de persona ha sido usted durante los últimos 5 años.</li>
+                    <li>Por favor no omita ningún ítem. Si no está seguro de una respuesta, señale la respuesta (Verdadero o Falso) que le parezca más correcta.</li>
+                    <li>No hay límite de tiempo, pero no pierda mucho tiempo pensando cuál es la respuesta correcta a un ítem determinado.</li>
+                    <li>Cuando la respuesta sea verdadero, seleccione "Verdadero". Cuando la respuesta sea falso, seleccione "Falso".</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="action-button" onclick="nextCard()">Comenzar Evaluación</button>
+            </div>
+        </div>
+
+        <!-- Cards 1-59: Ítems individuales -->
+        <!-- Card 1 -->
+        <div class="card" id="card-1">
+            <div class="card-header">
+                <h2>Pregunta 1 de 59</h2>
+            </div>
+            <div class="question-text">Normalmente me divierto y disfruto de la vida</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(1, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(1, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card" id="card-2">
+            <div class="card-header">
+                <h2>Pregunta 2 de 59</h2>
+            </div>
+            <div class="question-text">No reacciono bien cuando alguien me ofende</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(2, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(2, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card" id="card-3">
+            <div class="card-header">
+                <h2>Pregunta 3 de 59</h2>
+            </div>
+            <div class="question-text">No soy minucioso con los pequeños detalles</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(3, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(3, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card" id="card-4">
+            <div class="card-header">
+                <h2>Pregunta 4 de 59</h2>
+            </div>
+            <div class="question-text">No puedo decidir qué tipo de persona quiero ser</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(4, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(4, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card" id="card-5">
+            <div class="card-header">
+                <h2>Pregunta 5 de 59</h2>
+            </div>
+            <div class="question-text">Muestro mis sentimientos a todo el mundo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(5, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(5, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card" id="card-6">
+            <div class="card-header">
+                <h2>Pregunta 6 de 59</h2>
+            </div>
+            <div class="question-text">Dejo que los demás tomen decisiones importantes por mí</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(6, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(6, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="card" id="card-7">
+            <div class="card-header">
+                <h2>Pregunta 7 de 59</h2>
+            </div>
+            <div class="question-text">Habitualmente me siento tenso o nervioso</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(7, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(7, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="card" id="card-8">
+            <div class="card-header">
+                <h2>Pregunta 8 de 59</h2>
+            </div>
+            <div class="question-text">Casi nunca me enfado con nada</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(8, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(8, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 9 -->
+        <div class="card" id="card-9">
+            <div class="card-header">
+                <h2>Pregunta 9 de 59</h2>
+            </div>
+            <div class="question-text">Hago lo que sea necesario para que la gente no me abandone</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(9, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(9, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 10 -->
+        <div class="card" id="card-10">
+            <div class="card-header">
+                <h2>Pregunta 10 de 59</h2>
+            </div>
+            <div class="question-text">Soy una persona muy precavida</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(10, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(10, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 11 -->
+        <div class="card" id="card-11">
+            <div class="card-header">
+                <h2>Pregunta 11 de 59</h2>
+            </div>
+            <div class="question-text">Nunca me han detenido</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(11, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(11, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 12 -->
+        <div class="card" id="card-12">
+            <div class="card-header">
+                <h2>Pregunta 12 de 59</h2>
+            </div>
+            <div class="question-text">La gente cree que soy frío y distante</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(12, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(12, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 13 -->
+        <div class="card" id="card-13">
+            <div class="card-header">
+                <h2>Pregunta 13 de 59</h2>
+            </div>
+            <div class="question-text">Me meto en relaciones muy intensas, pero poco duraderas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(13, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(13, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 14 -->
+        <div class="card" id="card-14">
+            <div class="card-header">
+                <h2>Pregunta 14 de 59</h2>
+            </div>
+            <div class="question-text">La mayoría de la gente es justa y honesta conmigo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(14, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(14, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 15 -->
+        <div class="card" id="card-15">
+            <div class="card-header">
+                <h2>Pregunta 15 de 59</h2>
+            </div>
+            <div class="question-text">Me cuesta discrepar de las personas de quienes dependo mucho</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(15, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(15, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 16 -->
+        <div class="card" id="card-16">
+            <div class="card-header">
+                <h2>Pregunta 16 de 59</h2>
+            </div>
+            <div class="question-text">Me siento molesto o fuera de lugar en situaciones sociales</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(16, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(16, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 17 -->
+        <div class="card" id="card-17">
+            <div class="card-header">
+                <h2>Pregunta 17 de 59</h2>
+            </div>
+            <div class="question-text">Me siento fácilmente influido por lo que me rodea</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(17, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(17, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 18 -->
+        <div class="card" id="card-18">
+            <div class="card-header">
+                <h2>Pregunta 18 de 59</h2>
+            </div>
+            <div class="question-text">Normalmente me siento mal cuando hago daño o trato mal a alguien</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(18, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(18, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 19 -->
+        <div class="card" id="card-19">
+            <div class="card-header">
+                <h2>Pregunta 19 de 59</h2>
+            </div>
+            <div class="question-text">Discuto o me peleo con la gente cuando tratan de impedirme que haga lo que quiero</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(19, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(19, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 20 -->
+        <div class="card" id="card-20">
+            <div class="card-header">
+                <h2>Pregunta 20 de 59</h2>
+            </div>
+            <div class="question-text">A veces he rechazado un trabajo, incluso si estaba esperándolo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(20, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(20, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 21 -->
+        <div class="card" id="card-21">
+            <div class="card-header">
+                <h2>Pregunta 21 de 59</h2>
+            </div>
+            <div class="question-text">Cuando me alaban o critican, no manifiesto mi reacción a los demás</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(21, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(21, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 22 -->
+        <div class="card" id="card-22">
+            <div class="card-header">
+                <h2>Pregunta 22 de 59</h2>
+            </div>
+            <div class="question-text">No he perdonado los agravios de otros durante años</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(22, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(22, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 23 -->
+        <div class="card" id="card-23">
+            <div class="card-header">
+                <h2>Pregunta 23 de 59</h2>
+            </div>
+            <div class="question-text">Paso demasiado tiempo tratando de hacer las cosas perfectamente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(23, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(23, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 24 -->
+        <div class="card" id="card-24">
+            <div class="card-header">
+                <h2>Pregunta 24 de 59</h2>
+            </div>
+            <div class="question-text">A menudo la gente se ríe de mí a mis espaldas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(24, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(24, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 25 -->
+        <div class="card" id="card-25">
+            <div class="card-header">
+                <h2>Pregunta 25 de 59</h2>
+            </div>
+            <div class="question-text">Nunca me he autolesionado a propósito, ni he amenazado con suicidarme</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(25, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(25, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 26 -->
+        <div class="card" id="card-26">
+            <div class="card-header">
+                <h2>Pregunta 26 de 59</h2>
+            </div>
+            <div class="question-text">Mis sentimientos son como el tiempo: siempre están cambiando</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(26, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(26, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 27 -->
+        <div class="card" id="card-27">
+            <div class="card-header">
+                <h2>Pregunta 27 de 59</h2>
+            </div>
+            <div class="question-text">Lucho por mis derechos aunque moleste a la gente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(27, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(27, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 28 -->
+        <div class="card" id="card-28">
+            <div class="card-header">
+                <h2>Pregunta 28 de 59</h2>
+            </div>
+            <div class="question-text">Me gusta vestirme para destacar entre la gente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(28, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(28, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 29 -->
+        <div class="card" id="card-29">
+            <div class="card-header">
+                <h2>Pregunta 29 de 59</h2>
+            </div>
+            <div class="question-text">Mentiría o haría trampas para lograr mis propósitos</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(29, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(29, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 30 -->
+        <div class="card" id="card-30">
+            <div class="card-header">
+                <h2>Pregunta 30 de 59</h2>
+            </div>
+            <div class="question-text">No mantengo un plan si no obtengo resultados inmediatamente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(30, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(30, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 31 -->
+        <div class="card" id="card-31">
+            <div class="card-header">
+                <h2>Pregunta 31 de 59</h2>
+            </div>
+            <div class="question-text">Tengo poco o ningún deseo de mantener relaciones sexuales</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(31, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(31, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 32 -->
+        <div class="card" id="card-32">
+            <div class="card-header">
+                <h2>Pregunta 32 de 59</h2>
+            </div>
+            <div class="question-text">La gente cree que soy demasiado estricto con las normas y reglas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(32, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(32, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 33 -->
+        <div class="card" id="card-33">
+            <div class="card-header">
+                <h2>Pregunta 33 de 59</h2>
+            </div>
+            <div class="question-text">Generalmente me siento incómodo o desvalido si estoy solo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(33, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(33, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 34 -->
+        <div class="card" id="card-34">
+            <div class="card-header">
+                <h2>Pregunta 34 de 59</h2>
+            </div>
+            <div class="question-text">No me gusta relacionarme con la gente hasta que no estoy seguro de que les gusto</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(34, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(34, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 35 -->
+        <div class="card" id="card-35">
+            <div class="card-header">
+                <h2>Pregunta 35 de 59</h2>
+            </div>
+            <div class="question-text">No me gusta ser el centro de atención</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(35, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(35, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 36 -->
+        <div class="card" id="card-36">
+            <div class="card-header">
+                <h2>Pregunta 36 de 59</h2>
+            </div>
+            <div class="question-text">Creo que mi cónyuge (amante) me puede ser infiel</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(36, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(36, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 37 -->
+        <div class="card" id="card-37">
+            <div class="card-header">
+                <h2>Pregunta 37 de 59</h2>
+            </div>
+            <div class="question-text">A veces me enfado tanto que rompo o tiro cosas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(37, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(37, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 38 -->
+        <div class="card" id="card-38">
+            <div class="card-header">
+                <h2>Pregunta 38 de 59</h2>
+            </div>
+            <div class="question-text">He tenido amistades íntimas que duraron mucho tiempo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(38, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(38, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 39 -->
+        <div class="card" id="card-39">
+            <div class="card-header">
+                <h2>Pregunta 39 de 59</h2>
+            </div>
+            <div class="question-text">Me preocupa mucho no gustar a la gente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(39, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(39, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 40 -->
+        <div class="card" id="card-40">
+            <div class="card-header">
+                <h2>Pregunta 40 de 59</h2>
+            </div>
+            <div class="question-text">A menudo me siento «vacío» por dentro</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(40, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(40, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 41 -->
+        <div class="card" id="card-41">
+            <div class="card-header">
+                <h2>Pregunta 41 de 59</h2>
+            </div>
+            <div class="question-text">Trabajo tanto que no tengo tiempo para nada más</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(41, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(41, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 42 -->
+        <div class="card" id="card-42">
+            <div class="card-header">
+                <h2>Pregunta 42 de 59</h2>
+            </div>
+            <div class="question-text">Me da miedo que me dejen solo y tener que cuidar de mí mismo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(42, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(42, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 43 -->
+        <div class="card" id="card-43">
+            <div class="card-header">
+                <h2>Pregunta 43 de 59</h2>
+            </div>
+            <div class="question-text">Muchas cosas me parecen peligrosas, y no a la mayoría de la gente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(43, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(43, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 44 -->
+        <div class="card" id="card-44">
+            <div class="card-header">
+                <h2>Pregunta 44 de 59</h2>
+            </div>
+            <div class="question-text">Tengo fama de que me gusta «flirtear»</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(44, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(44, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 45 -->
+        <div class="card" id="card-45">
+            <div class="card-header">
+                <h2>Pregunta 45 de 59</h2>
+            </div>
+            <div class="question-text">No pido favores a la gente de la que dependo mucho</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(45, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(45, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 46 -->
+        <div class="card" id="card-46">
+            <div class="card-header">
+                <h2>Pregunta 46 de 59</h2>
+            </div>
+            <div class="question-text">Prefiero las actividades que puedo hacer por mí mismo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(46, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(46, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 47 -->
+        <div class="card" id="card-47">
+            <div class="card-header">
+                <h2>Pregunta 47 de 59</h2>
+            </div>
+            <div class="question-text">Pierdo los estribos y me meto en peleas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(47, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(47, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 48 -->
+        <div class="card" id="card-48">
+            <div class="card-header">
+                <h2>Pregunta 48 de 59</h2>
+            </div>
+            <div class="question-text">La gente piensa que soy demasiado inflexible o formal</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(48, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(48, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 49 -->
+        <div class="card" id="card-49">
+            <div class="card-header">
+                <h2>Pregunta 49 de 59</h2>
+            </div>
+            <div class="question-text">Con frecuencia busco consejos o recomendaciones sobre decisiones de la vida cotidiana</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(49, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(49, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 50 -->
+        <div class="card" id="card-50">
+            <div class="card-header">
+                <h2>Pregunta 50 de 59</h2>
+            </div>
+            <div class="question-text">Me guardo las cosas para mí, incluso cuando estoy con gente</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(50, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(50, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 51 -->
+        <div class="card" id="card-51">
+            <div class="card-header">
+                <h2>Pregunta 51 de 59</h2>
+            </div>
+            <div class="question-text">Para mí es difícil estar sin problemas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(51, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(51, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 52 -->
+        <div class="card" id="card-52">
+            <div class="card-header">
+                <h2>Pregunta 52 de 59</h2>
+            </div>
+            <div class="question-text">Estoy convencido de que existe una conspiración tras muchas cosas que pasan en el mundo</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(52, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(52, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 53 -->
+        <div class="card" id="card-53">
+            <div class="card-header">
+                <h2>Pregunta 53 de 59</h2>
+            </div>
+            <div class="question-text">Soy muy emocional y caprichoso</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(53, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(53, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 54 -->
+        <div class="card" id="card-54">
+            <div class="card-header">
+                <h2>Pregunta 54 de 59</h2>
+            </div>
+            <div class="question-text">Me resulta difícil acostumbrarme a hacer cosas nuevas</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(54, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(54, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 55 -->
+        <div class="card" id="card-55">
+            <div class="card-header">
+                <h2>Pregunta 55 de 59</h2>
+            </div>
+            <div class="question-text">La mayoría de la gente piensa que soy una persona extraña</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(55, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(55, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 56 -->
+        <div class="card" id="card-56">
+            <div class="card-header">
+                <h2>Pregunta 56 de 59</h2>
+            </div>
+            <div class="question-text">Me arriesgo y hago cosas temerarias</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(56, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(56, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 57 -->
+        <div class="card" id="card-57">
+            <div class="card-header">
+                <h2>Pregunta 57 de 59</h2>
+            </div>
+            <div class="question-text">Todo el mundo necesita uno o dos amigos para ser feliz</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(57, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(57, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 58 -->
+        <div class="card" id="card-58">
+            <div class="card-header">
+                <h2>Pregunta 58 de 59</h2>
+            </div>
+            <div class="question-text">Estoy más interesado en mis pensamientos que en lo que pasa fuera</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(58, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(58, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card 59 -->
+        <div class="card" id="card-59">
+            <div class="card-header">
+                <h2>Pregunta 59 de 59</h2>
+            </div>
+            <div class="question-text">Normalmente trato que la gente haga las cosas a mi manera</div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption(59, 'V')">Verdadero</button>
+                <button class="option-button" onclick="selectOption(59, 'F')">Falso</button>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="completion-message">
+                <h3>Escala completada</h3>
+                <p>Muchas gracias por completar el cuestionario IPDE.</p>
+                <p>Por favor, pase el dispositivo a su médico o profesional de salud mental para la revisión de los resultados.</p>
+                <button class="medical-button" onclick="showResults()">Revisar Resultados (Médico)</button>
+            </div>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <div class="card-header">
+                <h2>Resultados IPDE</h2>
+                <div class="question-number">Examen Internacional de los Trastornos de Personalidad</div>
+            </div>
+            
+            <div class="results-container" id="results-content">
+                <!-- Los resultados se generarán dinámicamente aquí -->
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-button" onclick="generatePDF()">Descargar PDF</button>
+                <button class="action-button" onclick="captureScreen()">Capturar Pantalla</button>
+                <button class="action-button" onclick="newEvaluation()">Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-bar" id="progress-bar"></div>
+    <button class="back-button" id="back-button" onclick="previousCard()">← Regresar</button>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 59;
+
+        // Configuración de ítems y respuestas correctas
+        const correctAnswers = {
+            1: 'V', 2: 'V', 3: 'F', 4: 'F', 5: 'V', 6: 'F', 7: 'V', 8: 'F', 9: 'F', 10: 'V',
+            11: 'V', 12: 'F', 13: 'F', 14: 'V', 15: 'F', 16: 'F', 17: 'V', 18: 'V', 19: 'F', 20: 'F',
+            21: 'V', 22: 'F', 23: 'V', 24: 'F', 25: 'V', 26: 'V', 27: 'V', 28: 'F', 29: 'F', 30: 'F',
+            31: 'V', 32: 'V', 33: 'F', 34: 'F', 35: 'F', 36: 'F', 37: 'F', 38: 'V', 39: 'F', 40: 'F',
+            41: 'V', 42: 'F', 43: 'V', 44: 'F', 45: 'F', 46: 'F', 47: 'F', 48: 'F', 49: 'V', 50: 'F',
+            51: 'F', 52: 'F', 53: 'F', 54: 'F', 55: 'F', 56: 'F', 57: 'F', 58: 'F', 59: 'V'
+        };
+
+        // Configuración de trastornos y sus ítems
+        const disorders = {
+            'Paranoide': { items: [2, 14, 22, 24, 27, 36, 52], cluster: 'A', code: 'F60.0' },
+            'Esquizoide': { items: [1, 8, 12, 21, 31, 46, 55, 57, 58], cluster: 'A', code: 'F60.1' },
+            'Disocial': { items: [11, 18, 20, 29, 38, 47, 51], cluster: 'B', code: 'F60.2' },
+            'Impulsivo': { items: [19, 30, 37, 53, 56], cluster: 'B', code: 'F60.30' },
+            'Límite': { items: [4, 9, 13, 25, 40], cluster: 'B', code: 'F60.31' },
+            'Histriónico': { items: [5, 17, 26, 28, 35, 44], cluster: 'B', code: 'F60.4' },
+            'Anancástico': { items: [3, 10, 23, 32, 41, 48, 54, 59], cluster: 'C', code: 'F60.5' },
+            'Ansioso': { items: [7, 16, 34, 39, 43, 50], cluster: 'C', code: 'F60.6' },
+            'Dependiente': { items: [6, 15, 33, 42, 45, 49], cluster: 'C', code: 'F60.7' }
+        };
+
+        function updateProgress() {
+            const progress = (currentCard / (totalQuestions + 2)) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backButton = document.getElementById('back-button');
+            if (currentCard === 0 || currentCard === totalQuestions + 1 || currentCard === totalQuestions + 2) {
+                backButton.style.display = 'none';
+            } else {
+                backButton.style.display = 'block';
+            }
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`card-${cardNumber}`).classList.add('active');
+            updateProgress();
+            updateBackButton();
+        }
+
+        function nextCard() {
+            currentCard++;
+            if (currentCard <= totalQuestions) {
+                showCard(currentCard);
+            } else {
+                showCard('final');
+                currentCard = totalQuestions + 1;
+            }
+        }
+
+        function previousCard() {
+            if (currentCard > 1) {
+                currentCard--;
+                showCard(currentCard);
+            }
+        }
+
+        function selectOption(questionNumber, answer) {
+            responses[questionNumber] = answer;
+            
+            // Marcar visualmente la opción seleccionada
+            const card = document.getElementById(`card-${questionNumber}`);
+            const buttons = card.querySelectorAll('.option-button');
+            buttons.forEach(button => {
+                button.classList.remove('selected');
+                if (button.textContent === (answer === 'V' ? 'Verdadero' : 'Falso')) {
+                    button.classList.add('selected');
+                }
+            });
+
+            // Auto-avance después de un breve retraso
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function calculateScores() {
+            const scores = {};
+            const alerts = [];
+
+            for (const [disorderName, config] of Object.entries(disorders)) {
+                let score = 0;
+                for (const item of config.items) {
+                    if (responses[item] && responses[item] !== correctAnswers[item]) {
+                        score++;
+                    }
+                }
+                
+                const percentage = (score / config.items.length) * 100;
+                scores[disorderName] = {
+                    score: score,
+                    total: config.items.length,
+                    percentage: percentage,
+                    cluster: config.cluster,
+                    code: config.code
+                };
+
+                // Alertas para puntuaciones altas (≥66% del máximo)
+                if (percentage >= 66) {
+                    alerts.push({
+                        disorder: disorderName,
+                        score: score,
+                        total: config.items.length,
+                        percentage: percentage
+                    });
+                }
+            }
+
+            return { scores, alerts };
+        }
+
+        function getInterpretation(percentage) {
+            if (percentage >= 80) {
+                return {
+                    level: 'Muy Alto',
+                    description: 'Puntuación muy elevada que sugiere presencia significativa de rasgos del trastorno.',
+                    class: 'alert-high'
+                };
+            } else if (percentage >= 60) {
+                return {
+                    level: 'Alto',
+                    description: 'Puntuación elevada que sugiere presencia notable de rasgos del trastorno.',
+                    class: 'alert-moderate'
+                };
+            } else if (percentage >= 40) {
+                return {
+                    level: 'Moderado',
+                    description: 'Puntuación moderada con algunos rasgos presentes.',
+                    class: 'alert-moderate'
+                };
+            } else {
+                return {
+                    level: 'Bajo',
+                    description: 'Puntuación baja con rasgos mínimos o ausentes.',
+                    class: 'alert-low'
+                };
+            }
+        }
+
+        function showResults() {
+            const { scores, alerts } = calculateScores();
+            const resultsContent = document.getElementById('results-content');
+            
+            let html = '<div style="margin-bottom: 30px; text-align: center;">';
+            html += '<h3 style="color: #112F33; margin-bottom: 15px;">Resumen Ejecutivo</h3>';
+            
+            if (alerts.length > 0) {
+                html += '<div style="background: rgba(245, 101, 101, 0.1); border-left: 4px solid #f56565; padding: 15px; border-radius: 10px; margin-bottom: 20px;">';
+                html += '<h4 style="color: #742a2a; margin-bottom: 10px;">⚠️ Puntuaciones Elevadas Detectadas</h4>';
+                html += '<p style="margin-bottom: 10px;">Los siguientes trastornos presentan puntuaciones ≥66%:</p>';
+                alerts.forEach(alert => {
+                    html += `<p><strong>${alert.disorder}</strong>: ${alert.score}/${alert.total} (${alert.percentage.toFixed(1)}%)</p>`;
+                });
+                html += '</div>';
+            } else {
+                html += '<div style="background: rgba(72, 187, 120, 0.1); border-left: 4px solid #48bb78; padding: 15px; border-radius: 10px; margin-bottom: 20px;">';
+                html += '<h4 style="color: #22543d; margin-bottom: 10px;">✓ Perfil dentro de parámetros normales</h4>';
+                html += '<p>No se detectaron puntuaciones elevadas significativas en ningún trastorno de personalidad.</p>';
+                html += '</div>';
+            }
+            html += '</div>';
+
+            // Resultados por clusters
+            const clusters = {
+                'A': { name: 'Cluster A - Excéntrico/Psicótico', disorders: [] },
+                'B': { name: 'Cluster B - Dramático/Emocional', disorders: [] },
+                'C': { name: 'Cluster C - Ansioso/Temeroso', disorders: [] }
+            };
+
+            // Agrupar por clusters
+            for (const [disorderName, result] of Object.entries(scores)) {
+                clusters[result.cluster].disorders.push({ name: disorderName, ...result });
+            }
+
+            // Generar HTML por clusters
+            for (const [clusterKey, cluster] of Object.entries(clusters)) {
+                html += `<div class="cluster-section">`;
+                html += `<div class="cluster-title">${cluster.name}</div>`;
+                
+                cluster.disorders.forEach(disorder => {
+                    const interpretation = getInterpretation(disorder.percentage);
+                    html += `<div class="disorder-item ${interpretation.class}">`;
+                    html += `<div class="disorder-name">${disorder.name} (${disorder.code})</div>`;
+                    html += `<div class="disorder-score">`;
+                    html += `Puntuación: ${disorder.score}/${disorder.total} (${disorder.percentage.toFixed(1)}%) - ${interpretation.level}`;
+                    html += `<br><small>${interpretation.description}</small>`;
+                    html += `</div></div>`;
+                });
+                
+                html += `</div>`;
+            }
+
+            // Recomendaciones profesionales
+            html += '<div style="background: rgba(41, 169, 140, 0.1); border-left: 4px solid #29A98C; padding: 20px; border-radius: 10px; margin-top: 30px;">';
+            html += '<h4 style="color: #112F33; margin-bottom: 15px;">📋 Recomendaciones Clínicas</h4>';
+            
+            if (alerts.length > 0) {
+                html += '<ul style="margin-left: 20px; line-height: 1.6;">';
+                html += '<li>Se recomienda evaluación clínica especializada para los trastornos con puntuaciones elevadas.</li>';
+                html += '<li>Considerar entrevista diagnóstica estructurada (IPDE completo) para confirmación diagnóstica.</li>';
+                html += '<li>Evaluar impacto funcional y necesidad de intervención terapéutica.</li>';
+                html += '<li>Descartar influencia de trastornos del Eje I en las respuestas (sesgo de estado).</li>';
+                html += '</ul>';
+            } else {
+                html += '<p>Los resultados sugieren un perfil de personalidad dentro de parámetros normales. Se recomienda seguimiento rutinario según criterio clínico.</p>';
+            }
+            
+            html += '</div>';
+
+            // Información técnica
+            html += '<div style="background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 10px; margin-top: 20px; font-size: 0.9em; color: #666;">';
+            html += '<h5 style="margin-bottom: 10px;">Información Técnica:</h5>';
+            html += '<p><strong>Instrumento:</strong> IPDE (International Personality Disorder Examination) - Cuestionario de Cribado</p>';
+            html += '<p><strong>Punto de corte estándar:</strong> ≥3 respuestas no coincidentes por trastorno</p>';
+            html += '<p><strong>Interpretación:</strong> Screening inicial que requiere confirmación con entrevista clínica</p>';
+            html += '<p><strong>Fecha de aplicación:</strong> ' + new Date().toLocaleDateString('es-ES') + '</p>';
+            html += '</div>';
+
+            resultsContent.innerHTML = html;
+            showCard('results');
+            currentCard = totalQuestions + 2;
+        }
+
+        function generatePDF() {
+            window.print();
+        }
+
+        function captureScreen() {
+            html2canvas(document.getElementById('card-results')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'ipde_resultados.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        function newEvaluation() {
+            currentCard = 0;
+            responses = {};
+            
+            // Limpiar selecciones visuales
+            document.querySelectorAll('.option-button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            
+            showCard(0);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            updateBackButton();
+        });
+
+        // Navegación con teclado
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && currentCard > 1) {
+                previousCard();
+            }
+        });
+    </script>
+</body>
+</html>

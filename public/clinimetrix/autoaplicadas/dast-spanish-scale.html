@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAST - Cuestionario de Detección de Drogas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            text-align: center;
+        }
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            color: #112F33;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #112F33;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.2);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+        }
+
+        .checkbox-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-option:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+        }
+
+        .checkbox-option.selected {
+            background: rgba(41, 169, 140, 0.2);
+            border-color: #29A98C;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        .frequency-options {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .frequency-options .option {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #374151);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .results-section {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #29A98C;
+        }
+
+        .zone-1 { border-left-color: #48bb78; }
+        .zone-2 { border-left-color: #f6ad55; }
+        .zone-3 { border-left-color: #ed8936; }
+        .zone-4 { border-left-color: #f56565; }
+
+        .alert-high {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid #f56565;
+            color: #742a2a;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 95%;
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 25px;
+                margin: 10px 0;
+            }
+            
+            .card h1 {
+                font-size: 1.8rem;
+            }
+            
+            .frequency-options {
+                flex-direction: column;
+            }
+            
+            .checkbox-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border: 1px solid #29A98C;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #29A98C;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #112F33;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>DAST - Cuestionario de Detección de Drogas</h1>
+            <div class="instructions">
+                <h3>Instrucciones para el paciente:</h3>
+                <ul>
+                    <li>Este cuestionario ayudará a su médico a brindarle la mejor atención</li>
+                    <li>Responda todas las preguntas de manera honesta y completa</li>
+                    <li>El uso de drogas puede afectar su salud y algunos medicamentos</li>
+                    <li>Sus respuestas son confidenciales</li>
+                    <li>No hay respuestas correctas o incorrectas</li>
+                    <li>Presione la opción que mejor describa su situación</li>
+                </ul>
+            </div>
+            <p style="color: #112F33; margin: 20px 0;">El cuestionario toma aproximadamente 5 minutos en completarse.</p>
+            <button class="btn" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Card 1: Drogas utilizadas -->
+        <div class="card" id="card-1">
+            <h2>Pregunta 1 de 13</h2>
+            <div class="question-text">
+                <strong>¿Cuál de las siguientes drogas utilizó el año pasado?</strong><br>
+                <em>(Seleccione todas las que apliquen)</em>
+            </div>
+            <div class="checkbox-options">
+                <label class="checkbox-option" onclick="toggleCheckbox('metanfetaminas')">
+                    <input type="checkbox" id="metanfetaminas">
+                    Metanfetaminas (speed, cristal)
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('cannabis')">
+                    <input type="checkbox" id="cannabis">
+                    Cannabis (mariguana, maría)
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('inhalantes')">
+                    <input type="checkbox" id="inhalantes">
+                    Inhalantes (tíner, aerosol, pegamento)
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('tranquilizantes')">
+                    <input type="checkbox" id="tranquilizantes">
+                    Tranquilizantes (valium)
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('cocaina')">
+                    <input type="checkbox" id="cocaina">
+                    Cocaína
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('narcoticos')">
+                    <input type="checkbox" id="narcoticos">
+                    Narcóticos (heroína, oxicodona, metadona, etc.)
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('alucinogenos')">
+                    <input type="checkbox" id="alucinogenos">
+                    Alucinógenos (LSD, hongos)
+                </label>
+                <label class="checkbox-option" onclick="toggleCheckbox('otros')">
+                    <input type="checkbox" id="otros">
+                    Otros
+                </label>
+            </div>
+            <button class="btn" onclick="nextCard()">Continuar</button>
+        </div>
+
+        <!-- Card 2: Frecuencia -->
+        <div class="card" id="card-2">
+            <h2>Pregunta 2 de 13</h2>
+            <div class="question-text">
+                <strong>¿Con qué frecuencia ha usado estas drogas?</strong>
+            </div>
+            <div class="frequency-options">
+                <div class="option" onclick="selectOption('frequency', 'mensual')">
+                    Mensualmente o menos
+                </div>
+                <div class="option" onclick="selectOption('frequency', 'semanal')">
+                    Semanal
+                </div>
+                <div class="option" onclick="selectOption('frequency', 'diario')">
+                    A diario o casi a diario
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3-12: Preguntas principales -->
+        <div class="card" id="card-3">
+            <h2>Pregunta 3 de 13</h2>
+            <div class="question-text">
+                <strong>¿Ha utilizado medicamentos distintos de los necesarios por motivos médicos?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q1', 'no')">No</div>
+                <div class="option" onclick="selectOption('q1', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <h2>Pregunta 4 de 13</h2>
+            <div class="question-text">
+                <strong>¿Abusa de más de una droga a la vez?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q2', 'no')">No</div>
+                <div class="option" onclick="selectOption('q2', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <h2>Pregunta 5 de 13</h2>
+            <div class="question-text">
+                <strong>¿Puede dejar de consumir drogas cuando quiera?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q3', 'no')">No</div>
+                <div class="option" onclick="selectOption('q3', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <h2>Pregunta 6 de 13</h2>
+            <div class="question-text">
+                <strong>¿Ha experimentado pérdida temporal de la memoria o escenas retrospectivas como resultado del uso de drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q4', 'no')">No</div>
+                <div class="option" onclick="selectOption('q4', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <h2>Pregunta 7 de 13</h2>
+            <div class="question-text">
+                <strong>¿En ocasiones se siente mal o culpable por su uso de drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q5', 'no')">No</div>
+                <div class="option" onclick="selectOption('q5', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <h2>Pregunta 8 de 13</h2>
+            <div class="question-text">
+                <strong>¿Se quejan alguna vez su cónyuge (o padres) por su implicación con las drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q6', 'no')">No</div>
+                <div class="option" onclick="selectOption('q6', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <h2>Pregunta 9 de 13</h2>
+            <div class="question-text">
+                <strong>¿Ha descuidado a su familia debido a su uso de drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q7', 'no')">No</div>
+                <div class="option" onclick="selectOption('q7', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <h2>Pregunta 10 de 13</h2>
+            <div class="question-text">
+                <strong>¿Ha participado en actividades ilegales a fin de obtener drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q8', 'no')">No</div>
+                <div class="option" onclick="selectOption('q8', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <h2>Pregunta 11 de 13</h2>
+            <div class="question-text">
+                <strong>¿Ha experimentado alguna vez síntomas de abstinencia (sentirse enfermo) cuando ha dejado de consumir drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q9', 'no')">No</div>
+                <div class="option" onclick="selectOption('q9', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <h2>Pregunta 12 de 13</h2>
+            <div class="question-text">
+                <strong>¿Ha tenido problemas médicos como resultado de su uso de drogas (por ejemplo, pérdida de memoria, hepatitis, convulsiones, hemorragias)?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('q10', 'no')">No</div>
+                <div class="option" onclick="selectOption('q10', 'si')">Sí</div>
+            </div>
+        </div>
+
+        <!-- Card 13: Inyección -->
+        <div class="card" id="card-13">
+            <h2>Pregunta 13 de 13</h2>
+            <div class="question-text">
+                <strong>¿Alguna vez se ha inyectado drogas?</strong>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption('injection', 'nunca')">Nunca</div>
+                <div class="option" onclick="selectOption('injection', '90dias')">Sí, en los últimos 90 días</div>
+                <div class="option" onclick="selectOption('injection', 'mas90')">Sí, hace más de 90 días</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h1>✓ Escala Completada</h1>
+            <p style="color: #112F33; font-size: 1.1rem; margin: 30px 0;">
+                Muchas gracias por completar el cuestionario.<br><br>
+                Por favor pase el dispositivo a su médico o profesional para su revisión.
+            </p>
+            <button class="btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h1>Resultados DAST</h1>
+            <div class="results-section" id="results-content">
+                <!-- Los resultados se llenarán dinámicamente -->
+            </div>
+            
+            <div class="export-buttons">
+                <button class="btn" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="btn" onclick="captureResults()">📸 Capturar Imagen</button>
+                <button class="btn btn-secondary" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="backBtn" onclick="goBack()">← Regresar</button>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        let totalQuestions = 13;
+
+        function toggleCheckbox(drugId) {
+            try {
+                const checkbox = document.getElementById(drugId);
+                const option = checkbox.parentElement;
+                
+                checkbox.checked = !checkbox.checked;
+                option.classList.toggle('selected', checkbox.checked);
+                
+                if (!responses.drugs) responses.drugs = [];
+                
+                if (checkbox.checked) {
+                    if (!responses.drugs.includes(drugId)) {
+                        responses.drugs.push(drugId);
+                    }
+                } else {
+                    responses.drugs = responses.drugs.filter(drug => drug !== drugId);
+                }
+            } catch (error) {
+                console.error('Error in toggleCheckbox:', error);
+            }
+        }
+
+        function selectOption(question, value) {
+            try {
+                responses[question] = value;
+                console.log('Response saved:', question, value);
+                
+                // Visual feedback
+                const currentCardElement = document.getElementById(`card-${currentCard}`);
+                if (currentCardElement) {
+                    const options = currentCardElement.querySelectorAll('.option');
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    event.target.classList.add('selected');
+                }
+                
+                // Auto advance
+                setTimeout(() => {
+                    nextCard();
+                }, 150);
+            } catch (error) {
+                console.error('Error in selectOption:', error);
+            }
+        }
+
+        function nextCard() {
+            try {
+                console.log('Moving from card', currentCard, 'to', currentCard + 1);
+                
+                const currentCardElement = document.getElementById(`card-${currentCard}`);
+                if (currentCardElement) {
+                    currentCardElement.classList.remove('active');
+                }
+                
+                currentCard++;
+                
+                let nextCardId;
+                if (currentCard === totalQuestions + 1) {
+                    // Después de la última pregunta (card-13), ir a card-final
+                    nextCardId = 'card-final';
+                } else {
+                    // Para todas las demás, usar el número
+                    nextCardId = `card-${currentCard}`;
+                }
+                
+                const nextCardElement = document.getElementById(nextCardId);
+                if (nextCardElement) {
+                    nextCardElement.classList.add('active');
+                    console.log('Showing card:', nextCardId);
+                } else {
+                    console.error('Next card element not found:', nextCardId);
+                }
+                
+                updateProgress();
+                updateBackButton();
+                
+            } catch (error) {
+                console.error('Error in nextCard:', error);
+            }
+        }
+
+        function goBack() {
+            try {
+                if (currentCard > 0) {
+                    // Determinar el ID de la card actual
+                    let currentCardId;
+                    if (currentCard === totalQuestions + 1) {
+                        currentCardId = 'card-final';
+                    } else {
+                        currentCardId = `card-${currentCard}`;
+                    }
+                    
+                    const currentCardElement = document.getElementById(currentCardId);
+                    if (currentCardElement) {
+                        currentCardElement.classList.remove('active');
+                    }
+                    
+                    currentCard--;
+                    
+                    const prevCardElement = document.getElementById(`card-${currentCard}`);
+                    if (prevCardElement) {
+                        prevCardElement.classList.add('active');
+                    }
+                    
+                    updateProgress();
+                    updateBackButton();
+                }
+            } catch (error) {
+                console.error('Error in goBack:', error);
+            }
+        }
+
+        function updateProgress() {
+            try {
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar) {
+                    const progress = (currentCard / (totalQuestions + 1)) * 100;
+                    progressBar.style.width = progress + '%';
+                }
+            } catch (error) {
+                console.error('Error in updateProgress:', error);
+            }
+        }
+
+        function updateBackButton() {
+            try {
+                const backBtn = document.getElementById('backBtn');
+                const resultsCard = document.getElementById('card-results');
+                
+                if (!backBtn) return;
+                
+                const isResultsActive = resultsCard && resultsCard.classList.contains('active');
+                const isInFinalCard = currentCard === totalQuestions + 1; // card-final
+                
+                if (currentCard === 0 || isInFinalCard || isResultsActive) {
+                    backBtn.style.display = 'none';
+                } else {
+                    backBtn.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error in updateBackButton:', error);
+            }
+        }
+
+        function calculateScore() {
+            try {
+                let score = 0;
+                console.log('Calculating score with responses:', responses);
+                
+                // Preguntas principales (1-10)
+                for (let i = 1; i <= 10; i++) {
+                    const questionKey = `q${i}`;
+                    if (responses[questionKey] === 'si') {
+                        if (i === 3) {
+                            // Pregunta 3 es inversa: punto por "No"
+                            score += 0;
+                        } else {
+                            score += 1;
+                        }
+                    } else if (i === 3 && responses[questionKey] === 'no') {
+                        // Pregunta 3: punto por respuesta "No"
+                        score += 1;
+                    }
+                }
+                
+                console.log('Final score:', score);
+                return score;
+            } catch (error) {
+                console.error('Error in calculateScore:', error);
+                return 0;
+            }
+        }
+
+        function getInterpretation(score) {
+            try {
+                const drugUse = responses.drugs ? responses.drugs.length > 0 : false;
+                const dailyUse = responses.frequency === 'diario';
+                const weeklyNonCannabis = responses.frequency === 'semanal' && responses.drugs && 
+                    responses.drugs.some(drug => drug !== 'cannabis');
+                const injection90days = responses.injection === '90dias';
+                const currentTreatment = responses.treatment === 'actualmente';
+                
+                if (score === 0) {
+                    return {
+                        zone: 'I',
+                        level: 'Sin riesgo',
+                        class: 'zone-1',
+                        description: 'No hay riesgo de problemas de salud relacionados con el uso de drogas',
+                        action: 'Ninguna acción requerida'
+                    };
+                } else if (score >= 1 && score <= 2) {
+                    const meetsRiskyPeriods = !dailyUse && !weeklyNonCannabis && !injection90days && !currentTreatment;
+                    
+                    if (meetsRiskyPeriods) {
+                        return {
+                            zone: 'II',
+                            level: 'Riesgo',
+                            class: 'zone-2',
+                            description: 'Riesgo de problemas de salud relacionados con el uso de drogas',
+                            action: 'Ofrecer educación breve sobre los beneficios de abstenerse del uso de drogas. Monitorear en futuras visitas'
+                        };
+                    } else {
+                        return {
+                            zone: 'Intervención',
+                            level: 'Intervención breve',
+                            class: 'zone-2',
+                            description: 'Requiere intervención breve debido a patrones de uso de riesgo',
+                            action: 'Intervención breve recomendada'
+                        };
+                    }
+                } else if (score >= 3 && score <= 5) {
+                    return {
+                        zone: 'III',
+                        level: 'Dañino',
+                        class: 'zone-3',
+                        description: 'Riesgo de problemas de salud relacionados con el uso de drogas y posible trastorno leve o moderado por uso de sustancias',
+                        action: 'Intervención breve (ofrecer opciones que incluyan tratamiento)'
+                    };
+                } else {
+                    return {
+                        zone: 'IV',
+                        level: 'Severo',
+                        class: 'zone-4',
+                        description: 'Riesgo de problemas de salud relacionados con el uso de drogas y posible trastorno moderado o severo por uso de sustancias',
+                        action: 'Evaluación especializada y consideración de tratamiento intensivo'
+                    };
+                }
+            } catch (error) {
+                console.error('Error in getInterpretation:', error);
+                return {
+                    zone: 'Error',
+                    level: 'Error en cálculo',
+                    class: 'zone-1',
+                    description: 'Error al calcular interpretación',
+                    action: 'Revisar respuestas'
+                };
+            }
+        }
+
+        function getHighRiskItems() {
+            try {
+                const highRisk = [];
+                
+                const questionTexts = {
+                    'q1': 'Uso de medicamentos no médicos',
+                    'q2': 'Uso múltiple de drogas',
+                    'q3': 'Dificultad para dejar de consumir',
+                    'q4': 'Pérdida de memoria/flashbacks',
+                    'q5': 'Sentimientos de culpa',
+                    'q6': 'Quejas familiares',
+                    'q7': 'Descuido familiar',
+                    'q8': 'Actividades ilegales',
+                    'q9': 'Síntomas de abstinencia',
+                    'q10': 'Problemas médicos'
+                };
+                
+                for (let i = 1; i <= 10; i++) {
+                    const questionKey = `q${i}`;
+                    if (i === 3) {
+                        if (responses[questionKey] === 'no') {
+                            highRisk.push(questionTexts[questionKey]);
+                        }
+                    } else {
+                        if (responses[questionKey] === 'si') {
+                            highRisk.push(questionTexts[questionKey]);
+                        }
+                    }
+                }
+                
+                if (responses.injection === '90dias') {
+                    highRisk.push('Uso de drogas intravenosas reciente');
+                }
+                if (responses.frequency === 'diario') {
+                    highRisk.push('Uso diario de sustancias');
+                }
+                
+                return highRisk;
+            } catch (error) {
+                console.error('Error in getHighRiskItems:', error);
+                return [];
+            }
+        }
+
+        function showResults() {
+            try {
+                console.log('Showing results...');
+                console.log('All responses:', responses);
+                
+                // Ocultar todas las cards primero
+                document.querySelectorAll('.card.active').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                const score = calculateScore();
+                const interpretation = getInterpretation(score);
+                const highRiskItems = getHighRiskItems();
+                
+                console.log('Score:', score);
+                console.log('Interpretation:', interpretation);
+                
+                const drugsList = responses.drugs && responses.drugs.length > 0 ? 
+                    responses.drugs.map(drug => {
+                        const drugNames = {
+                            'metanfetaminas': 'Metanfetaminas',
+                            'cannabis': 'Cannabis',
+                            'inhalantes': 'Inhalantes',
+                            'tranquilizantes': 'Tranquilizantes',
+                            'cocaina': 'Cocaína',
+                            'narcoticos': 'Narcóticos',
+                            'alucinogenos': 'Alucinógenos',
+                            'otros': 'Otros'
+                        };
+                        return drugNames[drug] || drug;
+                    }).join(', ') : 'Ninguna reportada';
+
+                const frequencyText = responses.frequency ? 
+                    (responses.frequency === 'mensual' ? 'Mensualmente o menos' :
+                     responses.frequency === 'semanal' ? 'Semanal' : 'A diario o casi a diario') : 'No especificada';
+
+                const injectionText = responses.injection ? 
+                    (responses.injection === 'nunca' ? 'Nunca' :
+                     responses.injection === '90dias' ? 'Sí, últimos 90 días' : 'Sí, hace más de 90 días') : 'No especificado';
+                
+                const resultsHTML = `
+                    <div class="result-item ${interpretation.class}">
+                        <h3>Puntuación Total: ${score}/10</h3>
+                        <h4>Zona ${interpretation.zone}: ${interpretation.level}</h4>
+                        <p><strong>Interpretación:</strong> ${interpretation.description}</p>
+                        <p><strong>Acción recomendada:</strong> ${interpretation.action}</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h4>Sustancias reportadas:</h4>
+                        <p>${drugsList}</p>
+                        <p><strong>Frecuencia de uso:</strong> ${frequencyText}</p>
+                        <p><strong>Uso intravenoso:</strong> ${injectionText}</p>
+                    </div>
+                    
+                    ${highRiskItems.length > 0 ? `
+                    <div class="alert-high">
+                        <h4>⚠️ Elementos de alto riesgo identificados:</h4>
+                        <ul>
+                            ${highRiskItems.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="result-item">
+                        <h4>Recomendaciones clínicas:</h4>
+                        <ul>
+                            <li>Explorar motivación para el cambio en el uso de sustancias</li>
+                            <li>Evaluar factores de riesgo y protección adicionales</li>
+                            <li>Considerar evaluación de trastornos concurrentes</li>
+                            <li>Monitorear en consultas futuras</li>
+                            ${interpretation.zone === 'IV' ? '<li>Considerar derivación a especialista en adicciones</li>' : ''}
+                            ${highRiskItems.includes('Uso de drogas intravenosas reciente') ? '<li>Screening para hepatitis B, C y VIH</li>' : ''}
+                        </ul>
+                    </div>
+                    
+                    <div class="result-item">
+                        <small><strong>Fecha de evaluación:</strong> ${new Date().toLocaleDateString('es-ES')}<br>
+                        <strong>Instrumento:</strong> DAST (Drug Abuse Screening Test) - Versión en Español</small>
+                    </div>
+                `;
+                
+                const resultsContentElement = document.getElementById('results-content');
+                const resultsCardElement = document.getElementById('card-results');
+                
+                if (resultsContentElement) {
+                    resultsContentElement.innerHTML = resultsHTML;
+                    console.log('Results HTML inserted');
+                } else {
+                    console.error('Results content element not found');
+                }
+                
+                if (resultsCardElement) {
+                    resultsCardElement.classList.add('active');
+                    console.log('Results card shown');
+                } else {
+                    console.error('Results card element not found');
+                }
+                
+                updateBackButton();
+                
+            } catch (error) {
+                console.error('Error in showResults:', error);
+                alert('Error al mostrar resultados: ' + error.message);
+            }
+        }
+
+        function exportToPDF() {
+            window.print();
+        }
+
+        function captureResults() {
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(document.getElementById('card-results')).then(function(canvas) {
+                    const link = document.createElement('a');
+                    link.download = `DAST_Resultados_${new Date().toLocaleDateString('es-ES').replace(/\//g, '-')}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            } else {
+                alert('Para capturar imagen, use la función de captura de pantalla de su dispositivo');
+            }
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                currentCard = 0;
+                responses = {};
+                
+                document.querySelectorAll('.card.active').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                const initialCard = document.getElementById('card-0');
+                if (initialCard) {
+                    initialCard.classList.add('active');
+                }
+                
+                updateProgress();
+                updateBackButton();
+                
+                // Limpiar selecciones
+                document.querySelectorAll('.option.selected').forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('.checkbox-option.selected').forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            updateProgress();
+            updateBackButton();
+        });
+
+        // Fallback para inicialización inmediata
+        if (document.readyState !== 'loading') {
+            console.log('Document ready, initializing...');
+            updateProgress();
+            updateBackButton();
+        }
+    </script>
+</body>
+</html>

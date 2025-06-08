@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/sistema",
+      "dest": "/public/sistema.html"
+    },
+    {
+      "src": "/clinimetrix",
+      "dest": "/public/Clinimetrix/index.html"
+    },
+    {
+      "src": "/agenda",
+      "dest": "/public/agenda/index.html"
+    },
+    {
+      "src": "/chart",
+      "dest": "/public/chart/index.html"
+    },
+    {
+      "src": "/rx",
+      "dest": "/public/rx/index.html"
+    },
+    {
+      "src": "/resources",
+      "dest": "/public/resources/index.html"
+    },
+    {
+      "src": "/forms",
+      "dest": "/public/forms/index.html"
+    },
+    {
+      "src": "/finance",
+      "dest": "/public/finance/index.html"
+    },
+    {
+      "src": "/configuracion",
+      "dest": "/public/configuracion/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "/public/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ]
+}

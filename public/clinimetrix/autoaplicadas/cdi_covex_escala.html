@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Depresión Infantil CDI - COVEX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            margin: -30px -30px 20px -30px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .card-header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .card-header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #112F33;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .option:hover {
+            background: #e9f5f2;
+            border-color: #29A98C;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565, #742a2a);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-section {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .result-normal { background: #f0f9f0; border-color: #48bb78; }
+        .result-leve { background: #fff8dc; border-color: #f6ad55; }
+        .result-moderada { background: #fff5f5; border-color: #ed8936; }
+        .result-grave { background: #ffe5e5; border-color: #f56565; }
+
+        .score-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .subscale-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .subscale {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .alert-item {
+            background: #ffe5e5;
+            border: 1px solid #f56565;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            color: #742a2a;
+        }
+
+        .instructions {
+            background: #e9f5f2;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #29A98C;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+                margin: 10px 0;
+            }
+            
+            .card-header {
+                margin: -20px -20px 15px -20px;
+                padding: 15px;
+            }
+            
+            .card-header h1 {
+                font-size: 20px;
+            }
+            
+            .card-header h2 {
+                font-size: 16px;
+            }
+            
+            .question-text {
+                font-size: 16px;
+            }
+            
+            .option {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+            
+            .subscale-scores {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="card-header">
+                <h1>Cuestionario de Depresión Infantil</h1>
+                <h2>CDI - KOVACS</h2>
+                <div class="subtitle">Población infantil de 7-17 años</div>
+            </div>
+            
+            <div class="instructions">
+                <h3 style="color: #29A98C; margin-bottom: 15px;">Instrucciones</h3>
+                <p style="margin-bottom: 15px;">
+                    Este es un cuestionario que tiene oraciones que están en grupos de tres. 
+                    Escoge en cada grupo una oración, la que mejor diga cómo te has portado, 
+                    cómo te has sentido en las <strong>ÚLTIMAS DOS SEMANAS</strong>.
+                </p>
+                <p style="margin-bottom: 15px;">
+                    Luego marca con una 'X' la opción que corresponda. No hay respuesta correcta 
+                    ni falsa, solo trata de contestar con la mayor sinceridad, lo que es cierto para ti.
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="nextCard()">Comenzar Evaluación</button>
+            </div>
+        </div>
+
+        <!-- Cards 1-27: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">Pregunta 1 de 27</div>
+            <div class="question-text">¿Cómo te has sentido de triste?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">Estoy triste de vez en cuando.</div>
+                <div class="option" onclick="selectOption(1, 1)">Estoy triste muchas veces.</div>
+                <div class="option" onclick="selectOption(1, 2)">Estoy triste siempre.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">Pregunta 2 de 27</div>
+            <div class="question-text">¿Qué piensas sobre cómo te van a salir las cosas?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 2)">Nunca me saldrá nada bien.</div>
+                <div class="option" onclick="selectOption(2, 1)">No estoy seguro de si las cosas me saldrán bien.</div>
+                <div class="option" onclick="selectOption(2, 0)">Las cosas me saldrán bien.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">Pregunta 3 de 27</div>
+            <div class="question-text">¿Cómo haces las cosas?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">Hago bien la mayoría de las cosas.</div>
+                <div class="option" onclick="selectOption(3, 1)">Hago mal muchas cosas.</div>
+                <div class="option" onclick="selectOption(3, 2)">Todo lo hago mal.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">Pregunta 4 de 27</div>
+            <div class="question-text">¿Qué cosas te divierten?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">Me divierten muchas cosas.</div>
+                <div class="option" onclick="selectOption(4, 1)">Me divierten algunas cosas.</div>
+                <div class="option" onclick="selectOption(4, 2)">Nada me divierte.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">Pregunta 5 de 27</div>
+            <div class="question-text">¿Cómo te consideras?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 2)">Soy malo siempre.</div>
+                <div class="option" onclick="selectOption(5, 1)">Soy malo muchas veces.</div>
+                <div class="option" onclick="selectOption(5, 0)">Soy malo algunas veces.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">Pregunta 6 de 27</div>
+            <div class="question-text">¿Qué piensas que te puede ocurrir?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">A veces pienso que me pueden ocurrir cosas malas.</div>
+                <div class="option" onclick="selectOption(6, 1)">Me preocupa que me ocurran cosas malas.</div>
+                <div class="option" onclick="selectOption(6, 2)">Estoy seguro de que me van a ocurrir cosas terribles.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">Pregunta 7 de 27</div>
+            <div class="question-text">¿Cómo te sientes contigo mismo?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 2)">Me odio.</div>
+                <div class="option" onclick="selectOption(7, 1)">No me gusta como soy.</div>
+                <div class="option" onclick="selectOption(7, 0)">Me gusta como soy.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">Pregunta 8 de 27</div>
+            <div class="question-text">¿De quién es la culpa cuando ocurren cosas malas?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 2)">Todas las cosas malas son culpa mía.</div>
+                <div class="option" onclick="selectOption(8, 1)">Muchas cosas malas son culpa mía.</div>
+                <div class="option" onclick="selectOption(8, 0)">Generalmente no tengo la culpa de que ocurran cosas malas.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">Pregunta 9 de 27</div>
+            <div class="question-text">¿Piensas en hacerte daño?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">No pienso en matarme.</div>
+                <div class="option" onclick="selectOption(9, 1)">Pienso en matarme pero no lo haría.</div>
+                <div class="option" onclick="selectOption(9, 2)">Quiero matarme.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">Pregunta 10 de 27</div>
+            <div class="question-text">¿Con qué frecuencia tienes ganas de llorar?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 2)">Tengo ganas de llorar todos los días.</div>
+                <div class="option" onclick="selectOption(10, 1)">Tengo ganas de llorar muchos días.</div>
+                <div class="option" onclick="selectOption(10, 0)">Tengo ganas de llorar de cuando en cuando.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">Pregunta 11 de 27</div>
+            <div class="question-text">¿Con qué frecuencia te preocupan las cosas?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 2)">Las cosas me preocupan siempre.</div>
+                <div class="option" onclick="selectOption(11, 1)">Las cosas me preocupan muchas veces.</div>
+                <div class="option" onclick="selectOption(11, 0)">Las cosas me preocupan de cuando en cuando.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">Pregunta 12 de 27</div>
+            <div class="question-text">¿Te gusta estar con la gente?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 0)">Me gusta estar con la gente.</div>
+                <div class="option" onclick="selectOption(12, 1)">Muy a menudo no me gusta estar con la gente.</div>
+                <div class="option" onclick="selectOption(12, 2)">No quiero en absoluto estar con la gente.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">Pregunta 13 de 27</div>
+            <div class="question-text">¿Cómo tomas las decisiones?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 2)">No puedo decidirme.</div>
+                <div class="option" onclick="selectOption(13, 1)">Me cuesta decidirme.</div>
+                <div class="option" onclick="selectOption(13, 0)">Me decido fácilmente.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">Pregunta 14 de 27</div>
+            <div class="question-text">¿Cómo ves tu aspecto?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 0)">Tengo buen aspecto.</div>
+                <div class="option" onclick="selectOption(14, 1)">Hay algunas cosas de mi aspecto que no me gustan.</div>
+                <div class="option" onclick="selectOption(14, 2)">Soy feo.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">Pregunta 15 de 27</div>
+            <div class="question-text">¿Cómo te sientes cuando tienes que hacer los deberes?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 2)">Siempre me cuesta ponerme a hacer los deberes.</div>
+                <div class="option" onclick="selectOption(15, 1)">Muchas veces me cuesta ponerme a hacer los deberes.</div>
+                <div class="option" onclick="selectOption(15, 0)">No me cuesta ponerme a hacer los deberes.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">Pregunta 16 de 27</div>
+            <div class="question-text">¿Cómo duermes por las noches?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 2)">Todas las noches me cuesta dormirme.</div>
+                <div class="option" onclick="selectOption(16, 1)">Muchas noches me cuesta dormirme.</div>
+                <div class="option" onclick="selectOption(16, 0)">Duermo muy bien.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">Pregunta 17 de 27</div>
+            <div class="question-text">¿Cómo te sientes de cansado?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 0)">Estoy cansado de cuando en cuando.</div>
+                <div class="option" onclick="selectOption(17, 1)">Estoy cansado muchos días.</div>
+                <div class="option" onclick="selectOption(17, 2)">Estoy cansado siempre.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">Pregunta 18 de 27</div>
+            <div class="question-text">¿Cómo tienes el apetito?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 2)">La mayoría de los días no tengo ganas de comer.</div>
+                <div class="option" onclick="selectOption(18, 1)">Muchos días no tengo ganas de comer.</div>
+                <div class="option" onclick="selectOption(18, 0)">Como muy bien.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">Pregunta 19 de 27</div>
+            <div class="question-text">¿Te preocupas por dolores y enfermedades?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 0)">No me preocupa el dolor ni la enfermedad.</div>
+                <div class="option" onclick="selectOption(19, 1)">Muchas veces me preocupa el dolor y la enfermedad.</div>
+                <div class="option" onclick="selectOption(19, 2)">Siempre me preocupa el dolor y la enfermedad.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">Pregunta 20 de 27</div>
+            <div class="question-text">¿Te sientes solo?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 0)">Nunca me siento solo.</div>
+                <div class="option" onclick="selectOption(20, 1)">Me siento solo muchas veces.</div>
+                <div class="option" onclick="selectOption(20, 2)">Me siento solo siempre.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-number">Pregunta 21 de 27</div>
+            <div class="question-text">¿Te diviertes en el colegio?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 2)">Nunca me divierto en el colegio.</div>
+                <div class="option" onclick="selectOption(21, 1)">Me divierto en el colegio sólo de vez en cuando.</div>
+                <div class="option" onclick="selectOption(21, 0)">Me divierto en el colegio muchas veces.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-number">Pregunta 22 de 27</div>
+            <div class="question-text">¿Cuántos amigos tienes?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 0)">Tengo muchos amigos.</div>
+                <div class="option" onclick="selectOption(22, 1)">Tengo muchos amigos pero me gustaría tener más.</div>
+                <div class="option" onclick="selectOption(22, 2)">No tengo amigos.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="question-number">Pregunta 23 de 27</div>
+            <div class="question-text">¿Cómo va tu trabajo en el colegio?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(23, 0)">Mi trabajo en el colegio es bueno.</div>
+                <div class="option" onclick="selectOption(23, 1)">Mi trabajo en el colegio no es tan bueno como antes.</div>
+                <div class="option" onclick="selectOption(23, 2)">Llevo muy mal las asignaturas que antes llevaba bien.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-24">
+            <div class="question-number">Pregunta 24 de 27</div>
+            <div class="question-text">¿Cómo te comparas con otros niños?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(24, 2)">Nunca podré ser tan bueno como otros niños.</div>
+                <div class="option" onclick="selectOption(24, 1)">Si quiero puedo ser tan bueno como otros niños.</div>
+                <div class="option" onclick="selectOption(24, 0)">Soy tan bueno como otros niños.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="question-number">Pregunta 25 de 27</div>
+            <div class="question-text">¿Sientes que alguien te quiere?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(25, 2)">Nadie me quiere.</div>
+                <div class="option" onclick="selectOption(25, 1)">No estoy seguro de que alguien me quiera.</div>
+                <div class="option" onclick="selectOption(25, 0)">Estoy seguro de que alguien me quiere.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="question-number">Pregunta 26 de 27</div>
+            <div class="question-text">¿Haces lo que te dicen?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(26, 0)">Generalmente hago lo que me dicen.</div>
+                <div class="option" onclick="selectOption(26, 1)">Muchas veces no hago lo que me dicen.</div>
+                <div class="option" onclick="selectOption(26, 2)">Nunca hago lo que me dicen.</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-27">
+            <div class="question-number">Pregunta 27 de 27</div>
+            <div class="question-text">¿Cómo te llevas con la gente?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(27, 0)">Me llevo bien con la gente.</div>
+                <div class="option" onclick="selectOption(27, 1)">Me peleo muchas veces.</div>
+                <div class="option" onclick="selectOption(27, 2)">Me peleo siempre.</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="card-header">
+                <h1>Escala Completada</h1>
+                <h2>¡Muchas gracias!</h2>
+            </div>
+            <p style="text-align: center; font-size: 18px; margin: 30px 0; color: #112F33;">
+                Por favor pase el dispositivo a su médico o profesional para su revisión.
+            </p>
+            <div style="text-align: center;">
+                <button class="btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+            </div>
+        </div>
+
+        <!-- Card Resultados -->
+        <div class="card" id="card-results">
+            <div class="card-header">
+                <h1>Resultados CDI</h1>
+                <h2>Cuestionario de Depresión Infantil</h2>
+            </div>
+            
+            <div class="score-display" id="total-score">
+                Puntuación Total: <span id="score-value">--</span>/54
+            </div>
+            
+            <div class="subscale-scores">
+                <div class="subscale">
+                    <h4 style="color: #29A98C; margin-bottom: 10px;">Disforia</h4>
+                    <div style="font-size: 20px; font-weight: bold;" id="disforia-score">--/20</div>
+                    <div style="font-size: 12px; color: #666;">Humor depresivo, tristeza</div>
+                </div>
+                <div class="subscale">
+                    <h4 style="color: #29A98C; margin-bottom: 10px;">Autoestima Negativa</h4>
+                    <div style="font-size: 20px; font-weight: bold;" id="autoestima-score">--/18</div>
+                    <div style="font-size: 12px; color: #666;">Sentimientos de ineficacia</div>
+                </div>
+            </div>
+
+            <div id="interpretation-section">
+                <!-- Interpretación se generará dinámicamente -->
+            </div>
+
+            <div id="alerts-section">
+                <!-- Alertas se generarán dinámicamente -->
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="btn btn-secondary" onclick="captureResults()">📸 Capturar Imagen</button>
+                <button class="btn btn-secondary" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <!-- Back Button -->
+    <button class="back-btn" id="back-btn" onclick="previousCard()">← Regresar</button>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 27;
+
+        // Definición de subescalas según literatura CDI
+        const disforiaItems = [1, 6, 10, 11, 12, 16, 17, 19, 20, 21]; // 10 items
+        const autoestimaItems = [2, 3, 5, 7, 8, 13, 14, 24, 25]; // 9 items
+
+        function selectOption(question, value) {
+            responses[question] = value;
+            
+            // Marcar visualmente la opción seleccionada
+            const currentCardElement = document.getElementById(`card-${currentCard}`);
+            const options = currentCardElement.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            options[getOptionIndex(value)].classList.add('selected');
+            
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function getOptionIndex(value) {
+            // Para algunas preguntas las opciones están en orden inverso
+            const reverseQuestions = [2, 5, 7, 8, 13, 15, 16, 18, 24, 25, 26];
+            const currentQuestion = currentCard;
+            
+            if (reverseQuestions.includes(currentQuestion)) {
+                return value; // Ya están en el orden correcto en el HTML
+            }
+            return value;
+        }
+
+        function nextCard() {
+            if (currentCard === 0) {
+                // De bienvenida a primera pregunta
+                currentCard = 1;
+                showCard(currentCard);
+                updateProgress();
+                showBackButton();
+            } else if (currentCard <= totalQuestions) {
+                if (currentCard === totalQuestions) {
+                    // Última pregunta completada
+                    showCard('final');
+                    updateProgress(100);
+                    hideBackButton();
+                } else {
+                    // Siguiente pregunta
+                    currentCard++;
+                    showCard(currentCard);
+                    updateProgress();
+                }
+            }
+        }
+
+        function previousCard() {
+            if (currentCard > 1) {
+                currentCard--;
+                showCard(currentCard);
+                updateProgress();
+                
+                // Restaurar selección anterior si existe
+                if (responses[currentCard] !== undefined) {
+                    const currentCardElement = document.getElementById(`card-${currentCard}`);
+                    const options = currentCardElement.querySelectorAll('.option');
+                    options.forEach(option => option.classList.remove('selected'));
+                    options[responses[currentCard]].classList.add('selected');
+                }
+            } else if (currentCard === 1) {
+                currentCard = 0;
+                showCard(0);
+                updateProgress(0);
+                hideBackButton();
+            }
+        }
+
+        function showCard(cardId) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`card-${cardId}`).classList.add('active');
+        }
+
+        function updateProgress(percentage = null) {
+            if (percentage !== null) {
+                document.getElementById('progress').style.width = percentage + '%';
+            } else {
+                const progress = ((currentCard - 1) / totalQuestions) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+            }
+        }
+
+        function showBackButton() {
+            document.getElementById('back-btn').style.display = 'block';
+        }
+
+        function hideBackButton() {
+            document.getElementById('back-btn').style.display = 'none';
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let disforiaScore = 0;
+            let autoestimaScore = 0;
+
+            // Calcular puntuación total
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (responses[i] !== undefined) {
+                    totalScore += responses[i];
+                }
+            }
+
+            // Calcular subescalas
+            disforiaItems.forEach(item => {
+                if (responses[item] !== undefined) {
+                    disforiaScore += responses[item];
+                }
+            });
+
+            autoestimaItems.forEach(item => {
+                if (responses[item] !== undefined) {
+                    autoestimaScore += responses[item];
+                }
+            });
+
+            return {
+                total: totalScore,
+                disforia: disforiaScore,
+                autoestima: autoestimaScore
+            };
+        }
+
+        function getInterpretation(totalScore) {
+            if (totalScore < 19) {
+                return {
+                    level: 'normal',
+                    title: 'Sin Indicadores de Depresión',
+                    description: 'La puntuación obtenida se encuentra dentro del rango normal. No se evidencian síntomas depresivos clínicamente significativos según los criterios del CDI.',
+                    recommendations: 'Se sugiere mantener seguimiento preventivo y promover factores protectores del bienestar emocional.'
+                };
+            } else if (totalScore < 29) {
+                return {
+                    level: 'leve',
+                    title: 'Indicadores de Depresión Leve',
+                    description: 'Se identifican síntomas depresivos de intensidad leve que requieren atención y seguimiento clínico.',
+                    recommendations: 'Se recomienda intervención psicoterapéutica temprana y evaluación de factores precipitantes. Considerar apoyo familiar y escolar.'
+                };
+            } else if (totalScore < 39) {
+                return {
+                    level: 'moderada',
+                    title: 'Indicadores de Depresión Moderada',
+                    description: 'Presencia de sintomatología depresiva moderada que interfiere significativamente con el funcionamiento diario.',
+                    recommendations: 'Requiere intervención psicoterapéutica estructurada. Evaluar necesidad de intervención farmacológica. Coordinación con familia y escuela.'
+                };
+            } else {
+                return {
+                    level: 'grave',
+                    title: 'Indicadores de Depresión Grave',
+                    description: 'Sintomatología depresiva severa con alto impacto funcional. Requiere atención clínica inmediata.',
+                    recommendations: 'Intervención clínica urgente. Evaluación de riesgo suicida. Considerar hospitalización si procede. Tratamiento multidisciplinario intensivo.'
+                };
+            }
+        }
+
+        function checkAlerts() {
+            const alerts = [];
+            const highRiskItems = {
+                9: 'Ideación suicida',
+                7: 'Autoconcepto muy negativo',
+                8: 'Sentimientos de culpa excesivos',
+                25: 'Sentimientos de rechazo',
+                12: 'Aislamiento social severo'
+            };
+
+            Object.keys(highRiskItems).forEach(item => {
+                if (responses[item] >= 2) { // Puntuación máxima (respuesta más grave)
+                    alerts.push({
+                        item: item,
+                        description: highRiskItems[item],
+                        severity: 'high'
+                    });
+                }
+            });
+
+            return alerts;
+        }
+
+        function showResults() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores.total);
+            const alerts = checkAlerts();
+
+            // Mostrar puntuaciones
+            document.getElementById('score-value').textContent = scores.total;
+            document.getElementById('disforia-score').textContent = `${scores.disforia}/${disforiaItems.length * 2}`;
+            document.getElementById('autoestima-score').textContent = `${scores.autoestima}/${autoestimaItems.length * 2}`;
+
+            // Generar interpretación
+            const interpretationHTML = `
+                <div class="result-section result-${interpretation.level}">
+                    <h3 style="margin-bottom: 15px; color: #112F33;">${interpretation.title}</h3>
+                    <p style="margin-bottom: 15px;"><strong>Interpretación Clínica:</strong> ${interpretation.description}</p>
+                    <p><strong>Recomendaciones:</strong> ${interpretation.recommendations}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h4 style="color: #29A98C; margin-bottom: 10px;">Análisis por Subescalas:</h4>
+                    <p><strong>Disforia (${scores.disforia}/${disforiaItems.length * 2}):</strong> 
+                    ${scores.disforia > (disforiaItems.length * 1.3) ? 'Elevada - Indica presencia significativa de humor depresivo, tristeza y preocupación.' : 
+                      scores.disforia > (disforiaItems.length * 0.7) ? 'Moderada - Presencia de algunos síntomas disfóricos que requieren atención.' : 
+                      'Normal - Sin indicadores significativos de disforia.'}</p>
+                    
+                    <p><strong>Autoestima Negativa (${scores.autoestima}/${autoestimaItems.length * 2}):</strong> 
+                    ${scores.autoestima > (autoestimaItems.length * 1.3) ? 'Elevada - Indica sentimientos marcados de ineficacia, culpa y baja autoestima.' : 
+                      scores.autoestima > (autoestimaItems.length * 0.7) ? 'Moderada - Presencia de algunos sentimientos de inadecuación personal.' : 
+                      'Normal - Autoestima dentro de parámetros normales.'}</p>
+                </div>
+            `;
+
+            document.getElementById('interpretation-section').innerHTML = interpretationHTML;
+
+            // Mostrar alertas si existen
+            if (alerts.length > 0) {
+                let alertsHTML = `
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: #f56565; margin-bottom: 15px;">⚠️ Alertas Clínicas Importantes:</h4>
+                `;
+                
+                alerts.forEach(alert => {
+                    alertsHTML += `
+                        <div class="alert-item">
+                            <strong>Ítem ${alert.item}:</strong> ${alert.description} - Requiere evaluación clínica inmediata.
+                        </div>
+                    `;
+                });
+                
+                alertsHTML += '</div>';
+                document.getElementById('alerts-section').innerHTML = alertsHTML;
+            }
+
+            showCard('results');
+            hideBackButton();
+        }
+
+        function exportToPDF() {
+            const results = document.getElementById('card-results');
+            
+            // Crear ventana de impresión
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Resultados CDI - ${new Date().toLocaleDateString()}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #29A98C; padding-bottom: 20px; }
+                        .score-display { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+                        .result-section { margin: 20px 0; padding: 15px; border-left: 4px solid #29A98C; background: #f8f9fa; }
+                        .alert-item { background: #ffe5e5; border: 1px solid #f56565; padding: 10px; margin: 5px 0; border-radius: 4px; }
+                        .subscale-scores { display: flex; justify-content: space-around; margin: 20px 0; }
+                        .subscale { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Cuestionario de Depresión Infantil (CDI)</h1>
+                        <p>Fecha de evaluación: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    ${results.innerHTML.replace(/onclick="[^"]*"/g, '')}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function captureResults() {
+            // Implementación simplificada de captura
+            alert('Para capturar los resultados como imagen, utilice las herramientas de captura de pantalla de su dispositivo o la función de impresión a PDF.');
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                currentCard = 0;
+                responses = {};
+                showCard(0);
+                updateProgress(0);
+                hideBackButton();
+                
+                // Limpiar todas las selecciones
+                document.querySelectorAll('.option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress(0);
+            hideBackButton();
+        });
+    </script>
+</body>
+</html>

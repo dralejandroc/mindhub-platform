@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Salamanca de Trastornos de la Personalidad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 1.3rem;
+            color: #112F33;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(41, 169, 140, 0.3);
+            border-radius: 15px;
+            padding: 18px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            color: #112F33;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(41, 169, 140, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .option:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.2);
+        }
+        
+        .option:hover::before {
+            left: 100%;
+        }
+        
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            transform: scale(1.02);
+        }
+        
+        .option.selected::before {
+            display: none;
+        }
+        
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: #112F33;
+            line-height: 1.6;
+        }
+        
+        .instructions strong {
+            color: #29A98C;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+            display: block;
+            margin: 30px auto 0;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.4);
+        }
+        
+        .btn-back {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+            z-index: 1000;
+        }
+        
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.4);
+        }
+        
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .disorder-result {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #29A98C;
+        }
+        
+        .disorder-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #112F33;
+            margin-bottom: 5px;
+        }
+        
+        .disorder-score {
+            font-size: 0.95rem;
+            color: #666;
+        }
+        
+        .score-high {
+            color: #f56565;
+            font-weight: bold;
+        }
+        
+        .score-moderate {
+            color: #f6ad55;
+            font-weight: bold;
+        }
+        
+        .score-low {
+            color: #48bb78;
+        }
+        
+        .interpretation {
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(41, 169, 140, 0.3);
+        }
+        
+        .interpretation h3 {
+            color: #29A98C;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .interpretation p {
+            line-height: 1.6;
+            color: #112F33;
+            margin-bottom: 10px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-export {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+        
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.4);
+        }
+        
+        .group-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0 15px 0;
+            font-size: 1.1rem;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .chart-label {
+            width: 120px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #112F33;
+            flex-shrink: 0;
+        }
+        
+        .chart-bar-bg {
+            flex: 1;
+            height: 25px;
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+        
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            border-radius: 12px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+        
+        .chart-score {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #112F33;
+            min-width: 35px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100%;
+                padding: 0 10px;
+            }
+            
+            .card {
+                padding: 25px;
+                border-radius: 15px;
+            }
+            
+            .card-header {
+                font-size: 1.5rem;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .option {
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-export {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .chart-label {
+                width: 100px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="card-header">
+                Cuestionario Salamanca de Trastornos de la Personalidad
+            </div>
+            <div class="instructions">
+                <p><strong>Instrucciones importantes:</strong></p>
+                <p>Este es un cuestionario de screening para la evaluación de los trastornos de la personalidad. <strong>Conteste según sea su manera de ser habitual y no según se encuentre en un momento dado.</strong></p>
+                <br>
+                <p>Para cada pregunta, seleccione:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><strong>Falso:</strong> Si la afirmación NO aplica para nada a usted</li>
+                    <li><strong>A veces:</strong> Si es verdadero pero solo ocasionalmente</li>
+                    <li><strong>Con frecuencia:</strong> Si es verdadero y ocurre a menudo</li>
+                    <li><strong>Siempre:</strong> Si es verdadero y ocurre constantemente</li>
+                </ul>
+                <p><strong>Importante:</strong> Responda según sus patrones habituales de comportamiento, no según se sienta hoy específicamente.</p>
+            </div>
+            <button class="btn-primary" onclick="nextCard()">Comenzar Cuestionario</button>
+        </div>
+
+        <!-- Cards 1-22: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">Pregunta 1 de 22</div>
+            <div class="question-text">Pienso que más vale no confiar en los demás</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">Falso</div>
+                <div class="option" onclick="selectOption(1, 1)">A veces</div>
+                <div class="option" onclick="selectOption(1, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(1, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">Pregunta 2 de 22</div>
+            <div class="question-text">Me gustaría dar a la gente su merecido</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">Falso</div>
+                <div class="option" onclick="selectOption(2, 1)">A veces</div>
+                <div class="option" onclick="selectOption(2, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(2, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">Pregunta 3 de 22</div>
+            <div class="question-text">Prefiero realizar actividades que pueda hacer yo solo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">Falso</div>
+                <div class="option" onclick="selectOption(3, 1)">A veces</div>
+                <div class="option" onclick="selectOption(3, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(3, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">Pregunta 4 de 22</div>
+            <div class="question-text">Prefiero estar conmigo mismo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">Falso</div>
+                <div class="option" onclick="selectOption(4, 1)">A veces</div>
+                <div class="option" onclick="selectOption(4, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(4, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">Pregunta 5 de 22</div>
+            <div class="question-text">¿Piensa la gente que es usted raro o excéntrico?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">Falso</div>
+                <div class="option" onclick="selectOption(5, 1)">A veces</div>
+                <div class="option" onclick="selectOption(5, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(5, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">Pregunta 6 de 22</div>
+            <div class="question-text">Estoy más en contacto con lo paranormal que la mayoría de la gente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">Falso</div>
+                <div class="option" onclick="selectOption(6, 1)">A veces</div>
+                <div class="option" onclick="selectOption(6, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(6, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">Pregunta 7 de 22</div>
+            <div class="question-text">Soy demasiado emocional</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">Falso</div>
+                <div class="option" onclick="selectOption(7, 1)">A veces</div>
+                <div class="option" onclick="selectOption(7, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(7, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">Pregunta 8 de 22</div>
+            <div class="question-text">Doy mucha importancia y atención a mi imagen</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">Falso</div>
+                <div class="option" onclick="selectOption(8, 1)">A veces</div>
+                <div class="option" onclick="selectOption(8, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(8, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">Pregunta 9 de 22</div>
+            <div class="question-text">Hago cosas que están fuera de la ley</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">Falso</div>
+                <div class="option" onclick="selectOption(9, 1)">A veces</div>
+                <div class="option" onclick="selectOption(9, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(9, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">Pregunta 10 de 22</div>
+            <div class="question-text">Tengo poco respeto por los derechos de los demás</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">Falso</div>
+                <div class="option" onclick="selectOption(10, 1)">A veces</div>
+                <div class="option" onclick="selectOption(10, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(10, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">Pregunta 11 de 22</div>
+            <div class="question-text">Soy especial y merezco que me lo reconozcan</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 0)">Falso</div>
+                <div class="option" onclick="selectOption(11, 1)">A veces</div>
+                <div class="option" onclick="selectOption(11, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(11, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">Pregunta 12 de 22</div>
+            <div class="question-text">Mucha gente me envidia por mi valía</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 0)">Falso</div>
+                <div class="option" onclick="selectOption(12, 1)">A veces</div>
+                <div class="option" onclick="selectOption(12, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(12, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">Pregunta 13 de 22</div>
+            <div class="question-text">Mis emociones son como una montaña rusa</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 0)">Falso</div>
+                <div class="option" onclick="selectOption(13, 1)">A veces</div>
+                <div class="option" onclick="selectOption(13, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(13, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">Pregunta 14 de 22</div>
+            <div class="question-text">Soy impulsivo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 0)">Falso</div>
+                <div class="option" onclick="selectOption(14, 1)">A veces</div>
+                <div class="option" onclick="selectOption(14, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(14, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">Pregunta 15 de 22</div>
+            <div class="question-text">Me pregunto con frecuencia cuál es mi papel en la vida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 0)">Falso</div>
+                <div class="option" onclick="selectOption(15, 1)">A veces</div>
+                <div class="option" onclick="selectOption(15, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(15, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">Pregunta 16 de 22</div>
+            <div class="question-text">Me siento aburrido y vacío con facilidad</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 0)">Falso</div>
+                <div class="option" onclick="selectOption(16, 1)">A veces</div>
+                <div class="option" onclick="selectOption(16, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(16, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">Pregunta 17 de 22</div>
+            <div class="question-text">¿Le considera la gente demasiado perfeccionista, obstinado o rígido?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 0)">Falso</div>
+                <div class="option" onclick="selectOption(17, 1)">A veces</div>
+                <div class="option" onclick="selectOption(17, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(17, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">Pregunta 18 de 22</div>
+            <div class="question-text">Soy detallista, minucioso y demasiado trabajador</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 0)">Falso</div>
+                <div class="option" onclick="selectOption(18, 1)">A veces</div>
+                <div class="option" onclick="selectOption(18, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(18, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">Pregunta 19 de 22</div>
+            <div class="question-text">Necesito sentirme cuidado y protegido por los demás</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 0)">Falso</div>
+                <div class="option" onclick="selectOption(19, 1)">A veces</div>
+                <div class="option" onclick="selectOption(19, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(19, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">Pregunta 20 de 22</div>
+            <div class="question-text">Me cuesta tomar decisiones por mí mismo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 0)">Falso</div>
+                <div class="option" onclick="selectOption(20, 1)">A veces</div>
+                <div class="option" onclick="selectOption(20, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(20, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-number">Pregunta 21 de 22</div>
+            <div class="question-text">Soy nervioso</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 0)">Falso</div>
+                <div class="option" onclick="selectOption(21, 1)">A veces</div>
+                <div class="option" onclick="selectOption(21, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(21, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-number">Pregunta 22 de 22</div>
+            <div class="question-text">Tengo mucho miedo a hacer el ridículo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 0)">Falso</div>
+                <div class="option" onclick="selectOption(22, 1)">A veces</div>
+                <div class="option" onclick="selectOption(22, 2)">Con frecuencia</div>
+                <div class="option" onclick="selectOption(22, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="card-header">
+                Escala Completada
+            </div>
+            <div style="text-align: center; color: #112F33; font-size: 1.2rem; line-height: 1.6; margin: 30px 0;">
+                <p>Muchas gracias por completar el cuestionario.</p>
+                <p><strong>Por favor pase el dispositivo a su médico o profesional de salud mental para su revisión.</strong></p>
+            </div>
+            <button class="btn-primary" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Resultados -->
+        <div class="card" id="card-results">
+            <div class="card-header">
+                Resultados - Cuestionario Salamanca
+            </div>
+            
+            <div class="interpretation">
+                <h3>Interpretación Profesional</h3>
+                <p><strong>Instrumento:</strong> Cuestionario Salamanca de screening para trastornos de la personalidad (versión 2007)</p>
+                <p><strong>Fecha y hora de aplicación:</strong> <span id="application-datetime"></span></p>
+                <p><strong>Punto de corte:</strong> ≥2 puntos por trastorno sugiere necesidad de evaluación más detallada</p>
+                <p><strong>Sensibilidad reportada:</strong> 94.34% vs IPDE | <strong>Especificidad:</strong> 64.84% vs IPDE entrevista</p>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="text-align: center; color: #29A98C; margin-bottom: 20px;">Perfil de Resultados por Grupos DSM-5</h3>
+                <div id="chart-content"></div>
+            </div>
+
+            <div class="results-section" id="results-content">
+                <!-- Los resultados se generarán dinámicamente -->
+            </div>
+
+            <div class="interpretation" id="interpretation-content">
+                <!-- La interpretación se generará dinámicamente -->
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="btn-export" onclick="captureResults()">📸 Capturar Imagen</button>
+                <button class="btn-export" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de regreso y barra de progreso -->
+    <button class="btn-back" id="btn-back" onclick="previousCard()" style="display: none;">← Regresar</button>
+    <div class="progress-bar" id="progress-bar" style="width: 0%;"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 22;
+
+        const disorders = {
+            paranoide: { items: [1, 2], name: 'Paranoide', group: 'A' },
+            esquizoide: { items: [3, 4], name: 'Esquizoide', group: 'A' },
+            esquizotipico: { items: [5, 6], name: 'Esquizotípico', group: 'A' },
+            histrionico: { items: [7, 8], name: 'Histriónico', group: 'B' },
+            antisocial: { items: [9, 10], name: 'Antisocial', group: 'B' },
+            narcisista: { items: [11, 12], name: 'Narcisista', group: 'B' },
+            inestabilidad_impulsivo: { items: [13, 14], name: 'Inestabilidad Emocional (Impulsivo)', group: 'B' },
+            inestabilidad_limite: { items: [15, 16], name: 'Inestabilidad Emocional (Límite)', group: 'B' },
+            anancastico: { items: [17, 18], name: 'Anancástico (Obsesivo-Compulsivo)', group: 'C' },
+            dependiente: { items: [19, 20], name: 'Dependiente', group: 'C' },
+            ansioso: { items: [21, 22], name: 'Ansioso (Evitativo)', group: 'C' }
+        };
+
+        function selectOption(questionNum, value) {
+            responses[questionNum] = value;
+            
+            // Actualizar visualización
+            const options = document.querySelectorAll(`#card-${questionNum} .option`);
+            options.forEach(option => option.classList.remove('selected'));
+            options[value].classList.add('selected');
+
+            // Auto-avance después de 150ms
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function nextCard() {
+            const current = document.getElementById(`card-${currentCard}`);
+            current.classList.remove('active');
+            
+            currentCard++;
+            
+            if (currentCard <= totalQuestions) {
+                const next = document.getElementById(`card-${currentCard}`);
+                next.classList.add('active');
+                updateProgress();
+                updateBackButton();
+            } else {
+                // Mostrar card final
+                const finalCard = document.getElementById('card-final');
+                finalCard.classList.add('active');
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                const current = document.getElementById(`card-${currentCard}`) || 
+                              document.getElementById('card-final') ||
+                              document.getElementById('card-results');
+                current.classList.remove('active');
+                
+                currentCard--;
+                const previous = document.getElementById(`card-${currentCard}`);
+                previous.classList.add('active');
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function updateProgress() {
+            const progress = currentCard === 0 ? 0 : (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('btn-back');
+            if (currentCard === 0) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.style.display = 'block';
+            }
+        }
+
+        function calculateScore() {
+            const scores = {};
+            
+            for (const [disorderKey, disorder] of Object.entries(disorders)) {
+                let score = 0;
+                disorder.items.forEach(itemNum => {
+                    score += responses[itemNum] || 0;
+                });
+                scores[disorderKey] = score;
+            }
+            
+            return scores;
+        }
+
+        function getInterpretation(scores) {
+            const highScores = [];
+            const moderateScores = [];
+            const alerts = [];
+            
+            for (const [disorderKey, score] of Object.entries(scores)) {
+                const disorderName = disorders[disorderKey].name;
+                
+                if (score >= 4) { // ≥66% del máximo (6)
+                    highScores.push(disorderName);
+                    alerts.push(`⚠️ <strong>${disorderName}:</strong> Puntuación alta (${score}/6) - Requiere evaluación detallada inmediata`);
+                } else if (score >= 2) {
+                    moderateScores.push(disorderName);
+                }
+            }
+
+            let interpretation = '<h3>Interpretación Clínica</h3>';
+            
+            if (alerts.length > 0) {
+                interpretation += '<div style="background: rgba(245, 101, 101, 0.1); border-left: 4px solid #f56565; padding: 15px; border-radius: 8px; margin: 15px 0;">';
+                interpretation += '<h4 style="color: #742a2a; margin-bottom: 10px;">🚨 Alertas Clínicas Prioritarias:</h4>';
+                alerts.forEach(alert => {
+                    interpretation += `<p style="color: #742a2a; margin-bottom: 8px;">${alert}</p>`;
+                });
+                interpretation += '</div>';
+            }
+
+            if (moderateScores.length > 0) {
+                interpretation += '<div style="background: rgba(246, 173, 85, 0.1); border-left: 4px solid #f6ad55; padding: 15px; border-radius: 8px; margin: 15px 0;">';
+                interpretation += '<h4 style="color: #ed8936; margin-bottom: 10px;">⚠️ Indicadores de Evaluación Adicional:</h4>';
+                interpretation += `<p style="color: #ed8936;">Los siguientes patrones superan el punto de corte (≥2): <strong>${moderateScores.join(', ')}</strong></p>`;
+                interpretation += '<p style="color: #ed8936;">Se recomienda exploración clínica más detallada de estos dominios.</p>';
+                interpretation += '</div>';
+            }
+
+            if (highScores.length === 0 && moderateScores.length === 0) {
+                interpretation += '<div style="background: rgba(72, 187, 120, 0.1); border-left: 4px solid #48bb78; padding: 15px; border-radius: 8px; margin: 15px 0;">';
+                interpretation += '<h4 style="color: #22543d; margin-bottom: 10px;">✅ Perfil de Screening Negativo</h4>';
+                interpretation += '<p style="color: #22543d;">No se identifican patrones significativos que sugieran trastornos de personalidad según los criterios de screening del Cuestionario Salamanca.</p>';
+                interpretation += '</div>';
+            }
+
+            // Información técnica adicional
+            interpretation += '<div style="background: rgba(41, 169, 140, 0.1); border-left: 4px solid #29A98C; padding: 15px; border-radius: 8px; margin: 15px 0;">';
+            interpretation += '<h4 style="color: #29A98C; margin-bottom: 10px;">📊 Consideraciones Técnicas:</h4>';
+            interpretation += '<ul style="color: #112F33; margin-left: 20px;">';
+            interpretation += '<li><strong>Herramienta de screening:</strong> Estos resultados NO constituyen un diagnóstico definitivo</li>';
+            interpretation += '<li><strong>Validación:</strong> Desarrollado en Universidad de Salamanca con validación contra IPDE</li>';
+            interpretation += '<li><strong>Aplicación:</strong> Útil para identificar áreas que requieren evaluación clínica más profunda</li>';
+            interpretation += '<li><strong>Limitaciones:</strong> Debe complementarse con entrevista clínica estructurada para diagnóstico formal</li>';
+            interpretation += '</ul>';
+            interpretation += '</div>';
+
+            return interpretation;
+        }
+
+        function showResults() {
+            // Ocultar card final
+            document.getElementById('card-final').classList.remove('active');
+            
+            // Establecer fecha y hora de aplicación
+            const now = new Date();
+            const dateTimeString = now.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('application-datetime').textContent = dateTimeString;
+            
+            // Calcular puntuaciones
+            const scores = calculateScore();
+            
+            // Generar gráfico
+            generateChart(scores);
+            
+            // Generar resultados detallados
+            generateDetailedResults(scores);
+            
+            // Generar interpretación
+            const interpretation = getInterpretation(scores);
+            document.getElementById('interpretation-content').innerHTML = interpretation;
+            
+            // Mostrar card de resultados
+            document.getElementById('card-results').classList.add('active');
+            document.getElementById('progress-bar').style.width = '100%';
+            
+            // Ocultar botón de regreso en resultados
+            document.getElementById('btn-back').style.display = 'none';
+        }
+
+        function generateChart(scores) {
+            const groups = { A: [], B: [], C: [] };
+            
+            // Agrupar por clusters
+            for (const [disorderKey, score] of Object.entries(scores)) {
+                const disorder = disorders[disorderKey];
+                groups[disorder.group].push({
+                    name: disorder.name,
+                    score: score,
+                    key: disorderKey
+                });
+            }
+
+            let chartHTML = '';
+            
+            // Generar gráfico por grupos
+            ['A', 'B', 'C'].forEach(group => {
+                const groupNames = {
+                    'A': 'Grupo A - Raros/Excéntricos',
+                    'B': 'Grupo B - Dramáticos/Emocionales',
+                    'C': 'Grupo C - Ansiosos/Temerosos'
+                };
+                
+                chartHTML += `<div class="group-header">${groupNames[group]}</div>`;
+                
+                groups[group].forEach(disorder => {
+                    const percentage = (disorder.score / 6) * 100;
+                    let scoreClass = 'score-low';
+                    if (disorder.score >= 4) scoreClass = 'score-high';
+                    else if (disorder.score >= 2) scoreClass = 'score-moderate';
+                    
+                    chartHTML += `
+                        <div class="chart-bar">
+                            <div class="chart-label">${disorder.name.split(' ')[0]}</div>
+                            <div class="chart-bar-bg">
+                                <div class="chart-bar-fill" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="chart-score ${scoreClass}">${disorder.score}/6</div>
+                        </div>
+                    `;
+                });
+            });
+            
+            document.getElementById('chart-content').innerHTML = chartHTML;
+        }
+
+        function generateDetailedResults(scores) {
+            const groups = { A: [], B: [], C: [] };
+            
+            // Agrupar por clusters
+            for (const [disorderKey, score] of Object.entries(scores)) {
+                const disorder = disorders[disorderKey];
+                groups[disorder.group].push({
+                    name: disorder.name,
+                    score: score,
+                    items: disorder.items
+                });
+            }
+
+            let resultsHTML = '';
+            
+            ['A', 'B', 'C'].forEach(group => {
+                const groupNames = {
+                    'A': 'Grupo A - Cluster Raro/Excéntrico',
+                    'B': 'Grupo B - Cluster Dramático/Emocional',
+                    'C': 'Grupo C - Cluster Ansioso/Temeroso'
+                };
+                
+                resultsHTML += `<div class="group-header">${groupNames[group]}</div>`;
+                
+                groups[group].forEach(disorder => {
+                    let scoreClass = 'score-low';
+                    let status = 'Dentro de parámetros normales';
+                    
+                    if (disorder.score >= 4) {
+                        scoreClass = 'score-high';
+                        status = '⚠️ ALERTA: Requiere evaluación inmediata';
+                    } else if (disorder.score >= 2) {
+                        scoreClass = 'score-moderate';
+                        status = '⚡ Supera punto de corte - Evaluar';
+                    }
+                    
+                    resultsHTML += `
+                        <div class="disorder-result">
+                            <div class="disorder-name">${disorder.name}</div>
+                            <div class="disorder-score ${scoreClass}">
+                                Puntuación: ${disorder.score}/6 - ${status}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            document.getElementById('results-content').innerHTML = resultsHTML;
+        }
+
+        function exportToPDF() {
+            // Crear ventana para imprimir solo los resultados
+            const resultsCard = document.getElementById('card-results').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Resultados - Cuestionario Salamanca</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .card-header { font-size: 24px; font-weight: bold; color: #29A98C; text-align: center; margin-bottom: 20px; }
+                        .interpretation { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #ddd; }
+                        .interpretation h3 { color: #29A98C; margin-bottom: 15px; }
+                        .interpretation p { margin-bottom: 8px; line-height: 1.4; }
+                        .chart-container { background: white; padding: 20px; margin: 20px 0; border: 1px solid #ddd; }
+                        .group-header { background: #29A98C; color: white; padding: 10px; text-align: center; font-weight: bold; margin: 15px 0; }
+                        .disorder-result { background: #f8f9fa; padding: 15px; margin: 10px 0; border-left: 4px solid #29A98C; }
+                        .disorder-name { font-weight: bold; color: #112F33; }
+                        .score-high { color: #f56565; font-weight: bold; }
+                        .score-moderate { color: #f6ad55; font-weight: bold; }
+                        .score-low { color: #48bb78; }
+                        .export-buttons { display: none; }
+                        .chart-bar { display: flex; align-items: center; margin-bottom: 10px; }
+                        .chart-label { width: 150px; font-weight: bold; }
+                        .chart-bar-bg { flex: 1; height: 20px; background: #f0f0f0; margin-right: 10px; position: relative; }
+                        .chart-bar-fill { height: 100%; background: #29A98C; }
+                        .chart-score { min-width: 50px; font-weight: bold; }
+                        @media print { body { -webkit-print-color-adjust: exact; } }
+                    </style>
+                </head>
+                <body>
+                    ${resultsCard}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
+
+        function captureResults() {
+            // Crear un canvas con los resultados
+            const resultsElement = document.getElementById('card-results');
+            
+            // Simple implementation - in a real app you'd use html2canvas
+            exportToPDF(); // Por ahora redirigimos al PDF
+        }
+
+        function newEvaluation() {
+            // Reiniciar todo
+            currentCard = 0;
+            responses = {};
+            
+            // Ocultar todos los cards
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Limpiar selecciones
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Mostrar card inicial
+            document.getElementById('card-0').classList.add('active');
+            updateProgress();
+            updateBackButton();
+        }
+
+        // Inicializar
+        updateProgress();
+        updateBackButton();
+    </script>
+</body>
+</html>

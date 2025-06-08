@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHQ-9 - Cuestionario de Salud del Paciente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #29A98C;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        h2 {
+            color: #112F33;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 4px solid #29A98C;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .question-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(41, 169, 140, 0.2);
+            border-radius: 15px;
+            padding: 18px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+        }
+
+        .option:hover {
+            border-color: #29A98C;
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.2);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(41, 169, 140, 0.3);
+        }
+
+        .option-value {
+            background: rgba(255, 255, 255, 0.2);
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .option.selected .option-value {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .start-btn, .results-btn, .action-btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-btn:hover, .results-btn:hover, .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(41, 169, 140, 0.4);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #29A98C;
+            border: 2px solid #29A98C;
+            padding: 15px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: #29A98C;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .back-btn.hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .results-container {
+            text-align: center;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 25px 0;
+            font-size: 1.5rem;
+        }
+
+        .interpretation {
+            margin: 25px 0;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .level-minimal {
+            background: rgba(72, 187, 120, 0.1);
+            border-left: 4px solid #48bb78;
+            color: #2d5016;
+        }
+
+        .level-mild {
+            background: rgba(246, 173, 85, 0.1);
+            border-left: 4px solid #f6ad55;
+            color: #744210;
+        }
+
+        .level-moderate {
+            background: rgba(237, 137, 54, 0.1);
+            border-left: 4px solid #ed8936;
+            color: #7b2d0e;
+        }
+
+        .level-severe {
+            background: rgba(245, 101, 101, 0.1);
+            border-left: 4px solid #f56565;
+            color: #742a2a;
+        }
+
+        .alerts {
+            background: rgba(245, 101, 101, 0.1);
+            border: 2px solid #f56565;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #742a2a;
+        }
+
+        .alerts h3 {
+            color: #e53e3e;
+            margin-bottom: 15px;
+        }
+
+        .technical-info {
+            background: rgba(41, 169, 140, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            color: #112F33;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            margin: 5px;
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+
+        .completed-message {
+            text-align: center;
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #29A98C;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 25px 20px;
+                margin: 10px 0;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .option {
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .start-btn, .results-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .back-btn {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 18px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>PHQ-9</h1>
+            <h2>Cuestionario de Salud del Paciente - 9</h2>
+            
+            <div class="instructions">
+                <strong>Instrucciones:</strong><br>
+                Durante las <strong>ÚLTIMAS DOS SEMANAS</strong>, ¿con qué frecuencia le ha afectado alguno de los siguientes problemas?
+                <br><br>
+                Por favor, seleccione la opción que mejor describa su experiencia para cada pregunta.
+                <br><br>
+                <em>Esta evaluación consta de 9 preguntas principales más una pregunta adicional sobre el impacto funcional.</em>
+            </div>
+            
+            <button class="start-btn" onclick="startQuestionnaire()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-9: Ítems principales -->
+        <div class="card" id="card-1">
+            <div class="question-header">
+                <div class="question-number">Pregunta 1 de 9</div>
+                <div class="question-text">Poco interés o alegría para hacer las cosas</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-header">
+                <div class="question-number">Pregunta 2 de 9</div>
+                <div class="question-text">Sensación de estar decaído, deprimido o desesperanzado</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-header">
+                <div class="question-number">Pregunta 3 de 9</div>
+                <div class="question-text">Problemas para quedarse dormido, para seguir durmiendo o dormir demasiado</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-header">
+                <div class="question-number">Pregunta 4 de 9</div>
+                <div class="question-text">Sensación de cansancio o de tener poca energía</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-header">
+                <div class="question-number">Pregunta 5 de 9</div>
+                <div class="question-text">Poco apetito o comer demasiado</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-header">
+                <div class="question-number">Pregunta 6 de 9</div>
+                <div class="question-text">Sentirse mal consigo mismo; sentir que es un fracasado o que ha decepcionado a su familia o a sí mismo</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-header">
+                <div class="question-number">Pregunta 7 de 9</div>
+                <div class="question-text">Problemas para concentrarse en algo, como leer el periódico o ver la televisión</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-header">
+                <div class="question-number">Pregunta 8 de 9</div>
+                <div class="question-text">Moverse o hablar tan despacio que los demás pueden haberlo notado. O lo contrario: estar tan inquieto o agitado que se ha estado moviendo de un lado a otro más de lo habitual</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-header">
+                <div class="question-number">Pregunta 9 de 9</div>
+                <div class="question-text">Pensamientos de que estaría mejor muerto o de querer hacerse daño de algún modo</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">
+                    <span class="option-value">0</span>
+                    <span>Nunca</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 1)">
+                    <span class="option-value">1</span>
+                    <span>Varios días</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 2)">
+                    <span class="option-value">2</span>
+                    <span>Más de la mitad de los días</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 3)">
+                    <span class="option-value">3</span>
+                    <span>Casi todos los días</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 10: Pregunta adicional de funcionalidad -->
+        <div class="card" id="card-10">
+            <div class="question-header">
+                <div class="question-number">Pregunta adicional</div>
+                <div class="question-text">Si ha marcado alguno de los problemas de este cuestionario, ¿hasta qué punto estos problemas le han creado dificultades para hacer su trabajo, ocuparse de la casa o relacionarse con los demás?</div>
+            </div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">
+                    <span class="option-value">0</span>
+                    <span>Ninguna dificultad</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 1)">
+                    <span class="option-value">1</span>
+                    <span>Algunas dificultades</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 2)">
+                    <span class="option-value">2</span>
+                    <span>Muchas dificultades</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 3)">
+                    <span class="option-value">3</span>
+                    <span>Muchísimas dificultades</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="completed-message">
+                <h2>Escala completada</h2>
+                <p>Muchas gracias por completar el cuestionario.</p>
+                <p><strong>Por favor, pase el dispositivo a su médico o profesional de la salud para su revisión.</strong></p>
+            </div>
+            <button class="results-btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <div class="results-container">
+                <h2>Resultados PHQ-9</h2>
+                <div class="score-display" id="score-display">
+                    <!-- Score will be inserted here -->
+                </div>
+                <div class="interpretation" id="interpretation">
+                    <!-- Interpretation will be inserted here -->
+                </div>
+                <div class="alerts" id="alerts" style="display: none;">
+                    <!-- Alerts will be inserted here -->
+                </div>
+                <div class="technical-info">
+                    <strong>Información técnica:</strong><br>
+                    • PHQ-9 (Patient Health Questionnaire-9)<br>
+                    • Rango de puntuación: 0-27 puntos<br>
+                    • Puntos de corte validados clínicamente<br>
+                    • Incluye evaluación de riesgo suicida
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="generatePDF()">📄 Generar PDF</button>
+                    <button class="action-btn" onclick="captureScreen()">📸 Captura</button>
+                    <button class="action-btn" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="back-btn" onclick="goBack()">← Regresar</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        let totalQuestions = 10; // 9 main questions + 1 functional question
+
+        function startQuestionnaire() {
+            currentCard = 1;
+            showCard(currentCard);
+            updateProgress();
+            document.getElementById('back-btn').classList.remove('hidden');
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`card-${cardNumber}`).classList.add('active');
+            
+            // Hide back button on special cards
+            const backBtn = document.getElementById('back-btn');
+            if (cardNumber === 0 || cardNumber === 'final' || cardNumber === 'results') {
+                backBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+            }
+        }
+
+        function selectOption(questionNumber, value) {
+            responses[questionNumber] = value;
+            
+            // Visual feedback
+            const card = document.getElementById(`card-${questionNumber}`);
+            const options = card.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                option.classList.remove('selected');
+                if (index === value) {
+                    option.classList.add('selected');
+                }
+            });
+
+            // Auto-advance after 150ms
+            setTimeout(() => {
+                if (questionNumber < totalQuestions) {
+                    currentCard = questionNumber + 1;
+                    showCard(currentCard);
+                    updateProgress();
+                } else {
+                    // Show completion card
+                    showCard('final');
+                    updateProgress();
+                }
+            }, 150);
+        }
+
+        function goBack() {
+            if (currentCard > 1) {
+                currentCard--;
+                showCard(currentCard);
+                updateProgress();
+            } else if (currentCard === 1) {
+                currentCard = 0;
+                showCard(0);
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            let progress = 0;
+            
+            if (currentCard === 0) {
+                progress = 0;
+            } else if (currentCard === 'final') {
+                progress = 100;
+            } else if (currentCard === 'results') {
+                progress = 100;
+            } else {
+                progress = (currentCard / totalQuestions) * 100;
+            }
+            
+            progressBar.style.width = progress + '%';
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            for (let i = 1; i <= 9; i++) {
+                if (responses[i] !== undefined) {
+                    totalScore += responses[i];
+                }
+            }
+            return totalScore;
+        }
+
+        function getInterpretation(score) {
+            if (score >= 0 && score <= 4) {
+                return {
+                    level: 'minimal',
+                    title: 'Sintomatología Depresiva Mínima',
+                    description: 'Los síntomas reportados son mínimos y no sugieren un episodio depresivo clínicamente significativo. Se recomienda monitoreo rutinario y promoción de hábitos saludables.',
+                    recommendations: 'Mantenimiento de rutinas saludables, ejercicio regular, y seguimiento preventivo.',
+                    className: 'level-minimal'
+                };
+            } else if (score >= 5 && score <= 9) {
+                return {
+                    level: 'mild',
+                    title: 'Sintomatología Depresiva Leve',
+                    description: 'Presencia de síntomas depresivos leves que pueden requerir vigilancia clínica. Se sugiere evaluación psicológica y consideración de intervenciones psicoterapéuticas.',
+                    recommendations: 'Evaluación psicológica, técnicas de manejo del estrés, y seguimiento clínico en 2-4 semanas.',
+                    className: 'level-mild'
+                };
+            } else if (score >= 10 && score <= 14) {
+                return {
+                    level: 'moderate',
+                    title: 'Sintomatología Depresiva Moderada',
+                    description: 'Síntomas depresivos moderados que requieren intervención clínica activa. Se recomienda evaluación psiquiátrica y consideración de tratamiento psicoterapéutico y/o farmacológico.',
+                    recommendations: 'Evaluación psiquiátrica prioritaria, inicio de psicoterapia estructurada, y seguimiento clínico semanal.',
+                    className: 'level-moderate'
+                };
+            } else if (score >= 15 && score <= 19) {
+                return {
+                    level: 'moderate-severe',
+                    title: 'Sintomatología Depresiva Moderada-Severa',
+                    description: 'Síntomas depresivos moderados a severos que requieren intervención inmediata. Se recomienda evaluación psiquiátrica urgente y consideración de tratamiento combinado.',
+                    recommendations: 'Evaluación psiquiátrica urgente, tratamiento farmacológico y psicoterapéutico combinado, y seguimiento estrecho.',
+                    className: 'level-severe'
+                };
+            } else {
+                return {
+                    level: 'severe',
+                    title: 'Sintomatología Depresiva Severa',
+                    description: 'Síntomas depresivos severos que requieren atención clínica inmediata y manejo especializado. Alto riesgo de deterioro funcional significativo.',
+                    recommendations: 'Evaluación psiquiátrica inmediata, hospitalización si es necesario, tratamiento intensivo combinado, y seguimiento diario.',
+                    className: 'level-severe'
+                };
+            }
+        }
+
+        function checkAlerts() {
+            const alerts = [];
+            
+            // Check for suicidal ideation (question 9)
+            if (responses[9] && responses[9] >= 1) {
+                alerts.push({
+                    type: 'critical',
+                    title: '⚠️ ALERTA CRÍTICA: Ideación Suicida',
+                    message: 'El paciente reporta pensamientos de muerte o autolesión. Requiere evaluación inmediata de riesgo suicida y manejo de seguridad.'
+                });
+            }
+
+            // Check for high-scoring items (≥2 points = 66% of maximum)
+            const highScoreItems = [];
+            const itemTexts = {
+                1: 'Anhedonia (pérdida de interés/placer)',
+                2: 'Estado de ánimo deprimido',
+                3: 'Alteraciones del sueño',
+                4: 'Fatiga/pérdida de energía',
+                5: 'Alteraciones del apetito',
+                6: 'Sentimientos de culpa/inutilidad',
+                7: 'Problemas de concentración',
+                8: 'Alteraciones psicomotoras'
+            };
+
+            for (let i = 1; i <= 8; i++) {
+                if (responses[i] && responses[i] >= 2) {
+                    highScoreItems.push(itemTexts[i]);
+                }
+            }
+
+            if (highScoreItems.length > 0) {
+                alerts.push({
+                    type: 'warning',
+                    title: '⚠️ Síntomas Significativos',
+                    message: 'Los siguientes síntomas requieren atención clínica: ' + highScoreItems.join(', ') + '.'
+                });
+            }
+
+            // Check functional impairment (question 10)
+            if (responses[10] && responses[10] >= 2) {
+                alerts.push({
+                    type: 'functional',
+                    title: '📋 Deterioro Funcional Significativo',
+                    message: 'El paciente reporta dificultades importantes en el funcionamiento laboral, doméstico o social.'
+                });
+            }
+
+            return alerts;
+        }
+
+        function showResults() {
+            const score = calculateScore();
+            const interpretation = getInterpretation(score);
+            const alerts = checkAlerts();
+
+            // Update score display
+            document.getElementById('score-display').innerHTML = `
+                <div>Puntuación Total: <strong>${score}/27</strong></div>
+                <div style="font-size: 1rem; margin-top: 10px; opacity: 0.9;">
+                    Pregunta funcional: ${responses[10] !== undefined ? responses[10] : 'No respondida'}
+                </div>
+            `;
+
+            // Update interpretation
+            document.getElementById('interpretation').innerHTML = `
+                <h3>${interpretation.title}</h3>
+                <p><strong>Descripción:</strong> ${interpretation.description}</p>
+                <p><strong>Recomendaciones:</strong> ${interpretation.recommendations}</p>
+            `;
+            document.getElementById('interpretation').className = `interpretation ${interpretation.className}`;
+
+            // Update alerts
+            const alertsDiv = document.getElementById('alerts');
+            if (alerts.length > 0) {
+                alertsDiv.style.display = 'block';
+                alertsDiv.innerHTML = '<h3>Alertas Clínicas</h3>' + 
+                    alerts.map(alert => `<p><strong>${alert.title}</strong><br>${alert.message}</p>`).join('');
+            } else {
+                alertsDiv.style.display = 'none';
+            }
+
+            showCard('results');
+            updateProgress();
+        }
+
+        function generatePDF() {
+            const score = calculateScore();
+            const interpretation = getInterpretation(score);
+            const alerts = checkAlerts();
+            const now = new Date();
+            
+            let pdfContent = `
+PHQ-9 - CUESTIONARIO DE SALUD DEL PACIENTE
+=========================================
+
+Fecha: ${now.toLocaleDateString('es-ES')}
+Hora: ${now.toLocaleTimeString('es-ES')}
+
+PUNTUACIÓN TOTAL: ${score}/27
+
+INTERPRETACIÓN:
+${interpretation.title}
+
+${interpretation.description}
+
+RECOMENDACIONES:
+${interpretation.recommendations}
+
+DETALLE DE RESPUESTAS:
+`;
+
+            const questionTexts = [
+                '',
+                'Poco interés o alegría para hacer las cosas',
+                'Sensación de estar decaído, deprimido o desesperanzado',
+                'Problemas para quedarse dormido, para seguir durmiendo o dormir demasiado',
+                'Sensación de cansancio o de tener poca energía',
+                'Poco apetito o comer demasiado',
+                'Sentirse mal consigo mismo; sentir que es un fracasado o que ha decepcionado a su familia o a sí mismo',
+                'Problemas para concentrarse en algo, como leer el periódico o ver la televisión',
+                'Moverse o hablar tan despacio que los demás pueden haberlo notado. O lo contrario: estar tan inquieto o agitado que se ha estado moviendo de un lado a otro más de lo habitual',
+                'Pensamientos de que estaría mejor muerto o de querer hacerse daño de algún modo'
+            ];
+
+            const responseTexts = ['Nunca', 'Varios días', 'Más de la mitad de los días', 'Casi todos los días'];
+
+            for (let i = 1; i <= 9; i++) {
+                const response = responses[i] !== undefined ? responses[i] : 'No respondida';
+                const responseText = responses[i] !== undefined ? responseTexts[responses[i]] : 'No respondida';
+                pdfContent += `\n${i}. ${questionTexts[i]}\n   Respuesta: ${responseText} (${response})\n`;
+            }
+
+            pdfContent += `\nPREGUNTA FUNCIONAL:
+Si ha marcado alguno de los problemas de este cuestionario, ¿hasta qué punto estos problemas le han creado dificultades para hacer su trabajo, ocuparse de la casa o relacionarse con los demás?
+Respuesta: ${responses[10] !== undefined ? ['Ninguna dificultad', 'Algunas dificultades', 'Muchas dificultades', 'Muchísimas dificultades'][responses[10]] : 'No respondida'}`;
+
+            if (alerts.length > 0) {
+                pdfContent += `\n\nALERTAS CLÍNICAS:
+${alerts.map(alert => `• ${alert.title}: ${alert.message}`).join('\n')}`;
+            }
+
+            // Create and download the file
+            const blob = new Blob([pdfContent], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PHQ9_${now.toISOString().split('T')[0]}_${now.toLocaleTimeString('es-ES').replace(/:/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function captureScreen() {
+            // Simple screen capture simulation - in a real environment, you'd use html2canvas or similar
+            alert('Función de captura: En un entorno real, esto tomaría una captura de pantalla de los resultados. Por favor, use la función de captura de pantalla de su dispositivo.');
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                currentCard = 0;
+                responses = {};
+                showCard(0);
+                updateProgress();
+                
+                // Reset all selected options
+                document.querySelectorAll('.option.selected').forEach(option => {
+                    option.classList.remove('selected');
+                });
+            }
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

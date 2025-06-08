@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLS-23 - Lista de Síntomas de Trastorno Límite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            color: #112F33;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .instructions {
+            color: #112F33;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .instructions strong {
+            color: #29A98C;
+        }
+
+        .scale-info {
+            text-align: center;
+            color: #112F33;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 10px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 18px 25px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.3);
+            font-weight: 500;
+        }
+
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.4);
+            background: linear-gradient(135deg, #29A98C, #1a4247);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px solid #29A98C;
+            border-radius: 10px;
+        }
+
+        .percentage-slider {
+            width: 100%;
+            margin: 20px 0;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #f56565, #f6ad55, #68d391, #4fd1c7);
+            outline: none;
+        }
+
+        .percentage-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #29A98C;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .percentage-slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #29A98C;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .percentage-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #29A98C;
+            margin: 15px 0;
+        }
+
+        .percentage-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #112F33;
+            margin-top: 10px;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: none;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1001;
+        }
+
+        .result-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .result-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 169, 140, 0.4);
+        }
+
+        .results-container {
+            text-align: left;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 15px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .result-section h3 {
+            color: #29A98C;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .result-section p {
+            color: #112F33;
+            margin-bottom: 8px;
+        }
+
+        .severity-level {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .severity-low { background: rgba(72, 187, 120, 0.2); color: #2d7d47; }
+        .severity-moderate { background: rgba(246, 173, 85, 0.2); color: #c05621; }
+        .severity-severe { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+
+        .alert-item {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid #f56565;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            color: #742a2a;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .export-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .export-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 30px 25px;
+            }
+            
+            .card h1 {
+                font-size: 1.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .option {
+                padding: 16px 20px;
+                font-size: 1rem;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>BLS-23</h1>
+            <h2>Lista de Síntomas de Trastorno Límite</h2>
+            <div class="instructions">
+                <p><strong>Instrucciones:</strong></p>
+                <p>En la siguiente evaluación encontrará una serie de dificultades, problemas y conductas que podrían describirle. Por favor, lea cada afirmación y decida en qué grado le afectó cada problema <strong>durante la última semana</strong>.</p>
+                <br>
+                <p>En el caso de que no sienta nada en este momento, por favor responda de acuerdo a cómo piensa que podría haberse sentido. Por favor responda con <strong>sinceridad</strong>.</p>
+                <br>
+                <p>Si se ha sentido de diferente manera en diferentes momentos de la semana, haga una <strong>valoración promedio</strong> de cómo le fueron las cosas.</p>
+            </div>
+            <div class="scale-info">
+                <p><strong>Tiempo estimado:</strong> 7-10 minutos</p>
+                <p><strong>Estructura:</strong> Parte 1: 23 síntomas • Parte 2: 11 conductas • Evaluación general</p>
+            </div>
+            <button class="result-button" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Section header for affective items -->
+        <div class="card" id="card-section1">
+            <div class="section-header">PARTE 1: SÍNTOMAS Y SENTIMIENTOS<br>Última semana</div>
+            <p style="color: #112F33; margin-bottom: 30px; font-size: 1.1rem;">
+                A continuación encontrará una serie de dificultades y problemas que podrían describirle. 
+                Indique en qué grado le afectó cada problema durante la última semana.
+            </p>
+            <button class="result-button" onclick="nextCard()">Continuar</button>
+        </div>
+
+        <!-- Affective items (1-23) -->
+        <div class="card" id="card-1">
+            <div class="question-number">Síntoma 1 de 23</div>
+            <div class="question-text">Me resultaba difícil concentrarme</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(0, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(0, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(0, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(0, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(0, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">Síntoma 2 de 23</div>
+            <div class="question-text">Me sentí indefenso</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(1, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(1, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(1, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(1, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(1, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">Síntoma 3 de 23</div>
+            <div class="question-text">Estuve ausente e incapaz de recordar que estaba haciendo en realidad</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(2, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(2, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(2, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(2, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(2, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">Síntoma 4 de 23</div>
+            <div class="question-text">Sentí asco</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(3, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(3, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(3, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(3, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(3, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">Síntoma 5 de 23</div>
+            <div class="question-text">Pensé en hacerme daño</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(4, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(4, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(4, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(4, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(4, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">Síntoma 6 de 23</div>
+            <div class="question-text">Desconfié de los demás</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(5, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(5, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(5, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(5, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(5, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">Síntoma 7 de 23</div>
+            <div class="question-text">No creía que tuviera derecho a vivir</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(6, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(6, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(6, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(6, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(6, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">Síntoma 8 de 23</div>
+            <div class="question-text">Me sentía solo</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(7, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(7, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(7, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(7, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(7, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">Síntoma 9 de 23</div>
+            <div class="question-text">Sentí una tensión interna estresante</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(8, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(8, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(8, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(8, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(8, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">Síntoma 10 de 23</div>
+            <div class="question-text">Sentí mucho miedo de imágenes que me vinieron a la cabeza</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(9, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(9, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(9, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(9, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(9, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">Síntoma 11 de 23</div>
+            <div class="question-text">Me odié a mí mismo</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(10, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(10, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(10, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(10, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(10, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">Síntoma 12 de 23</div>
+            <div class="question-text">Quise castigarme</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(11, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(11, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(11, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(11, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(11, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">Síntoma 13 de 23</div>
+            <div class="question-text">Sufrí de vergüenza</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(12, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(12, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(12, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(12, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(12, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">Síntoma 14 de 23</div>
+            <div class="question-text">Mi humor oscilaba rápidamente entre la ansiedad, la rabia y la depresión</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(13, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(13, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(13, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(13, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(13, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">Síntoma 15 de 23</div>
+            <div class="question-text">Sufrí al oír voces y ruidos procedentes de dentro o fuera de mi cabeza</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(14, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(14, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(14, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(14, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(14, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">Síntoma 16 de 23</div>
+            <div class="question-text">Las críticas tuvieron un efecto demoledor en mí</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(15, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(15, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(15, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(15, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(15, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">Síntoma 17 de 23</div>
+            <div class="question-text">Me sentí vulnerable</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(16, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(16, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(16, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(16, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(16, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">Síntoma 18 de 23</div>
+            <div class="question-text">La idea de morirme me causó una cierta fascinación</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(17, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(17, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(17, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(17, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(17, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">Síntoma 19 de 23</div>
+            <div class="question-text">Nada parecía tener sentido para mí</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(18, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(18, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(18, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(18, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(18, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">Síntoma 20 de 23</div>
+            <div class="question-text">Tuve miedo de perder el control</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(19, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(19, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(19, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(19, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(19, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-number">Síntoma 21 de 23</div>
+            <div class="question-text">Me di asco a mí mismo</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(20, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(20, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(20, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(20, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(20, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-number">Síntoma 22 de 23</div>
+            <div class="question-text">Tuve la sensación de salir de mí mismo</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(21, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(21, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(21, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(21, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(21, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="question-number">Síntoma 23 de 23</div>
+            <div class="question-text">Sentí que no valía nada</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(22, 0, 'affective')">Nunca</button>
+                <button class="option" onclick="selectOption(22, 1, 'affective')">Algo</button>
+                <button class="option" onclick="selectOption(22, 2, 'affective')">Bastante</button>
+                <button class="option" onclick="selectOption(22, 3, 'affective')">Mucho</button>
+                <button class="option" onclick="selectOption(22, 4, 'affective')">Extremadamente</button>
+            </div>
+        </div>
+
+        <!-- Section header for behavioral items -->
+        <div class="card" id="card-section2">
+            <div class="section-header">PARTE 2: CONDUCTAS Y COMPORTAMIENTOS<br>Última semana</div>
+            <p style="color: #112F33; margin-bottom: 30px; font-size: 1.1rem;">
+                Ahora, en la siguiente sección encontrará una serie de <strong>CONDUCTAS</strong> que podrían haberte pasado en la última semana. 
+                Por favor selecciona la <strong>FRECUENCIA</strong> que corresponda en cada una.
+            </p>
+            <button class="result-button" onclick="nextCard()">Continuar</button>
+        </div>
+
+        <!-- Behavioral items (24-34) -->
+        <div class="card" id="card-24">
+            <div class="question-number">Conducta 1 de 11</div>
+            <div class="question-text">Me hice daño cortándome, quemándome, estrangulándome, dándome golpes con la cabeza, etc.</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(23, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(23, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(23, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(23, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(23, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="question-number">Conducta 2 de 11</div>
+            <div class="question-text">Dije a otras personas que iba a matarme</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(24, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(24, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(24, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(24, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(24, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="question-number">Conducta 3 de 11</div>
+            <div class="question-text">Intenté suicidarme</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(25, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(25, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(25, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(25, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(25, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-27">
+            <div class="question-number">Conducta 4 de 11</div>
+            <div class="question-text">Tuve atracones de comida</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(26, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(26, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(26, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(26, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(26, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-28">
+            <div class="question-number">Conducta 5 de 11</div>
+            <div class="question-text">Me provoqué el vómito</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(27, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(27, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(27, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(27, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(27, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-29">
+            <div class="question-number">Conducta 6 de 11</div>
+            <div class="question-text">Realicé deliberadamente conductas arriesgadas como conducir demasiado rápido o en dirección contraria, hacer equilibrios y juegos en lugares altos, etc.</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(28, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(28, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(28, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(28, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(28, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-30">
+            <div class="question-number">Conducta 7 de 11</div>
+            <div class="question-text">Me emborraché</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(29, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(29, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(29, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(29, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(29, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-31">
+            <div class="question-number">Conducta 8 de 11</div>
+            <div class="question-text">Usé drogas</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(30, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(30, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(30, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(30, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(30, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-32">
+            <div class="question-number">Conducta 9 de 11</div>
+            <div class="question-text">Tomé medicación que no se me había recetado o si se me había prescrito, tomé más de la dosis recetada</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(31, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(31, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(31, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(31, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(31, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-33">
+            <div class="question-number">Conducta 10 de 11</div>
+            <div class="question-text">Tuve brotes de ira incontrolada o ataqué físicamente a otras personas</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(32, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(32, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(32, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(32, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(32, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-34">
+            <div class="question-number">Conducta 11 de 11</div>
+            <div class="question-text">Tuve relaciones sexuales que no pude controlar, de las cuales más tarde me sentí avergonzado/a o enfadado/a</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(33, 0, 'behavioral')">Nada</button>
+                <button class="option" onclick="selectOption(33, 1, 'behavioral')">1 vez</button>
+                <button class="option" onclick="selectOption(33, 2, 'behavioral')">2 a 3 veces</button>
+                <button class="option" onclick="selectOption(33, 3, 'behavioral')">4 a 6 veces</button>
+                <button class="option" onclick="selectOption(33, 4, 'behavioral')">Diario</button>
+            </div>
+        </div>
+
+        <!-- Percentage assessment card -->
+        <div class="card" id="card-percentage">
+            <h2>Evaluación General</h2>
+            <p style="color: #112F33; margin-bottom: 30px; font-size: 1.1rem;">
+                Califica la <strong>CALIDAD DE TU ESTADO EN GENERAL</strong> a lo largo de la última semana.
+            </p>
+            <p style="color: #112F33; margin-bottom: 20px;">
+                <strong>0%</strong> significa absolutamente hundido, <strong>100%</strong> significa excelente. 
+                Por favor, señale el porcentaje que más se aproxime a tu situación.
+            </p>
+            
+            <div class="percentage-display" id="percentage-value">50%</div>
+            <input type="range" min="0" max="100" value="50" class="percentage-slider" id="percentage-slider">
+            <div class="percentage-labels">
+                <span>Absolutamente hundido (0%)</span>
+                <span>Excelente (100%)</span>
+            </div>
+            
+            <button class="result-button" onclick="setPercentage()">Continuar</button>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h2>Evaluación Completada</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0; color: #112F33;">
+                Muchas gracias por completar la evaluación. Por favor pase el dispositivo a su médico o profesional para su revisión.
+            </p>
+            <button class="result-button" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h1>BLS-23 - Resultados</h1>
+            <div class="results-container">
+                <div class="result-section">
+                    <h3>Puntuaciones</h3>
+                    <p><strong>Total Afectivo:</strong> <span id="affective-score">0</span>/92 puntos</p>
+                    <p><strong>Total Conductual:</strong> <span id="behavioral-score">0</span>/44 puntos</p>
+                    <p><strong>Puntuación Total:</strong> <span id="total-score">0</span>/136 puntos</p>
+                    <p><strong>Puntuación Media Afectiva:</strong> <span id="mean-affective">0.00</span></p>
+                    <p><strong>Estado General:</strong> <span id="general-state">0</span>%</p>
+                    <div id="severity-level" class="severity-level"></div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Interpretación Clínica</h3>
+                    <p id="clinical-interpretation"></p>
+                </div>
+
+                <div class="result-section" id="high-scores-section" style="display: none;">
+                    <h3>Ítems con Puntuación Elevada (≥66% del máximo)</h3>
+                    <div id="high-scores-list"></div>
+                </div>
+
+                <div class="result-section" id="critical-behaviors-section" style="display: none;">
+                    <h3>⚠️ Conductas Críticas Identificadas</h3>
+                    <div id="critical-behaviors-list"></div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Recomendaciones Clínicas</h3>
+                    <div id="clinical-recommendations"></div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Información Técnica</h3>
+                    <p><strong>Fecha y hora de aplicación:</strong> <span id="application-date"></span></p>
+                    <p><strong>Escala:</strong> BLS-23 (Lista de Síntomas de Trastorno Límite)</p>
+                    <p><strong>Estructura:</strong> 23 ítems afectivos + 11 ítems conductuales + evaluación general</p>
+                    <p><strong>Marco temporal evaluado:</strong> Última semana</p>
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="export-button" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="export-button" onclick="exportToImage()">🖼️ Captura de Pantalla</button>
+                <button class="export-button" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-button" id="back-button" onclick="previousCard()">← Regresar</button>
+    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {
+            affective: {},
+            behavioral: {}
+        };
+        let generalState = 50;
+        let totalQuestions = 34; // 23 affective + 11 behavioral
+        let totalCards = 37; // including section headers, percentage, final
+
+        const affectiveQuestions = [
+            "Me resultaba difícil concentrarme",
+            "Me sentí indefenso",
+            "Estuve ausente e incapaz de recordar que estaba haciendo en realidad",
+            "Sentí asco",
+            "Pensé en hacerme daño",
+            "Desconfié de los demás",
+            "No creía que tuviera derecho a vivir",
+            "Me sentía solo",
+            "Sentí una tensión interna estresante",
+            "Sentí mucho miedo de imágenes que me vinieron a la cabeza",
+            "Me odié a mí mismo",
+            "Quise castigarme",
+            "Sufrí de vergüenza",
+            "Mi humor oscilaba rápidamente entre la ansiedad, la rabia y la depresión",
+            "Sufrí al oír voces y ruidos procedentes de dentro o fuera de mi cabeza",
+            "Las críticas tuvieron un efecto demoledor en mí",
+            "Me sentí vulnerable",
+            "La idea de morirme me causó una cierta fascinación",
+            "Nada parecía tener sentido para mí",
+            "Tuve miedo de perder el control",
+            "Me di asco a mí mismo",
+            "Tuve la sensación de salir de mí mismo",
+            "Sentí que no valía nada"
+        ];
+
+        const behavioralQuestions = [
+            "Me hice daño cortándome, quemándome, estrangulándome, dándome golpes con la cabeza, etc.",
+            "Dije a otras personas que iba a matarme",
+            "Intenté suicidarme",
+            "Tuve atracones de comida",
+            "Me provoqué el vómito",
+            "Realicé deliberadamente conductas arriesgadas como conducir demasiado rápido o en dirección contraria, hacer equilibrios y juegos en lugares altos, etc.",
+            "Me emborraché",
+            "Usé drogas",
+            "Tomé medicación que no se me había recetado o si se me había prescrito, tomé más de la dosis recetada",
+            "Tuve brotes de ira incontrolada o ataqué físicamente a otras personas",
+            "Tuve relaciones sexuales que no pude controlar, de las cuales más tarde me sentí avergonzado/a o enfadado/a"
+        ];
+
+        // Initialize percentage slider
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.getElementById('percentage-slider');
+            const display = document.getElementById('percentage-value');
+            
+            if (slider && display) {
+                slider.addEventListener('input', function() {
+                    display.textContent = this.value + '%';
+                });
+            }
+        });
+
+        function nextCard() {
+            hideCard(currentCard);
+            currentCard++;
+            showCard(currentCard);
+            updateProgress();
+            updateBackButton();
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                hideCard(currentCard);
+                currentCard--;
+                showCard(currentCard);
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function selectOption(questionIndex, value, type) {
+            responses[type][questionIndex] = value;
+            
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function setPercentage() {
+            const slider = document.getElementById('percentage-slider');
+            generalState = parseInt(slider.value);
+            nextCard();
+        }
+
+        function hideCard(cardIndex) {
+            const cardIds = [
+                'card-0', 'card-section1', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6', 'card-7', 'card-8', 'card-9', 'card-10',
+                'card-11', 'card-12', 'card-13', 'card-14', 'card-15', 'card-16', 'card-17', 'card-18', 'card-19', 'card-20', 'card-21', 'card-22', 'card-23',
+                'card-section2', 'card-24', 'card-25', 'card-26', 'card-27', 'card-28', 'card-29', 'card-30', 'card-31', 'card-32', 'card-33', 'card-34',
+                'card-percentage', 'card-final', 'card-results'
+            ];
+            
+            if (cardIndex < cardIds.length) {
+                const card = document.getElementById(cardIds[cardIndex]);
+                if (card) {
+                    card.classList.remove('active');
+                }
+            }
+        }
+
+        function showCard(cardIndex) {
+            const cardIds = [
+                'card-0', 'card-section1', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6', 'card-7', 'card-8', 'card-9', 'card-10',
+                'card-11', 'card-12', 'card-13', 'card-14', 'card-15', 'card-16', 'card-17', 'card-18', 'card-19', 'card-20', 'card-21', 'card-22', 'card-23',
+                'card-section2', 'card-24', 'card-25', 'card-26', 'card-27', 'card-28', 'card-29', 'card-30', 'card-31', 'card-32', 'card-33', 'card-34',
+                'card-percentage', 'card-final', 'card-results'
+            ];
+            
+            if (cardIndex < cardIds.length) {
+                const card = document.getElementById(cardIds[cardIndex]);
+                if (card) {
+                    card.classList.add('active');
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            let progress = 0;
+            
+            if (currentCard === 0) {
+                progress = 0;
+            } else if (currentCard < 37) {
+                progress = (currentCard / 37) * 100;
+            } else {
+                progress = 100;
+            }
+            
+            progressBar.style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backButton = document.getElementById('back-button');
+            // Hide back button on welcome, section headers, final and results cards
+            if (currentCard === 0 || currentCard === 1 || currentCard === 25 || currentCard === 37 || currentCard === 38 || currentCard === 39) {
+                backButton.style.display = 'none';
+            } else {
+                backButton.style.display = 'block';
+            }
+        }
+
+        function calculateAffectiveScore() {
+            let score = 0;
+            for (let i = 0; i < 23; i++) {
+                if (responses.affective[i] !== undefined) {
+                    score += responses.affective[i];
+                }
+            }
+            return score;
+        }
+
+        function calculateBehavioralScore() {
+            let score = 0;
+            for (let i = 23; i < 34; i++) {
+                if (responses.behavioral[i] !== undefined) {
+                    score += responses.behavioral[i];
+                }
+            }
+            return score;
+        }
+
+        function getMeanAffectiveScore() {
+            const totalScore = calculateAffectiveScore();
+            return (totalScore / 23).toFixed(2);
+        }
+
+        function getSeverityLevel(totalScore) {
+            // Based on the file data: 0-48 = Leve, 49-62 = Moderado, 63+ = Grave
+            if (totalScore <= 48) return { level: "Leve", class: "severity-low" };
+            if (totalScore <= 62) return { level: "Moderado", class: "severity-moderate" };
+            return { level: "Grave", class: "severity-severe" };
+        }
+
+        function getInterpretation(severity, affectiveScore, behavioralScore) {
+            const interpretations = {
+                "Leve": "El paciente presenta síntomas mínimos a leves relacionados con el trastorno límite de personalidad. La sintomatología afectiva y conductual se encuentra en rangos que no interfieren significativamente con el funcionamiento diario. Se recomienda seguimiento preventivo y evaluación de factores de riesgo.",
+                
+                "Moderado": "Se identifica un nivel moderado de sintomatología límite que requiere atención clínica. Los síntomas afectivos y las conductas problema interfieren con el funcionamiento diario y las relaciones interpersonales. Se requiere intervención terapéutica estructurada y seguimiento regular.",
+                
+                "Grave": "El paciente presenta sintomatología límite severa con impacto significativo en múltiples áreas de funcionamiento. Se observan síntomas afectivos intensos y conductas de alto riesgo que requieren intervención inmediata y manejo intensivo. Evaluación urgente de riesgo suicida y autolesivo requerida."
+            };
+            
+            return interpretations[severity] || "Interpretación no disponible para este nivel de severidad.";
+        }
+
+        function getHighScoreItems() {
+            const threshold = Math.ceil(4 * 0.66); // 66% del máximo (4)
+            const highItems = [];
+            
+            // Check affective items
+            for (let i = 0; i < 23; i++) {
+                if (responses.affective[i] !== undefined && responses.affective[i] >= threshold) {
+                    highItems.push({
+                        number: i + 1,
+                        text: affectiveQuestions[i],
+                        score: responses.affective[i],
+                        type: "Síntoma"
+                    });
+                }
+            }
+            
+            // Check behavioral items
+            for (let i = 23; i < 34; i++) {
+                if (responses.behavioral[i] !== undefined && responses.behavioral[i] >= threshold) {
+                    highItems.push({
+                        number: (i - 23) + 1,
+                        text: behavioralQuestions[i - 23],
+                        score: responses.behavioral[i],
+                        type: "Conducta"
+                    });
+                }
+            }
+            
+            return highItems;
+        }
+
+        function getCriticalBehaviors() {
+            const criticalIndices = [23, 24, 25]; // Self-harm, suicide threats, suicide attempts
+            const criticalBehaviors = [];
+            
+            for (let i of criticalIndices) {
+                if (responses.behavioral[i] !== undefined && responses.behavioral[i] > 0) {
+                    criticalBehaviors.push({
+                        number: (i - 23) + 1,
+                        text: behavioralQuestions[i - 23],
+                        score: responses.behavioral[i]
+                    });
+                }
+            }
+            
+            return criticalBehaviors;
+        }
+
+        function getClinicalRecommendations(severity, affectiveScore, behavioralScore, criticalBehaviors, generalState) {
+            let recommendations = [];
+            
+            switch(severity) {
+                case "Leve":
+                    recommendations.push("Seguimiento clínico preventivo cada 3-6 meses.");
+                    recommendations.push("Evaluación de factores de riesgo y estrategias de afrontamiento.");
+                    recommendations.push("Consideración de psicoterapia de apoyo si aumenta la sintomatología.");
+                    break;
+                    
+                case "Moderado":
+                    recommendations.push("Indicación de psicoterapia especializada (TDC, terapia específica para TLP).");
+                    recommendations.push("Evaluación integral de comorbilidades psiquiátricas.");
+                    recommendations.push("Planificación de tratamiento estructurado a mediano plazo.");
+                    recommendations.push("Seguimiento mensual durante la fase inicial del tratamiento.");
+                    break;
+                    
+                case "Grave":
+                    recommendations.push("Intervención terapéutica intensiva inmediata (TDC intensiva o similar).");
+                    recommendations.push("Evaluación psiquiátrica urgente para consideración de tratamiento farmacológico.");
+                    recommendations.push("Implementación de plan de seguridad y manejo de crisis.");
+                    recommendations.push("Consideración de tratamiento residencial o parcial hospitalización.");
+                    break;
+            }
+
+            // Critical behaviors recommendations
+            if (criticalBehaviors.length > 0) {
+                recommendations.unshift("⚠️ ALERTA CRÍTICA: Evaluación inmediata de riesgo autolesivo/suicida requerida.");
+                recommendations.push("Implementación urgente de protocolo de prevención de suicidio.");
+                recommendations.push("Activación de red de apoyo y contacto de emergencia.");
+            }
+
+            // General state considerations
+            if (generalState <= 30) {
+                recommendations.push("⚠️ Estado general muy deteriorado: Evaluación de necesidad de soporte adicional.");
+            }
+
+            // High behavioral score
+            if (behavioralScore > 20) {
+                recommendations.push("Enfoque específico en reducción de conductas problema y habilidades de regulación emocional.");
+            }
+            
+            return recommendations;
+        }
+
+        function showResults() {
+            const affectiveScore = calculateAffectiveScore();
+            const behavioralScore = calculateBehavioralScore();
+            const totalScore = affectiveScore + behavioralScore;
+            const meanAffective = parseFloat(getMeanAffectiveScore());
+            const severity = getSeverityLevel(totalScore);
+            const interpretation = getInterpretation(severity.level, affectiveScore, behavioralScore);
+            const highItems = getHighScoreItems();
+            const criticalBehaviors = getCriticalBehaviors();
+            const recommendations = getClinicalRecommendations(severity.level, affectiveScore, behavioralScore, criticalBehaviors, generalState);
+            
+            // Update scores
+            document.getElementById('affective-score').textContent = affectiveScore;
+            document.getElementById('behavioral-score').textContent = behavioralScore;
+            document.getElementById('total-score').textContent = totalScore;
+            document.getElementById('mean-affective').textContent = meanAffective;
+            document.getElementById('general-state').textContent = generalState;
+            
+            // Update severity level
+            const severityElement = document.getElementById('severity-level');
+            severityElement.textContent = `Nivel de Severidad: ${severity.level}`;
+            severityElement.className = `severity-level ${severity.class}`;
+            
+            // Update interpretation
+            document.getElementById('clinical-interpretation').textContent = interpretation;
+            
+            // Show high scoring items
+            if (highItems.length > 0) {
+                document.getElementById('high-scores-section').style.display = 'block';
+                const highScoresList = document.getElementById('high-scores-list');
+                highScoresList.innerHTML = highItems.map(item => 
+                    `<div class="alert-item">
+                        <strong>${item.type} ${item.number}:</strong> ${item.text} 
+                        <span style="float: right; font-weight: bold;">${item.score}/4</span>
+                    </div>`
+                ).join('');
+            }
+
+            // Show critical behaviors
+            if (criticalBehaviors.length > 0) {
+                document.getElementById('critical-behaviors-section').style.display = 'block';
+                const criticalBehaviorsList = document.getElementById('critical-behaviors-list');
+                criticalBehaviorsList.innerHTML = criticalBehaviors.map(item => 
+                    `<div class="alert-item" style="background: rgba(229, 62, 62, 0.2); border-color: #e53e3e;">
+                        <strong>Conducta ${item.number}:</strong> ${item.text} 
+                        <span style="float: right; font-weight: bold; color: #9b2c2c;">${item.score}/4</span>
+                    </div>`
+                ).join('');
+            }
+            
+            // Update recommendations
+            const recommendationsElement = document.getElementById('clinical-recommendations');
+            recommendationsElement.innerHTML = recommendations.map(rec => `<p>• ${rec}</p>`).join('');
+            
+            // Update date
+            document.getElementById('application-date').textContent = new Date().toLocaleString('es-ES');
+            
+            // Hide current card and show results
+            hideCard(currentCard);
+            currentCard = 39; // Results card index
+            showCard(currentCard);
+            updateBackButton();
+        }
+
+        function exportToPDF() {
+            const affectiveScore = calculateAffectiveScore();
+            const behavioralScore = calculateBehavioralScore();
+            const totalScore = affectiveScore + behavioralScore;
+            const meanAffective = getMeanAffectiveScore();
+            const severity = getSeverityLevel(totalScore);
+            const highItems = getHighScoreItems();
+            const criticalBehaviors = getCriticalBehaviors();
+            const date = new Date().toLocaleString('es-ES');
+            
+            let content = `BLS-23 - RESULTADOS DE EVALUACIÓN\n\n`;
+            content += `Fecha: ${date}\n\n`;
+            content += `PUNTUACIONES:\n`;
+            content += `Total Afectivo: ${affectiveScore}/92\n`;
+            content += `Total Conductual: ${behavioralScore}/44\n`;
+            content += `Puntuación Total: ${totalScore}/136\n`;
+            content += `Media Afectiva: ${meanAffective}\n`;
+            content += `Estado General: ${generalState}%\n`;
+            content += `Nivel de Severidad: ${severity.level}\n\n`;
+            
+            if (criticalBehaviors.length > 0) {
+                content += `⚠️ CONDUCTAS CRÍTICAS:\n`;
+                criticalBehaviors.forEach(item => {
+                    content += `• Conducta ${item.number}: ${item.text} (${item.score}/4)\n`;
+                });
+                content += `\n`;
+            }
+            
+            if (highItems.length > 0) {
+                content += `ÍTEMS CON PUNTUACIÓN ELEVADA:\n`;
+                highItems.forEach(item => {
+                    content += `• ${item.type} ${item.number}: ${item.text} (${item.score}/4)\n`;
+                });
+                content += `\n`;
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `BLS23_Resultados_${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function exportToImage() {
+            const resultsCard = document.getElementById('card-results');
+            
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(resultsCard).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `BLS23_Resultados_${new Date().toISOString().slice(0,10)}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            } else {
+                alert('Función de captura de imagen no disponible en este dispositivo. Use la función PDF en su lugar.');
+            }
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los resultados actuales.')) {
+                currentCard = 0;
+                responses = {
+                    affective: {},
+                    behavioral: {}
+                };
+                generalState = 50;
+                hideCard(39); // Hide results card
+                showCard(0);
+                updateProgress();
+                updateBackButton();
+                
+                // Reset percentage slider
+                const slider = document.getElementById('percentage-slider');
+                const display = document.getElementById('percentage-value');
+                if (slider && display) {
+                    slider.value = 50;
+                    display.textContent = '50%';
+                }
+            }
+        }
+
+        // Initialize
+        updateBackButton();
+        updateProgress();
+    </script>
+</body>
+</html>

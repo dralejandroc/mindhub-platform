@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Búsqueda de Sensaciones SSS-V</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            color: #112F33;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            display: none;
+            text-align: center;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #112F33;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px 25px;
+            border: 2px solid #29A98C;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            color: #112F33;
+        }
+
+        .option:hover {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .instructions {
+            text-align: left;
+            margin-bottom: 30px;
+            color: #112F33;
+            font-size: 1.1em;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.4);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .results-section {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .dimension-result {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(41, 169, 140, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .total-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .interpretation {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .risk-minimal {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .risk-low {
+            background-color: #f6ad55;
+            color: white;
+        }
+
+        .risk-moderate {
+            background-color: #ed8936;
+            color: white;
+        }
+
+        .risk-high {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .alert-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #742a2a;
+            color: white;
+            border-radius: 10px;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .download-buttons .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card h1 {
+                font-size: 1.8em;
+            }
+            
+            .card h2 {
+                font-size: 1.5em;
+            }
+            
+            .question-text {
+                font-size: 1.1em;
+            }
+            
+            .option {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+            
+            .download-buttons .btn {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Card 0: Bienvenida -->
+    <div class="container">
+        <div class="card active" id="card-0">
+            <h1>Escala de Búsqueda de Sensaciones SSS-V</h1>
+            <div class="instructions">
+                <p><strong>Instrucciones:</strong></p>
+                <p>A continuación encontrará 20 afirmaciones. Para cada una, deberá elegir SÍ si está de acuerdo o NO si no está de acuerdo con la afirmación.</p>
+                <br>
+                <p><strong>Importante:</strong></p>
+                <ul>
+                    <li>No hay respuestas correctas o incorrectas</li>
+                    <li>Responda con honestidad según sus preferencias reales</li>
+                    <li>Elija la opción que mejor refleje su forma de ser</li>
+                    <li>No piense demasiado en cada respuesta</li>
+                </ul>
+                <br>
+                <p>Esta escala evalúa su tendencia a buscar experiencias y sensaciones nuevas, variadas y emocionantes.</p>
+                <br>
+                <p><strong>Nota de Privacidad:</strong> Esta escala aborda temas relacionados con la sexualidad y comportamientos personales. Sus respuestas serán tratadas con la máxima confidencialidad y privacidad que el tema amerita.</p>
+            </div>
+            <button class="btn" onclick="startScale()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-20: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">1</div>
+            <div class="question-text">A menudo desearía ser un escalador de montañas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(1, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">2</div>
+            <div class="question-text">Me gustan las fiestas desenfrenadas y desinhibidas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(2, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">3</div>
+            <div class="question-text">Me gusta la compañía de personas liberadas que practican el "cambio de parejas"</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(3, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">4</div>
+            <div class="question-text">Me gustaría practicar el esquí acuático</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(4, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">5</div>
+            <div class="question-text">He probado marihuana u otras hierbas, o me gustaría hacerlo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(5, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">6</div>
+            <div class="question-text">A menudo me gusta ir colocado (bebiendo alcohol o fumando hierba)</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(6, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">7</div>
+            <div class="question-text">Me gustaría practicar el wind-surfing</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(7, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">8</div>
+            <div class="question-text">He probado o me gustaría probar alguna droga que produce alucinaciones</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(8, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">9</div>
+            <div class="question-text">Me gusta tener experiencias y sensaciones nuevas y excitantes, aunque sean poco convencionales o incluso ilegales</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(9, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">10</div>
+            <div class="question-text">Me gustaría aprender a volar en avioneta</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(10, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">11</div>
+            <div class="question-text">Me gusta salir con personas del sexo opuesto que sean físicamente excitantes</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(11, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">12</div>
+            <div class="question-text">Me gustaría practicar el submarinismo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(12, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">13</div>
+            <div class="question-text">Me gustaría probar a lanzarme en paracaídas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(13, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">14</div>
+            <div class="question-text">Una persona debería tener considerable experiencia sexual antes del matrimonio</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(14, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">15</div>
+            <div class="question-text">Me gusta saltar desde trampolines altos en piscinas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(15, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">16</div>
+            <div class="question-text">Me imagino buscando placeres alrededor del mundo con gente adinerada (jet-set)</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(16, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">17</div>
+            <div class="question-text">Me gustaría recorrer una gran distancia en un pequeño velero</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(17, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">18</div>
+            <div class="question-text">Me gusta ver las escenas sexys de las películas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 0)">SÍ</div>
+                <div class="option" onclick="selectOption(18, 1)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">19</div>
+            <div class="question-text">Me gustaría la sensación de bajar esquiando muy rápido por la pendiente de una gran montaña</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(19, 0)">NO</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">20</div>
+            <div class="question-text">Me siento muy bien después de tomarme unas copas de alcohol</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 1)">SÍ</div>
+                <div class="option" onclick="selectOption(20, 0)">NO</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h2>Evaluación Completada</h2>
+            <p style="font-size: 1.2em; margin: 20px 0;">Muchas gracias por completar la Escala de Búsqueda de Sensaciones SSS-V.</p>
+            <p style="margin: 20px 0;">Por favor, pase el dispositivo a su médico o profesional de la salud para la revisión de los resultados.</p>
+            <button class="btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h2>Resultados de la Evaluación</h2>
+            <div class="total-score" id="total-score-display"></div>
+            
+            <div class="results-section">
+                <h3 style="color: #29A98C; margin-bottom: 15px;">Puntuaciones por Dimensión:</h3>
+                <div class="dimension-result">
+                    <strong>Búsqueda de Aventura y Emoción (BAE):</strong> <span id="bae-score"></span>/9<br>
+                    <small><em>Indica el deseo de participar en actividades físicas que proporcionan sensaciones y experiencias inusuales, actividades deportivas que implican rapidez o peligro, tales como el alpinismo, surfeo, esquiar y salto de paracaídas.</em></small>
+                </div>
+                <div class="dimension-result">
+                    <strong>Búsqueda de Experiencia (BE):</strong> <span id="be-score"></span>/6<br>
+                    <small><em>Describe la búsqueda de nuevas sensaciones y experiencias a través de la mente y los sentidos (música, arte, viajes). Incluye deseo por explorar, el exhibicionismo y gusto por conductas como el uso de drogas, entre ellas la marihuana y los alucinógenos.</em></small>
+                </div>
+                <div class="dimension-result">
+                    <strong>Desinhibición (Des):</strong> <span id="d-score"></span>/5<br>
+                    <small><em>Se refiere a la búsqueda de sensaciones a través de otras personas, la búsqueda de la aceptación social. Refleja un deseo de liberación social a través de actividades como el consumo excesivo de alcohol, las fiestas y las experiencias sexuales.</em></small>
+                </div>
+            </div>
+
+            <div class="interpretation" id="interpretation"></div>
+            
+            <div id="alerts-section"></div>
+            
+            <div class="results-section">
+                <h3 style="color: #29A98C; margin-bottom: 15px;">Descripción Clínica:</h3>
+                <p id="clinical-description"></p>
+            </div>
+
+            <div class="download-buttons">
+                <button class="btn" onclick="generatePDF()">Generar PDF</button>
+                <button class="btn" onclick="generateJPG()">Generar JPG</button>
+                <button class="btn" onclick="restartScale()">Nueva Escala</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="back-btn" onclick="goBack()">← Regresar</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 20;
+
+        // Distribución de ítems por dimensión según el archivo Excel
+        const dimensions = {
+            BE: [3, 5, 8, 9, 11, 14], // Búsqueda de Experiencia (6 ítems)
+            BAE: [1, 4, 7, 10, 12, 13, 15, 17, 19], // Búsqueda de Aventura y Emoción (9 ítems)
+            D: [2, 6, 16, 18, 20] // Desinhibición (5 ítems)
+        };
+
+        function startScale() {
+            currentCard = 1;
+            showCard(currentCard);
+            updateProgress();
+            document.getElementById('back-btn').style.display = 'block';
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`card-${cardNumber}`).classList.add('active');
+            
+            // Ocultar botón de regresar en cards especiales
+            if (cardNumber === 0 || cardNumber === 'final' || cardNumber === 'results') {
+                document.getElementById('back-btn').style.display = 'none';
+            } else {
+                document.getElementById('back-btn').style.display = 'block';
+            }
+        }
+
+        function selectOption(questionNumber, value) {
+            responses[questionNumber] = value;
+            
+            setTimeout(() => {
+                if (currentCard < totalQuestions) {
+                    currentCard++;
+                    showCard(currentCard);
+                    updateProgress();
+                } else {
+                    showCard('final');
+                    document.getElementById('back-btn').style.display = 'none';
+                }
+            }, 150);
+        }
+
+        function updateProgress() {
+            const progress = (currentCard / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function goBack() {
+            if (currentCard > 1) {
+                currentCard--;
+                showCard(currentCard);
+                updateProgress();
+            } else if (currentCard === 1) {
+                currentCard = 0;
+                showCard(0);
+                document.getElementById('progress-bar').style.width = '0%';
+                document.getElementById('back-btn').style.display = 'none';
+            }
+        }
+
+        function calculateScore() {
+            let scores = { BE: 0, BAE: 0, D: 0 };
+            
+            // Calcular puntuaciones por dimensión
+            for (let dim in dimensions) {
+                for (let item of dimensions[dim]) {
+                    if (responses[item] !== undefined) {
+                        scores[dim] += responses[item];
+                    }
+                }
+            }
+            
+            const totalScore = scores.BE + scores.BAE + scores.D;
+            return { ...scores, total: totalScore };
+        }
+
+        function getInterpretation(totalScore) {
+            if (totalScore <= 3) {
+                return {
+                    level: 'Riesgo Nulo o Mínimo',
+                    className: 'risk-minimal',
+                    description: 'Presenta muy baja tendencia a la búsqueda de sensaciones. Prefiere experiencias familiares y predecibles. No representa riesgo significativo para conductas de riesgo.'
+                };
+            } else if (totalScore <= 8) {
+                return {
+                    level: 'Riesgo Leve',
+                    className: 'risk-low',
+                    description: 'Presenta tendencia leve a la búsqueda de sensaciones. Ocasionalmente busca experiencias nuevas pero mantiene cautela. Riesgo bajo para conductas problemáticas.'
+                };
+            } else if (totalScore <= 14) {
+                return {
+                    level: 'Riesgo Moderado',
+                    className: 'risk-moderate',
+                    description: 'Presenta tendencia moderada a la búsqueda de sensaciones. Busca activamente experiencias nuevas y emocionantes. Requiere supervisión para prevenir conductas de riesgo.'
+                };
+            } else {
+                return {
+                    level: 'Riesgo Alto',
+                    className: 'risk-high',
+                    description: 'Presenta alta tendencia a la búsqueda de sensaciones. Fuerte inclinación hacia experiencias intensas y potencialmente peligrosas. Alto riesgo para conductas problemáticas y necesita intervención profesional.'
+                };
+            }
+        }
+
+        function showResults() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores.total);
+            
+            // Mostrar puntuación total
+            document.getElementById('total-score-display').textContent = 
+                `Puntuación Total: ${scores.total}/20`;
+            
+            // Mostrar puntuaciones por dimensión
+            document.getElementById('be-score').textContent = scores.BE;
+            document.getElementById('bae-score').textContent = scores.BAE;
+            document.getElementById('d-score').textContent = scores.D;
+            
+            // Mostrar interpretación
+            const interpretationDiv = document.getElementById('interpretation');
+            interpretationDiv.className = `interpretation ${interpretation.className}`;
+            interpretationDiv.innerHTML = `
+                <strong>Nivel de Riesgo: ${interpretation.level}</strong><br>
+                ${interpretation.description}
+            `;
+            
+            // Mostrar descripción clínica
+            document.getElementById('clinical-description').textContent = interpretation.description;
+            
+            // Verificar alertas (ítems ≥66% del máximo)
+            const alertsSection = document.getElementById('alerts-section');
+            let alerts = [];
+            
+            if (scores.BE >= 4) alerts.push('Búsqueda de Experiencia elevada');
+            if (scores.BAE >= 6) alerts.push('Búsqueda de Aventura y Emoción elevada');
+            if (scores.D >= 3) alerts.push('Desinhibición elevada');
+            
+            if (alerts.length > 0) {
+                alertsSection.innerHTML = `
+                    <div class="alert-section">
+                        <h3>⚠️ Alertas Clínicas:</h3>
+                        <ul>
+                            ${alerts.map(alert => `<li>${alert}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                alertsSection.innerHTML = '';
+            }
+            
+            showCard('results');
+        }
+
+        function generatePDF() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores.total);
+            const currentDate = new Date().toLocaleDateString('es-ES');
+            
+            // Crear contenido del PDF
+            const content = `ESCALA DE BÚSQUEDA DE SENSACIONES SSS-V
+
+Fecha de evaluación: ${currentDate}
+
+RESULTADOS:
+
+Puntuación Total: ${scores.total}/20
+
+Dimensiones:
+• Búsqueda de Aventura y Emoción (BAE): ${scores.BAE}/9
+• Búsqueda de Experiencia (BE): ${scores.BE}/6
+• Desinhibición (Des): ${scores.D}/5
+
+INTERPRETACIÓN:
+Nivel de Riesgo: ${interpretation.level}
+
+${interpretation.description}
+
+DEFINICIONES:
+• BAE: Indica el deseo de participar en actividades físicas que proporcionan sensaciones y experiencias inusuales, actividades deportivas que implican rapidez o peligro.
+• BE: Describe la búsqueda de nuevas sensaciones y experiencias a través de la mente y los sentidos (música, arte, viajes).
+• Des: Se refiere a la búsqueda de sensaciones a través de otras personas, la búsqueda de la aceptación social.
+
+---
+Escala validada para población mexicana
+Basada en Zuckerman, Eysenck & Eysenck (1978)`;
+            
+            // Crear y descargar archivo - compatible con móviles
+            try {
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `SSS-V_Resultados_${currentDate.replace(/\//g, '-')}.txt`;
+                
+                // Para móviles/tablets
+                if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/)) {
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                }
+                
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Mensaje de confirmación
+                alert('Archivo PDF generado correctamente');
+            } catch (error) {
+                // Fallback para dispositivos que no soportan descarga
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(`<pre>${content}</pre>`);
+                newWindow.document.title = 'Resultados SSS-V';
+            }
+        }
+
+        function generateJPG() {
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores.total);
+            const currentDate = new Date().toLocaleDateString('es-ES');
+            
+            // Crear canvas para generar imagen
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 700;
+            const ctx = canvas.getContext('2d');
+            
+            // Fondo blanco
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 800, 700);
+            
+            // Título
+            ctx.fillStyle = '#29A98C';
+            ctx.font = 'bold 26px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('ESCALA DE BÚSQUEDA DE SENSACIONES SSS-V', 400, 40);
+            
+            // Fecha
+            ctx.fillStyle = '#112F33';
+            ctx.font = '16px Arial';
+            ctx.fillText(`Fecha: ${currentDate}`, 400, 70);
+            
+            // Puntuación total
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#29A98C';
+            ctx.fillText(`PUNTUACIÓN TOTAL: ${scores.total}/20`, 400, 120);
+            
+            // Resultados por dimensión
+            ctx.font = 'bold 18px Arial';
+            ctx.fillStyle = '#112F33';
+            ctx.textAlign = 'left';
+            ctx.fillText('RESULTADOS POR DIMENSIÓN:', 50, 160);
+            
+            ctx.font = '16px Arial';
+            ctx.fillText(`• Búsqueda de Aventura y Emoción (BAE): ${scores.BAE}/9`, 50, 190);
+            ctx.fillText(`• Búsqueda de Experiencia (BE): ${scores.BE}/6`, 50, 220);
+            ctx.fillText(`• Desinhibición (Des): ${scores.D}/5`, 50, 250);
+            
+            // Interpretación
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText(`NIVEL DE RIESGO: ${interpretation.level}`, 50, 300);
+            
+            // Descripción (dividir texto largo)
+            ctx.font = '14px Arial';
+            const words = interpretation.description.split(' ');
+            let line = '';
+            let y = 330;
+            const maxWidth = 700;
+            
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const metrics = ctx.measureText(testLine);
+                
+                if (metrics.width > maxWidth && i > 0) {
+                    ctx.fillText(line, 50, y);
+                    line = words[i] + ' ';
+                    y += 20;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, 50, y);
+            
+            // Pie de página
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666666';
+            ctx.textAlign = 'center';
+            ctx.fillText('Escala validada para población mexicana - Zuckerman, Eysenck & Eysenck (1978)', 400, 650);
+            
+            // Convertir a imagen y manejar descarga compatible con móviles
+            try {
+                canvas.toBlob(function(blob) {
+                    if (blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `SSS-V_Resultados_${currentDate.replace(/\//g, '-')}.jpg`;
+                        
+                        // Para móviles/tablets
+                        if (navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/)) {
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                        }
+                        
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        alert('Imagen JPG generada correctamente');
+                    }
+                }, 'image/jpeg', 0.9);
+            } catch (error) {
+                // Fallback: abrir canvas en nueva ventana
+                const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(`<img src="${dataURL}" alt="Resultados SSS-V" style="max-width:100%;">`);
+                newWindow.document.title = 'Resultados SSS-V';
+            }
+        }
+
+        function restartScale() {
+            currentCard = 0;
+            responses = {};
+            showCard(0);
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('back-btn').style.display = 'none';
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            showCard(0);
+        });
+    </script>
+</body>
+</html>

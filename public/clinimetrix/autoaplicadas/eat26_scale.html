@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAT-26 - Test de Actitudes hacia la Alimentación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            color: #112F33;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #112F33;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(41, 169, 140, 0.1);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: rgba(41, 169, 140, 0.2);
+            border-color: #29A98C;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #112F33;
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border: 1px solid #29A98C;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(41, 169, 140, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .results-section {
+            margin: 20px 0;
+        }
+
+        .score-box {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .interpretation {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid #29A98C;
+        }
+
+        .interpretation.high-risk {
+            border-left-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .interpretation.moderate-risk {
+            border-left-color: #f6ad55;
+            background: rgba(246, 173, 85, 0.1);
+        }
+
+        .interpretation.low-risk {
+            border-left-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .subscale-scores {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .subscale {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .subscale-name {
+            font-weight: 600;
+            color: #112F33;
+            margin-bottom: 5px;
+        }
+
+        .subscale-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #29A98C;
+        }
+
+        .alert-items {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid #f56565;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #f56565;
+        }
+
+        .alert-items h2 {
+            color: #742a2a !important;
+            background: none !important;
+            -webkit-text-fill-color: #742a2a !important;
+        }
+
+        .alert-item {
+            margin: 10px 0; 
+            padding: 10px; 
+            background: rgba(245, 101, 101, 0.1); 
+            border-radius: 5px;
+            color: #f56565;
+        }
+
+        .export-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .card {
+                padding: 25px;
+                margin: 10px 0;
+            }
+            
+            .card h1 {
+                font-size: 1.8em;
+            }
+            
+            .back-btn {
+                bottom: 10px;
+                right: 10px;
+                padding: 12px 16px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>Test de Actitudes hacia la Alimentación (EAT-26)</h1>
+            
+            <div class="instructions">
+                <h2>Instrucciones para el paciente</h2>
+                <p><strong>Por favor, complete este cuestionario de forma completamente honesta y precisa.</strong></p>
+                <br>
+                <p>Este test evalúa sus actitudes, sentimientos y comportamientos relacionados con la alimentación. Consta de 26 preguntas sobre hábitos alimentarios.</p>
+                <br>
+                <p><strong>Instrucciones importantes:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Lea cada pregunta cuidadosamente</li>
+                    <li>Seleccione la opción que mejor describe su experiencia</li>
+                    <li>No hay respuestas correctas o incorrectas</li>
+                    <li>Base sus respuestas en sus pensamientos y comportamientos actuales</li>
+                    <li>Responda todas las preguntas de forma honesta</li>
+                </ul>
+                <br>
+                <p><strong>Confidencialidad:</strong> Sus respuestas son confidenciales y serán utilizadas únicamente para fines de evaluación clínica.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="nextCard()">Comenzar evaluación</button>
+            </div>
+        </div>
+
+        <!-- Cards 1-26: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-header">Pregunta 1 de 26</div>
+            <div class="question-text">Me aterra estar con sobrepeso</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(1, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(1, 0)">A veces</div>
+                <div class="option" onclick="selectOption(1, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(1, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(1, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-header">Pregunta 2 de 26</div>
+            <div class="question-text">Evito comer cuando tengo hambre</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(2, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(2, 0)">A veces</div>
+                <div class="option" onclick="selectOption(2, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(2, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(2, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-header">Pregunta 3 de 26</div>
+            <div class="question-text">Me preocupo mucho por la comida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(3, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(3, 0)">A veces</div>
+                <div class="option" onclick="selectOption(3, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(3, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(3, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-header">Pregunta 4 de 26</div>
+            <div class="question-text">He sufrido episodios de atracones de comida durante los cuales he sentido que podría no ser capaz de parar de comer</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(4, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(4, 0)">A veces</div>
+                <div class="option" onclick="selectOption(4, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(4, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(4, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-header">Pregunta 5 de 26</div>
+            <div class="question-text">Corto mis alimentos en trozos pequeños</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(5, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(5, 0)">A veces</div>
+                <div class="option" onclick="selectOption(5, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(5, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(5, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-header">Pregunta 6 de 26</div>
+            <div class="question-text">Estoy al tanto del contenido calórico de los alimentos que como</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(6, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(6, 0)">A veces</div>
+                <div class="option" onclick="selectOption(6, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(6, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(6, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-header">Pregunta 7 de 26</div>
+            <div class="question-text">Evito especialmente aquellos alimentos con alto contenido de carbohidratos (por ejemplo: pan, arroz, papas, etc.)</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(7, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(7, 0)">A veces</div>
+                <div class="option" onclick="selectOption(7, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(7, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(7, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-header">Pregunta 8 de 26</div>
+            <div class="question-text">Siento que las otras personas preferirían que comiera más</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(8, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(8, 0)">A veces</div>
+                <div class="option" onclick="selectOption(8, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(8, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(8, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-header">Pregunta 9 de 26</div>
+            <div class="question-text">Vomito después de comer</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(9, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(9, 0)">A veces</div>
+                <div class="option" onclick="selectOption(9, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(9, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(9, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-header">Pregunta 10 de 26</div>
+            <div class="question-text">Me siento extremadamente culpable después de comer</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(10, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(10, 0)">A veces</div>
+                <div class="option" onclick="selectOption(10, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(10, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(10, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-header">Pregunta 11 de 26</div>
+            <div class="question-text">Me preocupa el deseo de estar más delgado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(11, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(11, 0)">A veces</div>
+                <div class="option" onclick="selectOption(11, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(11, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(11, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-header">Pregunta 12 de 26</div>
+            <div class="question-text">Cuando hago ejercicio pienso en quemar calorías</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(12, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(12, 0)">A veces</div>
+                <div class="option" onclick="selectOption(12, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(12, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(12, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-header">Pregunta 13 de 26</div>
+            <div class="question-text">Otras personas piensan que estoy demasiado delgado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(13, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(13, 0)">A veces</div>
+                <div class="option" onclick="selectOption(13, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(13, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(13, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-header">Pregunta 14 de 26</div>
+            <div class="question-text">Me preocupa la idea de tener grasa en mi cuerpo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(14, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(14, 0)">A veces</div>
+                <div class="option" onclick="selectOption(14, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(14, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(14, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-header">Pregunta 15 de 26</div>
+            <div class="question-text">Tardo más tiempo en comer que otras personas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(15, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(15, 0)">A veces</div>
+                <div class="option" onclick="selectOption(15, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(15, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(15, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-header">Pregunta 16 de 26</div>
+            <div class="question-text">Evito alimentos que contienen azúcar</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(16, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(16, 0)">A veces</div>
+                <div class="option" onclick="selectOption(16, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(16, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(16, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-header">Pregunta 17 de 26</div>
+            <div class="question-text">Como alimentos dietéticos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(17, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(17, 0)">A veces</div>
+                <div class="option" onclick="selectOption(17, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(17, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(17, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-header">Pregunta 18 de 26</div>
+            <div class="question-text">Siento que la comida controla mi vida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(18, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(18, 0)">A veces</div>
+                <div class="option" onclick="selectOption(18, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(18, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(18, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-header">Pregunta 19 de 26</div>
+            <div class="question-text">Muestro autocontrol en relación con la comida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(19, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(19, 0)">A veces</div>
+                <div class="option" onclick="selectOption(19, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(19, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(19, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-header">Pregunta 20 de 26</div>
+            <div class="question-text">Siento que otras personas me presionan para comer</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(20, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(20, 0)">A veces</div>
+                <div class="option" onclick="selectOption(20, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(20, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(20, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-header">Pregunta 21 de 26</div>
+            <div class="question-text">Paso demasiado tiempo pensando en comida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(21, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(21, 0)">A veces</div>
+                <div class="option" onclick="selectOption(21, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(21, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(21, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-header">Pregunta 22 de 26</div>
+            <div class="question-text">Me siento incómodo/a después de comer dulces</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(22, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(22, 0)">A veces</div>
+                <div class="option" onclick="selectOption(22, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(22, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(22, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="question-header">Pregunta 23 de 26</div>
+            <div class="question-text">Me comprometo a hacer dieta</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(23, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(23, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(23, 0)">A veces</div>
+                <div class="option" onclick="selectOption(23, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(23, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(23, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-24">
+            <div class="question-header">Pregunta 24 de 26</div>
+            <div class="question-text">Me gusta sentir el estómago vacío</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(24, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(24, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(24, 0)">A veces</div>
+                <div class="option" onclick="selectOption(24, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(24, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(24, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="question-header">Pregunta 25 de 26</div>
+            <div class="question-text">Disfruto probando comidas nuevas y sabrosas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(25, 3)">Nunca</div>
+                <div class="option" onclick="selectOption(25, 2)">Raramente</div>
+                <div class="option" onclick="selectOption(25, 1)">A veces</div>
+                <div class="option" onclick="selectOption(25, 0)">A menudo</div>
+                <div class="option" onclick="selectOption(25, 0)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(25, 0)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="question-header">Pregunta 26 de 26</div>
+            <div class="question-text">Tengo impulso de vomitar después de las comidas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(26, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(26, 0)">Raramente</div>
+                <div class="option" onclick="selectOption(26, 0)">A veces</div>
+                <div class="option" onclick="selectOption(26, 1)">A menudo</div>
+                <div class="option" onclick="selectOption(26, 2)">Muy a menudo</div>
+                <div class="option" onclick="selectOption(26, 3)">Siempre</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h1>Evaluación Completada</h1>
+            <div class="instructions">
+                <h2>¡Muchas gracias por completar el Test de Actitudes hacia la Alimentación!</h2>
+                <p>Ha completado exitosamente todas las 26 preguntas del cuestionario.</p>
+                <br>
+                <p><strong>Por favor, entregue el dispositivo a su médico o profesional de la salud para la revisión de los resultados.</strong></p>
+                <br>
+                <p>Los resultados de esta evaluación serán interpretados por un profesional capacitado quien discutirá con usted los hallazgos y cualquier recomendación apropiada.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="showResults()">Revisar resultados (Médico)</button>
+            </div>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h1>Resultados del EAT-26</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                <em>Para revisión del profesional de la salud</em>
+            </p>
+            
+            <div id="results-content">
+                <!-- Contenido de resultados se generará dinámicamente -->
+            </div>
+            
+            <div class="export-section">
+                <button class="btn" onclick="exportToPDF()">📄 Exportar a PDF</button>
+                <button class="btn" onclick="exportToImage()">🖼️ Captura de pantalla</button>
+                <button class="btn" onclick="startNewAssessment()">🔄 Nueva evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="back-btn" onclick="previousCard()">← Regresar</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 26;
+
+        // Definición de subescalas
+        const subscales = {
+            dieting: [1, 6, 7, 10, 11, 12, 14, 16, 17, 22, 23, 24, 26],
+            bulimia: [3, 4, 9, 18, 21],
+            oralControl: [2, 5, 8, 13, 15, 19, 20, 25]
+        };
+
+        function updateProgressBar() {
+            const progress = (currentCard / (totalQuestions + 2)) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard === 0 || currentCard === totalQuestions + 1 || currentCard === totalQuestions + 2) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.style.display = 'block';
+            }
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            let cardId;
+            if (cardNumber === totalQuestions + 1) {
+                cardId = 'card-final';
+            } else if (cardNumber === totalQuestions + 2) {
+                cardId = 'card-results';
+            } else {
+                cardId = `card-${cardNumber}`;
+            }
+            
+            const targetCard = document.getElementById(cardId);
+            if (targetCard) {
+                targetCard.classList.add('active');
+            }
+            
+            updateProgressBar();
+            updateBackButton();
+        }
+
+        function nextCard() {
+            if (currentCard < totalQuestions + 2) {
+                currentCard++;
+                if (currentCard === totalQuestions + 1) {
+                    // Ir a card-final
+                    showCard(currentCard);
+                } else if (currentCard === totalQuestions + 2) {
+                    // Ir a card-results
+                    showCard(currentCard);
+                } else {
+                    // Cards normales
+                    showCard(currentCard);
+                }
+            }
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                showCard(currentCard);
+            }
+        }
+
+        function selectOption(questionNumber, score) {
+            responses[questionNumber] = score;
+            
+            // Resaltar opción seleccionada
+            const options = document.querySelectorAll(`#card-${questionNumber} .option`);
+            options.forEach(option => option.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Auto-avance después de selección
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let subscaleScores = {
+                dieting: 0,
+                bulimia: 0,
+                oralControl: 0
+            };
+
+            // Calcular puntuación total y subescalas
+            for (let i = 1; i <= totalQuestions; i++) {
+                const score = responses[i] || 0;
+                totalScore += score;
+
+                // Asignar a subescalas
+                if (subscales.dieting.includes(i)) {
+                    subscaleScores.dieting += score;
+                } else if (subscales.bulimia.includes(i)) {
+                    subscaleScores.bulimia += score;
+                } else if (subscales.oralControl.includes(i)) {
+                    subscaleScores.oralControl += score;
+                }
+            }
+
+            return { totalScore, subscaleScores };
+        }
+
+        function getInterpretation(totalScore, subscaleScores) {
+            if (totalScore >= 20) {
+                // Analizar patrones según subescalas
+                let patterns = [];
+                if (subscaleScores.dieting >= 8) {
+                    patterns.push('Alta probabilidad de conductas restrictivas tipo anorexia nerviosa');
+                }
+                if (subscaleScores.bulimia >= 3) {
+                    patterns.push('Alta probabilidad de conductas bulímicas y obsesión por la comida');
+                }
+                if (subscaleScores.oralControl >= 5) {
+                    patterns.push('Marcadas alteraciones en el control de la ingesta');
+                }
+                if (patterns.length > 1) {
+                    patterns.push('Patrón mixto de trastorno de la conducta alimentaria');
+                }
+
+                return {
+                    level: 'high-risk',
+                    title: 'Riesgo Alto - Patrón Clínico Significativo',
+                    description: 'Puntuación ≥20 indica presencia significativa de actitudes y comportamientos característicos de trastornos de la conducta alimentaria.',
+                    findings: patterns.length > 0 ? patterns : [
+                        'Actitudes alimentarias patológicas significativas',
+                        'Distorsión de la imagen corporal',
+                        'Comportamientos de riesgo para la salud'
+                    ]
+                };
+            } else if (totalScore >= 11) {
+                let patterns = [];
+                if (subscaleScores.dieting >= 5) {
+                    patterns.push('Tendencia a conductas restrictivas y preocupación excesiva por el peso');
+                }
+                if (subscaleScores.bulimia >= 2) {
+                    patterns.push('Presencia de pensamientos obsesivos sobre la comida');
+                }
+                if (subscaleScores.oralControl >= 3) {
+                    patterns.push('Dificultades en el control normal de la alimentación');
+                }
+
+                return {
+                    level: 'moderate-risk',
+                    title: 'Riesgo Moderado - Actitudes de Riesgo Presentes',
+                    description: 'Puntuación entre 11-19 indica presencia de actitudes alimentarias de riesgo que requieren atención.',
+                    findings: patterns.length > 0 ? patterns : [
+                        'Actitudes alimentarias subclínicas de riesgo',
+                        'Preocupación moderada por peso y forma corporal',
+                        'Algunos patrones de pensamiento disfuncional sobre la comida'
+                    ]
+                };
+            } else {
+                return {
+                    level: 'low-risk',
+                    title: 'Riesgo Bajo - Actitudes Normales',
+                    description: 'Puntuación <11 sugiere actitudes alimentarias dentro de parámetros normales.',
+                    findings: [
+                        'Actitudes alimentarias adaptativas',
+                        'Relación saludable con la comida y el peso',
+                        'Ausencia de patrones patológicos significativos'
+                    ]
+                };
+            }
+        }
+
+        function getHighRiskItems(responses) {
+            const highRiskItems = [];
+            const threshold = 2; // ≥66% del máximo (que es 3)
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (responses[i] >= threshold) {
+                    highRiskItems.push({
+                        number: i,
+                        score: responses[i],
+                        text: getQuestionText(i)
+                    });
+                }
+            }
+            
+            return highRiskItems;
+        }
+
+        function getQuestionText(number) {
+            const questions = {
+                1: "Me aterra estar con sobrepeso",
+                2: "Evito comer cuando tengo hambre",
+                3: "Me preocupo mucho por la comida",
+                4: "He sufrido episodios de atracones de comida",
+                5: "Corto mis alimentos en trozos pequeños",
+                6: "Estoy al tanto del contenido calórico de los alimentos",
+                7: "Evito especialmente alimentos con alto contenido de carbohidratos",
+                8: "Siento que las otras personas preferirían que comiera más",
+                9: "Vomito después de comer",
+                10: "Me siento extremadamente culpable después de comer",
+                11: "Me preocupa el deseo de estar más delgado/a",
+                12: "Cuando hago ejercicio pienso en quemar calorías",
+                13: "Otras personas piensan que estoy demasiado delgado/a",
+                14: "Me preocupa la idea de tener grasa en mi cuerpo",
+                15: "Tardo más tiempo en comer que otras personas",
+                16: "Evito alimentos que contienen azúcar",
+                17: "Como alimentos dietéticos",
+                18: "Siento que la comida controla mi vida",
+                19: "Muestro autocontrol en relación con la comida",
+                20: "Siento que otras personas me presionan para comer",
+                21: "Paso demasiado tiempo pensando en comida",
+                22: "Me siento incómodo/a después de comer dulces",
+                23: "Me comprometo a hacer dieta",
+                24: "Me gusta sentir el estómago vacío",
+                25: "Disfruto probando comidas nuevas y sabrosas",
+                26: "Tengo impulso de vomitar después de las comidas"
+            };
+            return questions[number] || "";
+        }
+
+        function showResults() {
+            // Cambiar directamente a la card de resultados
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById('card-results').classList.add('active');
+            
+            currentCard = totalQuestions + 2;
+            updateProgressBar();
+            updateBackButton();
+            
+            const { totalScore, subscaleScores } = calculateScore();
+            const interpretation = getInterpretation(totalScore, subscaleScores);
+            const highRiskItems = getHighRiskItems(responses);
+            
+            const resultsContent = document.getElementById('results-content');
+            
+            resultsContent.innerHTML = `
+                <div class="score-box">
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">Puntuación Total EAT-26</div>
+                    <div class="score-value">${totalScore}</div>
+                    <div style="font-size: 0.9em;">de 78 puntos posibles</div>
+                </div>
+                
+                <div class="interpretation ${interpretation.level}">
+                    <h2>${interpretation.title}</h2>
+                    <p><strong>Interpretación:</strong> ${interpretation.description}</p>
+                </div>
+                
+                <div class="results-section">
+                    <h2>Puntuaciones por Subescala</h2>
+                    <div class="subscale-scores">
+                        <div class="subscale">
+                            <div class="subscale-name">Dieta/Restricción (13 ítems)</div>
+                            <div class="subscale-score">${subscaleScores.dieting} puntos</div>
+                            <div style="font-size: 0.9em; color: #666;">Evalúa conductas evitativas de alimentos calóricos y preocupaciones por la delgadez</div>
+                            ${subscaleScores.dieting >= 8 ? '<div style="font-size: 0.85em; color: #f56565; margin-top: 5px;"><strong>⚠️ Puntuación elevada: Sugiere patrón restrictivo significativo</strong></div>' : ''}
+                        </div>
+                        <div class="subscale">
+                            <div class="subscale-name">Bulimia y Preocupación por la Comida (5 ítems)</div>
+                            <div class="subscale-score">${subscaleScores.bulimia} puntos</div>
+                            <div style="font-size: 0.9em; color: #666;">Evalúa conductas bulímicas y pensamientos obsesivos sobre la comida</div>
+                            ${subscaleScores.bulimia >= 3 ? '<div style="font-size: 0.85em; color: #f56565; margin-top: 5px;"><strong>⚠️ Puntuación elevada: Sugiere conductas bulímicas o preocupación excesiva</strong></div>' : ''}
+                        </div>
+                        <div class="subscale">
+                            <div class="subscale-name">Control Oral (8 ítems)</div>
+                            <div class="subscale-score">${subscaleScores.oralControl} puntos</div>
+                            <div style="font-size: 0.9em; color: #666;">Evalúa autocontrol sobre la ingesta y presión externa para comer</div>
+                            ${subscaleScores.oralControl >= 5 ? '<div style="font-size: 0.85em; color: #f56565; margin-top: 5px;"><strong>⚠️ Puntuación elevada: Sugiere alteraciones en el control alimentario</strong></div>' : ''}
+                        </div>
+                    </div>
+                </div>
+
+                ${highRiskItems.length > 0 ? `
+                <div class="alert-items">
+                    <h2 style="margin-bottom: 15px;">⚠️ Ítems de Alerta (Puntuación ≥2)</h2>
+                    <p style="margin-bottom: 15px;"><strong>Los siguientes ítems requieren atención especial:</strong></p>
+                    ${highRiskItems.map(item => 
+                        `<div class="alert-item">
+                            <strong>Ítem ${item.number}:</strong> ${item.text} (Puntuación: ${item.score})
+                        </div>`
+                    ).join('')}
+                </div>
+                ` : ''}
+                
+                <div class="results-section">
+                    <h2>Hallazgos Clínicos de la Escala</h2>
+                    <div class="interpretation">
+                        <ul style="margin-left: 20px;">
+                            ${interpretation.findings.map(finding => `<li style="margin: 8px 0;">${finding}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="results-section">
+                    <h2>Consideraciones Adicionales</h2>
+                    <div class="interpretation">
+                        <p><strong>Validez del instrumento:</strong> El EAT-26 es una herramienta de cribado validada para identificar riesgo de trastornos de la conducta alimentaria. No constituye un diagnóstico por sí solo.</p>
+                        <br>
+                        <p><strong>Punto de corte:</strong> Puntuaciones ≥20 indican necesidad de evaluación especializada. Algunos estudios sugieren considerar puntuaciones ≥11 para mayor sensibilidad.</p>
+                        <br>
+                        <p><strong>Limitaciones:</strong> Los resultados deben interpretarse en el contexto clínico completo, incluyendo historia médica, examen físico y evaluación psicológica.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function exportToPDF() {
+            window.print();
+        }
+
+        function exportToImage() {
+            const resultsCard = document.getElementById('card-results');
+            
+            if (typeof html2canvas === 'undefined') {
+                // Fallback: usar método nativo del navegador
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Resultados EAT-26',
+                        text: 'Resultados del Test de Actitudes hacia la Alimentación'
+                    });
+                } else {
+                    alert('Función de exportar imagen disponible. Use la opción de PDF o tome una captura de pantalla manualmente.');
+                }
+                return;
+            }
+
+            html2canvas(resultsCard).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'EAT26_Resultados.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        function startNewAssessment() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los resultados actuales.')) {
+                currentCard = 0;
+                responses = {};
+                
+                // Limpiar selecciones
+                document.querySelectorAll('.option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                showCard(0);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            showCard(0);
+        });
+
+        // Manejar teclas de navegación
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && currentCard > 0) {
+                previousCard();
+            } else if (event.key === 'ArrowRight' && currentCard < totalQuestions + 2) {
+                // Solo permitir avance si hay respuesta o no es una pregunta
+                if (currentCard === 0 || currentCard === totalQuestions + 1 || responses[currentCard]) {
+                    nextCard();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

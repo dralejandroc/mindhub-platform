@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GADI - Inventario de Ansiedad Generalizada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            color: #112F33;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            background: #FFF8EE;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            color: #112F33;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.2);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-color: #29A98C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: none;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button.visible {
+            display: block;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+
+        .instructions {
+            background: #FFF8EE;
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .instructions h3 {
+            color: #112F33;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .instructions ul {
+            color: #112F33;
+            line-height: 1.6;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .results-section {
+            margin-bottom: 25px;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-display h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .interpretation {
+            background: #FFF8EE;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .interpretation h3 {
+            color: #112F33;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .interpretation p {
+            color: #112F33;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .factor-scores {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .factor-score {
+            background: #FFF8EE;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .factor-score h4 {
+            color: #112F33;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .factor-score p {
+            color: #112F33;
+            margin: 5px 0;
+        }
+
+        .alert {
+            background: #f56565;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .alert h4 {
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .buttons-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .level-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .level-minimal { background: #48bb78; color: white; }
+        .level-mild { background: #f6ad55; color: white; }
+        .level-moderate { background: #ed8936; color: white; }
+        .level-severe { background: #f56565; color: white; }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                max-width: 100%;
+            }
+            
+            .card {
+                padding: 20px;
+                margin-bottom: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .question-text {
+                font-size: 1.1em;
+            }
+            
+            .option {
+                padding: 15px;
+                font-size: 1em;
+            }
+            
+            .back-button {
+                bottom: 10px;
+                right: 10px;
+                padding: 12px 16px;
+            }
+
+            .buttons-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="header">
+                <h1>GADI</h1>
+                <p>Inventario de Ansiedad Generalizada</p>
+            </div>
+            
+            <div class="instructions">
+                <h3>Instrucciones importantes:</h3>
+                <ul>
+                    <li><strong>Por favor, asegúrese de responder a todas las preguntas</strong> que ha sentido en las <strong>últimas dos semanas</strong>.</li>
+                    <li><strong>No se detenga demasiado tiempo</strong> en cada pregunta, ya que <strong>no hay respuestas correctas ni incorrectas</strong>.</li>
+                    <li><strong>Por favor, marque sólo una casilla por cada pregunta</strong>.</li>
+                    <li>Esta evaluación consta de <strong>22 preguntas</strong> sobre síntomas de ansiedad.</li>
+                    <li>Sus respuestas son <strong>confidenciales</strong> y serán revisadas por un profesional de la salud.</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="nextCard()">Comenzar Evaluación</button>
+            </div>
+        </div>
+
+        <!-- Cards 1-22: Ítems -->
+        <div class="card" id="card-1">
+            <span class="question-number">Pregunta 1 de 22</span>
+            <div class="question-text">Estoy ansioso/a la mayoría de los días</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(1, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(1, 2)">Algo</div>
+                <div class="option" onclick="selectOption(1, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(1, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <span class="question-number">Pregunta 2 de 22</span>
+            <div class="question-text">Me canso fácilmente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(2, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(2, 2)">Algo</div>
+                <div class="option" onclick="selectOption(2, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(2, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <span class="question-number">Pregunta 3 de 22</span>
+            <div class="question-text">Me preocupo por los acontecimientos cotidianos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(3, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(3, 2)">Algo</div>
+                <div class="option" onclick="selectOption(3, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(3, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <span class="question-number">Pregunta 4 de 22</span>
+            <div class="question-text">Encuentro dificultad para relajarme</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(4, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(4, 2)">Algo</div>
+                <div class="option" onclick="selectOption(4, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(4, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <span class="question-number">Pregunta 5 de 22</span>
+            <div class="question-text">Me siento «al límite»</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(5, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(5, 2)">Algo</div>
+                <div class="option" onclick="selectOption(5, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(5, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <span class="question-number">Pregunta 6 de 22</span>
+            <div class="question-text">Me despierto por la noche</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(6, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(6, 2)">Algo</div>
+                <div class="option" onclick="selectOption(6, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(6, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <span class="question-number">Pregunta 7 de 22</span>
+            <div class="question-text">Experimento sofocos o escalofríos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(7, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(7, 2)">Algo</div>
+                <div class="option" onclick="selectOption(7, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(7, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <span class="question-number">Pregunta 8 de 22</span>
+            <div class="question-text">Tengo malestar por mi ansiedad</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(8, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(8, 2)">Algo</div>
+                <div class="option" onclick="selectOption(8, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(8, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <span class="question-number">Pregunta 9 de 22</span>
+            <div class="question-text">Tengo la boca seca</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(9, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(9, 2)">Algo</div>
+                <div class="option" onclick="selectOption(9, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(9, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <span class="question-number">Pregunta 10 de 22</span>
+            <div class="question-text">Temo perder el control, desmayarme o volverme loco/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(10, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(10, 2)">Algo</div>
+                <div class="option" onclick="selectOption(10, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(10, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <span class="question-number">Pregunta 11 de 22</span>
+            <div class="question-text">Estoy molesto/a por la inquietud</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(11, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(11, 2)">Algo</div>
+                <div class="option" onclick="selectOption(11, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(11, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <span class="question-number">Pregunta 12 de 22</span>
+            <div class="question-text">Sufro mareos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(12, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(12, 2)">Algo</div>
+                <div class="option" onclick="selectOption(12, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(12, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <span class="question-number">Pregunta 13 de 22</span>
+            <div class="question-text">Estoy molesto/a por tener temblores y sacudidas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(13, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(13, 2)">Algo</div>
+                <div class="option" onclick="selectOption(13, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(13, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <span class="question-number">Pregunta 14 de 22</span>
+            <div class="question-text">Tengo dificultad para coger el sueño</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(14, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(14, 2)">Algo</div>
+                <div class="option" onclick="selectOption(14, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(14, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <span class="question-number">Pregunta 15 de 22</span>
+            <div class="question-text">Sufro por la tensión o dolor de los músculos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(15, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(15, 2)">Algo</div>
+                <div class="option" onclick="selectOption(15, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(15, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <span class="question-number">Pregunta 16 de 22</span>
+            <div class="question-text">Estoy molesto/a por la dificultad con la respiración</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(16, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(16, 2)">Algo</div>
+                <div class="option" onclick="selectOption(16, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(16, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <span class="question-number">Pregunta 17 de 22</span>
+            <div class="question-text">Me asusto fácilmente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(17, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(17, 2)">Algo</div>
+                <div class="option" onclick="selectOption(17, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(17, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <span class="question-number">Pregunta 18 de 22</span>
+            <div class="question-text">Tengo dificultad para concentrarme</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(18, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(18, 2)">Algo</div>
+                <div class="option" onclick="selectOption(18, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(18, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <span class="question-number">Pregunta 19 de 22</span>
+            <div class="question-text">Tengo dificultad para controlar mi ansiedad</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(19, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(19, 2)">Algo</div>
+                <div class="option" onclick="selectOption(19, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(19, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <span class="question-number">Pregunta 20 de 22</span>
+            <div class="question-text">Estoy molesto/a por hormigueos o insensibilidad en las manos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(20, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(20, 2)">Algo</div>
+                <div class="option" onclick="selectOption(20, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(20, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <span class="question-number">Pregunta 21 de 22</span>
+            <div class="question-text">Me preocupo excesivamente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(21, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(21, 2)">Algo</div>
+                <div class="option" onclick="selectOption(21, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(21, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <span class="question-number">Pregunta 22 de 22</span>
+            <div class="question-text">Estoy irritable</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 0)">En absoluto o no ha ocurrido</div>
+                <div class="option" onclick="selectOption(22, 1)">Un poco</div>
+                <div class="option" onclick="selectOption(22, 2)">Algo</div>
+                <div class="option" onclick="selectOption(22, 3)">Mucho</div>
+                <div class="option" onclick="selectOption(22, 4)">Extremadamente</div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <div class="header">
+                <h1>✓ Escala Completada</h1>
+                <p>Muchas gracias por completar la evaluación</p>
+            </div>
+            
+            <div class="instructions">
+                <h3>Evaluación finalizada</h3>
+                <p><strong>Por favor, pase el dispositivo a su médico o profesional de la salud</strong> para la revisión e interpretación de los resultados.</p>
+                <p>Los resultados de esta escala deben ser interpretados por un profesional capacitado en el contexto de una evaluación clínica completa.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+            </div>
+        </div>
+
+        <!-- Card Resultados -->
+        <div class="card" id="card-results">
+            <div class="header">
+                <h1>Resultados GADI</h1>
+                <p>Inventario de Ansiedad Generalizada</p>
+            </div>
+
+            <div class="score-display">
+                <h2 id="total-score">0/88</h2>
+                <p>Puntuación Total</p>
+            </div>
+
+            <div class="interpretation">
+                <h3>Interpretación Clínica <span id="severity-level" class="level-indicator"></span></h3>
+                <p id="interpretation-text"></p>
+                
+                <h4>Información Técnica del GADI:</h4>
+                <p><strong>Estructura factorial:</strong> El GADI evalúa tres dimensiones principales de la ansiedad generalizada:</p>
+                <ul>
+                    <li><strong>Síntomas Cognitivos:</strong> Preocupación excesiva, dificultad para controlar la ansiedad, temores específicos</li>
+                    <li><strong>Síntomas Somáticos:</strong> Manifestaciones físicas como tensión muscular, fatiga, síntomas autonómicos</li>
+                    <li><strong>Alteraciones del Sueño:</strong> Dificultades para conciliar el sueño y despertares nocturnos</li>
+                </ul>
+                <p><strong>Confiabilidad:</strong> α = .928 (excelente consistencia interna)</p>
+                <p><strong>Periodo evaluado:</strong> Síntomas experimentados en las últimas dos semanas</p>
+            </div>
+
+            <div class="factor-scores">
+                <div class="factor-score">
+                    <h4>Síntomas Cognitivos <span id="cognitive-score"></span></h4>
+                    <p id="cognitive-interpretation"></p>
+                    <p><strong>Ítems evaluados:</strong> Ansiedad general, preocupaciones cotidianas, malestar por ansiedad, temores de pérdida de control, inquietud, asustarse fácilmente, dificultad de concentración, dificultad para controlar ansiedad, preocupación excesiva</p>
+                </div>
+                
+                <div class="factor-score">
+                    <h4>Síntomas Somáticos <span id="somatic-score"></span></h4>
+                    <p id="somatic-interpretation"></p>
+                    <p><strong>Ítems evaluados:</strong> Fatiga, dificultad para relajarse, sensación de estar "al límite", sofocos/escalofríos, boca seca, mareos, temblores, tensión muscular, dificultades respiratorias, hormigueos, irritabilidad</p>
+                </div>
+                
+                <div class="factor-score">
+                    <h4>Alteraciones del Sueño <span id="sleep-score"></span></h4>
+                    <p id="sleep-interpretation"></p>
+                    <p><strong>Ítems evaluados:</strong> Despertares nocturnos, dificultad para conciliar el sueño</p>
+                </div>
+            </div>
+
+            <div id="high-scores-alert"></div>
+
+            <div class="interpretation">
+                <h3>Consideraciones para la Evaluación Clínica:</h3>
+                <p><strong>Escala de puntuación:</strong> 0=En absoluto, 1=Un poco, 2=Algo, 3=Mucho, 4=Extremadamente (Rango total: 0-88 puntos)</p>
+                <p><strong>Puntos de corte sugeridos:</strong> Puntuaciones ≥23 pueden indicar presencia de sintomatología clínicamente significativa que requiere evaluación adicional.</p>
+                <p><strong>Diagnóstico diferencial:</strong> Es importante considerar comorbilidades frecuentes como trastornos depresivos, otros trastornos de ansiedad y condiciones médicas.</p>
+                <p><strong>Seguimiento:</strong> La escala es sensible a cambios terapéuticos y puede utilizarse para monitorear evolución del tratamiento.</p>
+                <p><strong>Limitaciones:</strong> Esta escala es una herramienta de apoyo diagnóstico que no reemplaza la evaluación clínica completa ni la entrevista diagnóstica estructurada.</p>
+            </div>
+
+            <div class="buttons-group">
+                <button class="btn" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="btn" onclick="captureResults()">📷 Capturar Imagen</button>
+                <button class="btn btn-secondary" onclick="startNewEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elementos de navegación -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <button class="back-button" id="back-button" onclick="previousCard()">
+        ← Regresar
+    </button>
+
+    <script>
+        // Variables globales
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 22;
+
+        // Definir ítems por factor según literatura
+        const factorItems = {
+            cognitive: [1, 3, 8, 10, 11, 17, 18, 19, 21], // 9 ítems
+            somatic: [2, 4, 5, 7, 9, 12, 13, 15, 16, 20, 22], // 11 ítems
+            sleep: [6, 14] // 2 ítems
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            updateBackButton();
+        });
+
+        function selectOption(questionNumber, value) {
+            responses[questionNumber] = value;
+            
+            // Marcar opción seleccionada
+            const card = document.getElementById(`card-${questionNumber}`);
+            const options = card.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                option.classList.remove('selected');
+                if (index === value) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Auto-avance después de selección
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function nextCard() {
+            const current = document.getElementById(`card-${currentCard}`);
+            current.classList.remove('active');
+            
+            currentCard++;
+            
+            if (currentCard <= totalQuestions) {
+                const next = document.getElementById(`card-${currentCard}`);
+                next.classList.add('active');
+            } else {
+                const finalCard = document.getElementById('card-final');
+                finalCard.classList.add('active');
+            }
+            
+            updateProgress();
+            updateBackButton();
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                const current = document.getElementById(`card-${currentCard}`) || 
+                               document.getElementById('card-final') ||
+                               document.getElementById('card-results');
+                current.classList.remove('active');
+                
+                currentCard--;
+                const previous = document.getElementById(`card-${currentCard}`);
+                previous.classList.add('active');
+                
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        function updateBackButton() {
+            const backButton = document.getElementById('back-button');
+            
+            // Ocultar en card-0, card-final y card-results
+            if (currentCard === 0 || 
+                document.getElementById('card-final').classList.contains('active') ||
+                document.getElementById('card-results').classList.contains('active')) {
+                backButton.classList.remove('visible');
+            } else {
+                backButton.classList.add('visible');
+            }
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+            let cognitiveScore = 0;
+            let somaticScore = 0;
+            let sleepScore = 0;
+            
+            // Calcular puntuaciones por factor
+            for (let i = 1; i <= totalQuestions; i++) {
+                const score = responses[i] || 0;
+                totalScore += score;
+                
+                if (factorItems.cognitive.includes(i)) {
+                    cognitiveScore += score;
+                } else if (factorItems.somatic.includes(i)) {
+                    somaticScore += score;
+                } else if (factorItems.sleep.includes(i)) {
+                    sleepScore += score;
+                }
+            }
+            
+            return {
+                total: totalScore,
+                cognitive: cognitiveScore,
+                somatic: somaticScore,
+                sleep: sleepScore
+            };
+        }
+
+        function getInterpretation(scores) {
+            const { total, cognitive, somatic, sleep } = scores;
+            
+            let level, description, cogDesc, somDesc, sleepDesc;
+            
+            // Interpretación global basada en literatura (escala 0-4, máximo 88)
+            if (total >= 35) {
+                level = 'severe';
+                description = `<strong>Ansiedad Severa (${total}/88):</strong> La puntuación indica un nivel severo de sintomatología ansiosa que sugiere la presencia de un Trastorno de Ansiedad Generalizada clínicamente significativo. Se recomienda evaluación psiquiátrica urgente e intervención terapéutica inmediata. Los síntomas probablemente interfieren significativamente con el funcionamiento social, laboral y personal del paciente.`;
+            } else if (total >= 23) {
+                level = 'moderate';
+                description = `<strong>Ansiedad Moderada-Severa (${total}/88):</strong> La puntuación sugiere presencia de sintomatología ansiosa clínicamente significativa. Según la literatura adaptada para esta escala, pueden indicar riesgo de Trastorno de Ansiedad Generalizada. Se recomienda evaluación clínica detallada y consideración de intervención terapéutica.`;
+            } else if (total >= 13) {
+                level = 'mild';
+                description = `<strong>Ansiedad Leve-Moderada (${total}/88):</strong> La puntuación indica un nivel leve a moderado de síntomas ansiosos. Aunque no alcanza los puntos de corte para TAG severo, puede beneficiarse de estrategias de manejo de estrés y seguimiento clínico. Evaluar factores estresantes actuales y recursos de afrontamiento.`;
+            } else {
+                level = 'minimal';
+                description = `<strong>Ansiedad Mínima (${total}/88):</strong> La puntuación indica un nivel mínimo de sintomatología ansiosa, dentro de rangos normativos. Los síntomas reportados no sugieren la presencia de un Trastorno de Ansiedad Generalizada en este momento.`;
+            }
+            
+            // Interpretaciones por factor (escala 0-4)
+            const maxCognitive = factorItems.cognitive.length * 4; // 36
+            const maxSomatic = factorItems.somatic.length * 4; // 44
+            const maxSleep = factorItems.sleep.length * 4; // 8
+            
+            cogDesc = cognitive >= (maxCognitive * 0.6) ? 
+                `Puntuación elevada (${cognitive}/${maxCognitive}) que indica preocupación excesiva, dificultades para controlar la ansiedad y síntomas cognitivos prominentes del TAG.` :
+                `Puntuación dentro de rangos esperados (${cognitive}/${maxCognitive}) para síntomas cognitivos de ansiedad.`;
+                
+            somDesc = somatic >= (maxSomatic * 0.6) ? 
+                `Puntuación elevada (${somatic}/${maxSomatic}) que indica manifestaciones físicas significativas de ansiedad, incluyendo tensión muscular, síntomas autonómicos y fatiga.` :
+                `Puntuación dentro de rangos esperados (${somatic}/${maxSomatic}) para síntomas somáticos de ansiedad.`;
+                
+            sleepDesc = sleep >= (maxSleep * 0.6) ? 
+                `Puntuación elevada (${sleep}/${maxSleep}) que indica alteraciones significativas del sueño asociadas con ansiedad.` :
+                `Puntuación dentro de rangos esperados (${sleep}/${maxSleep}) para alteraciones del sueño.`;
+            
+            return {
+                level,
+                description,
+                cognitive: cogDesc,
+                somatic: somDesc,
+                sleep: sleepDesc
+            };
+        }
+
+        function getHighScoreAlerts(scores) {
+            const alerts = [];
+            const highThreshold = 3; // ≥75% del máximo (3 de 4)
+            
+            // Revisar ítems individuales
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (responses[i] >= highThreshold) {
+                    const itemTexts = {
+                        1: "Ansiedad persistente",
+                        2: "Fatiga fácil",
+                        3: "Preocupaciones cotidianas",
+                        4: "Dificultad para relajarse",
+                        5: "Sensación de estar al límite",
+                        6: "Despertares nocturnos",
+                        7: "Sofocos/escalofríos",
+                        8: "Malestar por ansiedad",
+                        9: "Boca seca",
+                        10: "Temor a perder control",
+                        11: "Inquietud molesta",
+                        12: "Mareos",
+                        13: "Temblores/sacudidas",
+                        14: "Dificultad para dormir",
+                        15: "Tensión muscular",
+                        16: "Dificultades respiratorias",
+                        17: "Asustarse fácilmente",
+                        18: "Dificultad concentración",
+                        19: "Dificultad controlar ansiedad",
+                        20: "Hormigueos en manos",
+                        21: "Preocupación excesiva",
+                        22: "Irritabilidad"
+                    };
+                    alerts.push(`• ${itemTexts[i]} (Ítem ${i}): Puntuación alta (${responses[i]}/4)`);
+                }
+            }
+            
+            return alerts;
+        }
+
+        function showResults() {
+            // Ocultar card final
+            document.getElementById('card-final').classList.remove('active');
+            
+            // Calcular puntuaciones
+            const scores = calculateScore();
+            const interpretation = getInterpretation(scores);
+            const alerts = getHighScoreAlerts(scores);
+            
+            // Mostrar puntuación total
+            document.getElementById('total-score').textContent = `${scores.total}/88`;
+            
+            // Mostrar nivel de severidad
+            const severityElement = document.getElementById('severity-level');
+            severityElement.textContent = {
+                'minimal': 'Mínima',
+                'mild': 'Leve',
+                'moderate': 'Moderada',
+                'severe': 'Severa'
+            }[interpretation.level];
+            severityElement.className = `level-indicator level-${interpretation.level}`;
+            
+            // Mostrar interpretación
+            document.getElementById('interpretation-text').innerHTML = interpretation.description;
+            
+            // Mostrar puntuaciones por factor
+            document.getElementById('cognitive-score').textContent = `(${scores.cognitive}/${factorItems.cognitive.length * 4})`;
+            document.getElementById('cognitive-interpretation').textContent = interpretation.cognitive;
+            
+            document.getElementById('somatic-score').textContent = `(${scores.somatic}/${factorItems.somatic.length * 4})`;
+            document.getElementById('somatic-interpretation').textContent = interpretation.somatic;
+            
+            document.getElementById('sleep-score').textContent = `(${scores.sleep}/${factorItems.sleep.length * 4})`;
+            document.getElementById('sleep-interpretation').textContent = interpretation.sleep;
+            
+            // Mostrar alertas de puntuaciones altas
+            const alertContainer = document.getElementById('high-scores-alert');
+            if (alerts.length > 0) {
+                alertContainer.innerHTML = `
+                    <div class="alert">
+                        <h4>⚠️ Síntomas de Atención Prioritaria</h4>
+                        <p>Los siguientes ítems obtuvieron puntuaciones altas (≥3/4) que requieren atención clínica específica:</p>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            ${alerts.map(alert => `<li>${alert}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                alertContainer.innerHTML = '';
+            }
+            
+            // Mostrar card de resultados
+            document.getElementById('card-results').classList.add('active');
+            updateBackButton();
+        }
+
+        function exportToPDF() {
+            const results = document.getElementById('card-results');
+            
+            // Crear ventana de impresión
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Resultados GADI - ${new Date().toLocaleDateString()}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #29A98C; padding-bottom: 20px; }
+                        .header h1 { color: #29A98C; margin-bottom: 10px; }
+                        .score-display { background: #29A98C; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+                        .score-display h2 { font-size: 2.5em; margin: 0; }
+                        .result-section { margin: 20px 0; padding: 15px; border-left: 4px solid #29A98C; background: #f8f9fa; }
+                        .result-section h3 { color: #112F33; margin-bottom: 15px; }
+                        .factor-scores { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 20px 0; }
+                        .factor-score { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #29A98C; }
+                        .factor-score h4 { color: #112F33; margin-bottom: 10px; }
+                        .alert { background: #ffe5e5; border: 1px solid #f56565; padding: 15px; margin: 15px 0; border-radius: 8px; }
+                        .alert h4 { color: #742a2a; margin-bottom: 10px; }
+                        .alert ul { margin: 10px 0; padding-left: 20px; }
+                        .level-indicator { padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9em; margin-left: 10px; }
+                        .level-minimal { background: #48bb78; color: white; }
+                        .level-mild { background: #f6ad55; color: white; }
+                        .level-moderate { background: #ed8936; color: white; }
+                        .level-severe { background: #f56565; color: white; }
+                        .technical-info { background: #FFF8EE; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                        .technical-info h4 { color: #112F33; margin-bottom: 10px; }
+                        .technical-info ul { margin: 10px 0; padding-left: 20px; }
+                        @media print {
+                            .buttons-group { display: none !important; }
+                            body { margin: 0; }
+                            .header { page-break-after: avoid; }
+                            .factor-scores { grid-template-columns: 1fr; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Inventario de Ansiedad Generalizada (GADI)</h1>
+                        <p><strong>Fecha de evaluación:</strong> ${new Date().toLocaleDateString()}</p>
+                        <p><strong>Hora:</strong> ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                    ${results.innerHTML.replace(/onclick="[^"]*"/g, '').replace(/class="btn[^"]*"/g, 'style="display:none"')}
+                    
+                    <div class="technical-info">
+                        <h4>Información Técnica de la Evaluación:</h4>
+                        <ul>
+                            <li><strong>Instrumento:</strong> Inventario de Ansiedad Generalizada (GADI)</li>
+                            <li><strong>Número de ítems:</strong> 22</li>
+                            <li><strong>Escala de puntuación:</strong> 0 (En absoluto) a 4 (Extremadamente)</li>
+                            <li><strong>Rango total:</strong> 0-88 puntos</li>
+                            <li><strong>Confiabilidad:</strong> α = .928 (excelente consistencia interna)</li>
+                            <li><strong>Periodo evaluado:</strong> Síntomas en las últimas dos semanas</li>
+                            <li><strong>Factores evaluados:</strong> Síntomas Cognitivos, Síntomas Somáticos, Alteraciones del Sueño</li>
+                        </ul>
+                        <p><strong>Nota importante:</strong> Este reporte debe ser interpretado por un profesional de la salud mental capacitado en el contexto de una evaluación clínica completa.</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function captureResults() {
+            // Simular captura de pantalla usando html2canvas (en producción)
+            const resultsCard = document.getElementById('card-results');
+            
+            // Método alternativo: crear canvas temporal
+            try {
+                // Crear un elemento temporal para mostrar
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = `
+                    position: fixed; top: -9999px; left: -9999px; 
+                    background: white; padding: 20px; 
+                    font-family: Arial, sans-serif; width: 800px;
+                `;
+                
+                const scores = calculateScore();
+                const interpretation = getInterpretation(scores);
+                const fecha = new Date().toLocaleDateString('es-ES');
+                
+                tempDiv.innerHTML = `
+                    <h1 style="color: #29A98C; text-align: center;">GADI - Resultados</h1>
+                    <p style="text-align: center; color: #666;">Fecha: ${fecha}</p>
+                    <div style="background: #29A98C; color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                        <h2>${scores.total}/88</h2>
+                        <p>Puntuación Total</p>
+                    </div>
+                    <h3>Interpretación: ${interpretation.level.toUpperCase()}</h3>
+                    <p>${interpretation.description.replace(/<[^>]*>/g, '')}</p>
+                `;
+                
+                document.body.appendChild(tempDiv);
+                
+                // En un entorno real, aquí usaríamos html2canvas
+                alert('Funcionalidad de captura de imagen disponible. En producción se implementaría con html2canvas para generar imagen PNG/JPG.');
+                
+                document.body.removeChild(tempDiv);
+                
+            } catch (error) {
+                alert('Error al capturar imagen. Funcionalidad disponible en entorno de producción.');
+            }
+        }
+
+        function startNewEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los resultados actuales.')) {
+                // Reiniciar variables
+                currentCard = 0;
+                responses = {};
+                
+                // Ocultar todas las cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // Limpiar selecciones
+                document.querySelectorAll('.option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Mostrar card inicial
+                document.getElementById('card-0').classList.add('active');
+                
+                // Actualizar navegación
+                updateProgress();
+                updateBackButton();
+            }
+        }
+    </script>
+</body>
+</html>

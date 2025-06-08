@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Evaluación TDAH Vanderbilt - Maestros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 100px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #112F33;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(41, 169, 140, 0.4);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #112F33, #29A98C);
+            transform: scale(1.02);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 10px 25px rgba(41, 169, 140, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .back-btn.hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .instructions {
+            background: #FFF8EE;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .instructions h3 {
+            color: #112F33;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #112F33;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .email-section {
+            background: #FFF8EE;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .email-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #29A98C;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .email-section label {
+            display: block;
+            margin-bottom: 5px;
+            color: #112F33;
+            font-weight: 500;
+        }
+
+        .results-container {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .score-section {
+            background: #FFF8EE;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #29A98C;
+        }
+
+        .score-section h3 {
+            color: #112F33;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-value {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .alert-high {
+            background: #f56565;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .alert-moderate {
+            background: #f6ad55;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .interpretation {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .subquestion {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #FFF8EE;
+            border-radius: 8px;
+        }
+
+        .subquestion-text {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #112F33;
+        }
+
+        .subquestion .options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .subquestion .option {
+            padding: 8px 4px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+                margin-bottom: 80px;
+            }
+            
+            .subquestion .options {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .subquestion .option {
+                padding: 12px;
+                font-size: 0.8em;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <div class="card-header">
+                <h2>Escala de Evaluación TDAH Vanderbilt para Maestros</h2>
+                <p>Evaluación profesional de síntomas de TDAH</p>
+            </div>
+
+            <div class="email-section">
+                <h3>Configuración de Envío</h3>
+                <label for="evaluator-email">Correo del Evaluador:</label>
+                <input type="email" id="evaluator-email" placeholder="maestro@escuela.com" required>
+                
+                <label for="recipient-email">Correo de Destino (Resultados):</label>
+                <input type="email" id="recipient-email" placeholder="profesional@clinica.com" required>
+            </div>
+
+            <div class="instructions">
+                <h3>Instrucciones para el Evaluador</h3>
+                <p><strong>Información del estudiante:</strong></p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+                    <input type="text" id="student-name" placeholder="Nombre del estudiante" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <input type="text" id="student-grade" placeholder="Grado escolar" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <input type="text" id="evaluator-name" placeholder="Nombre del evaluador" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
+                
+                <p><strong>Período de observación:</strong></p>
+                <input type="number" id="observation-weeks" placeholder="Número de semanas observadas" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 15px;">
+                
+                <p><strong>Estado de medicación durante la evaluación:</strong></p>
+                <div style="margin: 10px 0;">
+                    <label><input type="radio" name="medication-status" value="con"> Estaba tomando medicamentos</label><br>
+                    <label><input type="radio" name="medication-status" value="sin"> No estaba tomando medicamentos</label><br>
+                    <label><input type="radio" name="medication-status" value="noSeguro"> No está seguro</label>
+                </div>
+                
+                <p><strong>Criterios importantes:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Cada evaluación debe considerar el contexto apropiado para la edad del estudiante</li>
+                    <li>Refleje el comportamiento desde el inicio del año escolar</li>
+                    <li>Base sus respuestas en observaciones directas en el ambiente escolar</li>
+                    <li>Considere el funcionamiento del estudiante comparado con sus pares</li>
+                </ul>
+            </div>
+
+            <button class="option" onclick="startEvaluation()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-35: Síntomas -->
+        <div class="card" id="card-1">
+            <div class="card-header">
+                <h2>Pregunta 1 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">No presta atención a los detalles o comete errores por descuido en la tarea escolar</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(0, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(0, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(0, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(0, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="card-header">
+                <h2>Pregunta 2 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Tiene dificultad para concentrarse en las tareas o actividades</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(1, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(1, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(1, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(1, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="card-header">
+                <h2>Pregunta 3 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Parece no escuchar cuando se le habla directamente</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(2, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(2, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(2, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(2, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="card-header">
+                <h2>Pregunta 4 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">No sigue las instrucciones que se le dan y no logra terminar las actividades (no porque se niegue o no entienda)</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(3, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(3, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(3, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(3, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="card-header">
+                <h2>Pregunta 5 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Tiene dificultad para organizar tareas y actividades</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(4, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(4, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(4, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(4, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="card-header">
+                <h2>Pregunta 6 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Evita, no le gusta o es reacio a comprometerse con tareas que requieren un esfuerzo mental constante</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(5, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(5, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(5, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(5, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="card-header">
+                <h2>Pregunta 7 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Pierde los elementos necesarios para realizar sus tareas o actividades (tareas escolares, lápices o libros)</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(6, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(6, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(6, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(6, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="card-header">
+                <h2>Pregunta 8 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Se distrae fácilmente con los estímulos externos</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(7, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(7, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(7, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(7, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="card-header">
+                <h2>Pregunta 9 de 37</h2>
+                <p>Síntomas de Inatención</p>
+            </div>
+            <div class="question-text">Es olvidadizo con las actividades diarias</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(8, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(8, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(8, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(8, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="card-header">
+                <h2>Pregunta 10 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Mueve continuamente las manos o los pies, o se retuerce en el asiento</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(9, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(9, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(9, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(9, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="card-header">
+                <h2>Pregunta 11 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Se pone de pie en el salón o en otras situaciones en las que debería permanecer sentado</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(10, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(10, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(10, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(10, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="card-header">
+                <h2>Pregunta 12 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Corre por todos lados o trepa excesivamente en situaciones en las que debería permanecer sentado</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(11, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(11, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(11, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(11, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="card-header">
+                <h2>Pregunta 13 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Tiene dificultades para jugar o involucrarse en forma tranquila en actividades de esparcimiento</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(12, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(12, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(12, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(12, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="card-header">
+                <h2>Pregunta 14 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Está "siempre activo" o a menudo actúa como "si estuviese impulsado por un motor"</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(13, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(13, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(13, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(13, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="card-header">
+                <h2>Pregunta 15 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Habla excesivamente</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(14, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(14, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(14, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(14, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="card-header">
+                <h2>Pregunta 16 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Responde impulsivamente antes de que terminen de hacerle una pregunta</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(15, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(15, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(15, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(15, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="card-header">
+                <h2>Pregunta 17 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Tiene problemas para esperar su turno</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(16, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(16, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(16, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(16, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="card-header">
+                <h2>Pregunta 18 de 37</h2>
+                <p>Síntomas de Hiperactividad/Impulsividad</p>
+            </div>
+            <div class="question-text">Interrumpe o se mete en lo que otros están haciendo (por ejemplo, se entromete en las conversaciones o juegos)</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(17, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(17, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(17, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(17, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="card-header">
+                <h2>Pregunta 19 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Pierde el control</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(18, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(18, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(18, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(18, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="card-header">
+                <h2>Pregunta 20 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Desafía o se niega en forma activa a cooperar con las solicitudes o las reglas de los adultos</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(19, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(19, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(19, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(19, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="card-header">
+                <h2>Pregunta 21 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Está enojado o resentido</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(20, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(20, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(20, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(20, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="card-header">
+                <h2>Pregunta 22 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Es rencoroso y vengativo</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(21, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(21, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(21, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(21, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="card-header">
+                <h2>Pregunta 23 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Hostiliza, amenaza o intimida a los demás</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(22, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(22, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(22, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(22, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-24">
+            <div class="card-header">
+                <h2>Pregunta 24 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Inicia peleas físicas</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(23, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(23, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(23, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(23, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="card-header">
+                <h2>Pregunta 25 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Miente para obtener bienes o favores o para eludir obligaciones (por ejemplo: engañando a los demás)</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(24, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(24, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(24, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(24, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="card-header">
+                <h2>Pregunta 26 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Es cruel físicamente con las personas</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(25, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(25, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(25, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(25, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-27">
+            <div class="card-header">
+                <h2>Pregunta 27 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Ha robado objetos de valor</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(26, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(26, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(26, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(26, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-28">
+            <div class="card-header">
+                <h2>Pregunta 28 de 37</h2>
+                <p>Síntomas de Trastorno Oposicionista Desafiante</p>
+            </div>
+            <div class="question-text">Destruye intencionalmente los bienes de los demás</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(27, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(27, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(27, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(27, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-29">
+            <div class="card-header">
+                <h2>Pregunta 29 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Demuestra miedo, ansiedad o preocupación</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(28, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(28, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(28, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(28, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-30">
+            <div class="card-header">
+                <h2>Pregunta 30 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Parece inseguro o se avergüenza con facilidad</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(29, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(29, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(29, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(29, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-31">
+            <div class="card-header">
+                <h2>Pregunta 31 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Tiene miedo de intentar cosas nuevas por temor a equivocarse</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(30, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(30, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(30, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(30, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-32">
+            <div class="card-header">
+                <h2>Pregunta 32 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Se desprecia a sí mismo o se siente inferior</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(31, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(31, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(31, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(31, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-33">
+            <div class="card-header">
+                <h2>Pregunta 33 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Cree que es responsable de los problemas y siente culpa</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(32, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(32, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(32, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(32, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-34">
+            <div class="card-header">
+                <h2>Pregunta 34 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Se siente solo, no querido o no amado y se queja de que "nadie lo quiere"</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(33, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(33, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(33, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(33, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-35">
+            <div class="card-header">
+                <h2>Pregunta 35 de 37</h2>
+                <p>Síntomas de Ansiedad/Depresión</p>
+            </div>
+            <div class="question-text">Se siente triste, infeliz o deprimido</div>
+            <div class="options">
+                <button class="option" onclick="selectOption(34, 0)">Nunca</button>
+                <button class="option" onclick="selectOption(34, 1)">Ocasionalmente</button>
+                <button class="option" onclick="selectOption(34, 2)">A menudo</button>
+                <button class="option" onclick="selectOption(34, 3)">Muy a menudo</button>
+            </div>
+        </div>
+
+        <!-- Card 36: Rendimiento académico -->
+        <div class="card" id="card-36">
+            <div class="card-header">
+                <h2>Pregunta 36 de 37</h2>
+                <p>Rendimiento Académico</p>
+            </div>
+            <div class="question-text">Evalúe el rendimiento académico del estudiante en las siguientes áreas:</div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">a. Lectura</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(35, 0, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(35, 0, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(35, 0, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(35, 0, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(35, 0, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">b. Matemática</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(35, 1, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(35, 1, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(35, 1, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(35, 1, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(35, 1, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">c. Expresión escrita</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(35, 2, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(35, 2, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(35, 2, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(35, 2, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(35, 2, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">d. Cumplimiento de las tareas</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(35, 3, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(35, 3, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(35, 3, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(35, 3, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(35, 3, 5)">Excelente</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 37: Conducta en el salón -->
+        <div class="card" id="card-37">
+            <div class="card-header">
+                <h2>Pregunta 37 de 37</h2>
+                <p>Conducta en el Salón de Clase</p>
+            </div>
+            <div class="question-text">Evalúe la conducta del estudiante en el salón de clase:</div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">a. Relación con los compañeros</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(36, 0, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(36, 0, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(36, 0, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(36, 0, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(36, 0, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">b. Seguimiento de instrucciones/reglas</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(36, 1, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(36, 1, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(36, 1, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(36, 1, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(36, 1, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">c. Desorden en clase</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(36, 2, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(36, 2, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(36, 2, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(36, 2, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(36, 2, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">d. Cumplimiento de las tareas</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(36, 3, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(36, 3, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(36, 3, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(36, 3, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(36, 3, 5)">Excelente</button>
+                </div>
+            </div>
+            
+            <div class="subquestion">
+                <div class="subquestion-text">e. Habilidades para organizarse</div>
+                <div class="options">
+                    <button class="option" onclick="selectSubOption(36, 4, 1)">Bajo</button>
+                    <button class="option" onclick="selectSubOption(36, 4, 2)">Por debajo normal</button>
+                    <button class="option" onclick="selectSubOption(36, 4, 3)">Normal</button>
+                    <button class="option" onclick="selectSubOption(36, 4, 4)">Por encima normal</button>
+                    <button class="option" onclick="selectSubOption(36, 4, 5)">Excelente</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card final -->
+        <div class="card" id="card-final">
+            <div class="card-header">
+                <h2>Evaluación Completada</h2>
+                <p>¡Muchas gracias por completar la escala!</p>
+            </div>
+            <div class="question-text">
+                La evaluación ha sido completada exitosamente. Por favor pase el dispositivo a su médico o profesional para la revisión de los resultados.
+            </div>
+            <button class="option" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card results -->
+        <div class="card" id="card-results">
+            <div class="card-header">
+                <h2>Resultados - Escala Vanderbilt para Maestros</h2>
+                <p>Análisis profesional para evaluación clínica</p>
+            </div>
+            
+            <div class="results-container" id="results-content">
+                <!-- Los resultados se generarán dinámicamente -->
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="action-btn" onclick="sendEmail()">📧 Enviar Resultados</button>
+                <button class="action-btn" onclick="captureResults()">📸 Capturar Imagen</button>
+                <button class="action-btn" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="back-btn" onclick="goBack()">←</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        let subResponses = {};
+        const totalQuestions = 37;
+
+        function startEvaluation() {
+            const evaluatorEmail = document.getElementById('evaluator-email').value;
+            const recipientEmail = document.getElementById('recipient-email').value;
+            const studentName = document.getElementById('student-name').value;
+            const studentGrade = document.getElementById('student-grade').value;
+            const evaluatorName = document.getElementById('evaluator-name').value;
+            const observationWeeks = document.getElementById('observation-weeks').value;
+            const medicationStatus = document.querySelector('input[name="medication-status"]:checked');
+
+            if (!evaluatorEmail || !recipientEmail || !studentName || !studentGrade || !evaluatorName || !observationWeeks || !medicationStatus) {
+                alert('Por favor complete todos los campos antes de continuar.');
+                return;
+            }
+
+            // Guardar información del estudiante
+            responses.studentInfo = {
+                name: studentName,
+                grade: studentGrade,
+                evaluator: evaluatorName,
+                weeks: observationWeeks,
+                medication: medicationStatus.value,
+                evaluatorEmail: evaluatorEmail,
+                recipientEmail: recipientEmail,
+                date: new Date().toLocaleDateString('es-ES')
+            };
+
+            nextCard();
+        }
+
+        function selectOption(questionIndex, value) {
+            responses[questionIndex] = value;
+            
+            // Marcar la opción como seleccionada
+            const currentCardEl = document.getElementById(`card-${currentCard}`);
+            const options = currentCardEl.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            setTimeout(() => {
+                nextCard();
+            }, 150);
+        }
+
+        function selectSubOption(questionIndex, subIndex, value) {
+            if (!subResponses[questionIndex]) {
+                subResponses[questionIndex] = {};
+            }
+            subResponses[questionIndex][subIndex] = value;
+            
+            // Marcar la opción como seleccionada
+            const options = event.target.parentNode.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Verificar si todas las subpreguntas han sido respondidas
+            const expectedSubs = questionIndex === 35 ? 4 : 5; // Pregunta 36 (rendimiento) = 4 subs, Pregunta 37 (conducta) = 5 subs
+            const completedSubs = Object.keys(subResponses[questionIndex]).length;
+            
+            if (completedSubs === expectedSubs) {
+                setTimeout(() => {
+                    nextCard();
+                }, 300);
+            }
+        }
+
+        function nextCard() {
+            const currentCardEl = document.getElementById(`card-${currentCard}`);
+            currentCardEl.classList.remove('active');
+            
+            currentCard++;
+            
+            if (currentCard <= totalQuestions) {
+                const nextCardEl = document.getElementById(`card-${currentCard}`);
+                nextCardEl.classList.add('active');
+            } else {
+                document.getElementById('card-final').classList.add('active');
+            }
+            
+            updateProgress();
+            updateBackButton();
+        }
+
+        function goBack() {
+            if (currentCard > 1) {
+                const currentCardEl = document.getElementById(`card-${currentCard}`);
+                currentCardEl.classList.remove('active');
+                
+                currentCard--;
+                const prevCardEl = document.getElementById(`card-${currentCard}`);
+                prevCardEl.classList.add('active');
+                
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentCard / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard <= 1 || currentCard > totalQuestions) {
+                backBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+            }
+        }
+
+        function calculateScores() {
+            // Síntomas de Inatención (preguntas 1-9)
+            const inattentionScores = [];
+            for (let i = 0; i < 9; i++) {
+                if (responses[i] !== undefined) {
+                    inattentionScores.push(responses[i]);
+                }
+            }
+            const inattentionCount = inattentionScores.filter(score => score >= 2).length;
+            const inattentionTotal = inattentionScores.reduce((sum, score) => sum + score, 0);
+
+            // Síntomas de Hiperactividad/Impulsividad (preguntas 10-18)
+            const hyperactivityScores = [];
+            for (let i = 9; i < 18; i++) {
+                if (responses[i] !== undefined) {
+                    hyperactivityScores.push(responses[i]);
+                }
+            }
+            const hyperactivityCount = hyperactivityScores.filter(score => score >= 2).length;
+            const hyperactivityTotal = hyperactivityScores.reduce((sum, score) => sum + score, 0);
+
+            // Síntomas de Trastorno Oposicionista Desafiante (preguntas 19-28)
+            const oddScores = [];
+            for (let i = 18; i < 28; i++) {
+                if (responses[i] !== undefined) {
+                    oddScores.push(responses[i]);
+                }
+            }
+            const oddCount = oddScores.filter(score => score >= 2).length;
+
+            // Síntomas de Ansiedad/Depresión (preguntas 29-35)
+            const anxietyScores = [];
+            for (let i = 28; i < 35; i++) {
+                if (responses[i] !== undefined) {
+                    anxietyScores.push(responses[i]);
+                }
+            }
+            const anxietyCount = anxietyScores.filter(score => score >= 2).length;
+
+            // Rendimiento académico (pregunta 36)
+            let academicImpairment = 0;
+            if (subResponses[35]) {
+                Object.values(subResponses[35]).forEach(score => {
+                    if (score <= 2) academicImpairment++;
+                });
+            }
+
+            // Conducta en clase (pregunta 37)
+            let behaviorImpairment = 0;
+            if (subResponses[36]) {
+                Object.values(subResponses[36]).forEach(score => {
+                    if (score <= 2) behaviorImpairment++;
+                });
+            }
+
+            const totalSymptomsScore = inattentionTotal + hyperactivityTotal;
+
+            return {
+                inattention: {
+                    count: inattentionCount,
+                    total: inattentionTotal,
+                    scores: inattentionScores
+                },
+                hyperactivity: {
+                    count: hyperactivityCount,
+                    total: hyperactivityTotal,
+                    scores: hyperactivityScores
+                },
+                odd: {
+                    count: oddCount,
+                    scores: oddScores
+                },
+                anxiety: {
+                    count: anxietyCount,
+                    scores: anxietyScores
+                },
+                academic: {
+                    impairment: academicImpairment,
+                    scores: subResponses[35] || {}
+                },
+                behavior: {
+                    impairment: behaviorImpairment,
+                    scores: subResponses[36] || {}
+                },
+                totalSymptoms: totalSymptomsScore
+            };
+        }
+
+        function getInterpretation(scores) {
+            let interpretation = '';
+            let alerts = [];
+            let recommendations = [];
+
+            // Criterios TDAH según DSM-5 y literatura Vanderbilt
+            const meetsTDAHInattention = scores.inattention.count >= 6;
+            const meetsTDAHHyperactivity = scores.hyperactivity.count >= 6;
+            const hasImpairment = scores.academic.impairment >= 1 || scores.behavior.impairment >= 1;
+
+            // Interpretación principal
+            if (meetsTDAHInattention && meetsTDAHHyperactivity) {
+                interpretation = 'TDAH Presentación Combinada: Los síntomas cumplen criterios para inatención e hiperactividad/impulsividad.';
+                if (hasImpairment) {
+                    interpretation += ' Se evidencia deterioro funcional significativo en el rendimiento académico o conductual.';
+                }
+            } else if (meetsTDAHInattention) {
+                interpretation = 'TDAH Presentación Predominantemente Inatenta: Los síntomas cumplen criterios principalmente para inatención.';
+                if (hasImpairment) {
+                    interpretation += ' Se evidencia deterioro funcional en el ambiente escolar.';
+                }
+            } else if (meetsTDAHHyperactivity) {
+                interpretation = 'TDAH Presentación Predominantemente Hiperactiva/Impulsiva: Los síntomas cumplen criterios para hiperactividad/impulsividad.';
+                if (hasImpairment) {
+                    interpretation += ' Se evidencia deterioro funcional en el ambiente escolar.';
+                }
+            } else {
+                interpretation = 'Los síntomas evaluados no alcanzan el umbral diagnóstico completo para TDAH según criterios Vanderbilt.';
+                if (scores.inattention.count >= 4 || scores.hyperactivity.count >= 4) {
+                    interpretation += ' Sin embargo, existe un patrón subclínico que requiere monitoreo.';
+                }
+            }
+
+            // Comorbilidades
+            if (scores.odd.count >= 4) {
+                interpretation += ' Síntomas significativos de Trastorno Oposicionista Desafiante presentes.';
+                alerts.push(`TOD: ${scores.odd.count} síntomas significativos identificados`);
+            }
+
+            if (scores.anxiety.count >= 3) {
+                interpretation += ' Síntomas internalizantes (ansiedad/depresión) requieren evaluación adicional.';
+                alerts.push(`Ansiedad/Depresión: ${scores.anxiety.count} síntomas identificados`);
+            }
+
+            // Alertas por ítems críticos
+            const criticalItems = [];
+            for (let i = 0; i < 35; i++) {
+                if (responses[i] >= 2) { // 66% del máximo (2/3)
+                    criticalItems.push(i + 1);
+                }
+            }
+
+            if (criticalItems.length > 0) {
+                alerts.push(`Ítems con puntuación alta (≥2): ${criticalItems.join(', ')}`);
+            }
+
+            // Recomendaciones específicas
+            if (!hasImpairment && (meetsTDAHInattention || meetsTDAHHyperactivity)) {
+                recommendations.push('Evaluar funcionamiento en otros contextos (hogar, actividades extracurriculares) para completar criterio de deterioro.');
+            }
+
+            if (scores.academic.impairment >= 2) {
+                recommendations.push('Considerar evaluación psicopedagógica formal y posibles adaptaciones curriculares.');
+            }
+
+            if (scores.behavior.impairment >= 3) {
+                recommendations.push('Implementar estrategias de manejo conductual en el aula y considerar plan de intervención comportamental.');
+            }
+
+            if (scores.odd.count >= 6) {
+                recommendations.push('Evaluación familiar y entrenamiento parental/docente en manejo de comportamiento oposicionista.');
+            }
+
+            return {
+                main: interpretation,
+                alerts: alerts,
+                recommendations: recommendations,
+                severity: getSeverityLevel(scores)
+            };
+        }
+
+        function getSeverityLevel(scores) {
+            const totalCritical = scores.inattention.count + scores.hyperactivity.count;
+            const totalImpairment = scores.academic.impairment + scores.behavior.impairment;
+            
+            if (totalCritical >= 12 && totalImpairment >= 4) {
+                return { level: 'Severo', color: '#f56565' };
+            } else if (totalCritical >= 8 || totalImpairment >= 2) {
+                return { level: 'Moderado', color: '#f6ad55' };
+            } else if (totalCritical >= 4) {
+                return { level: 'Leve', color: '#f6ad55' };
+            } else {
+                return { level: 'Subclínico', color: '#48bb78' };
+            }
+        }
+
+        function showResults() {
+            document.getElementById('card-final').classList.remove('active');
+            document.getElementById('card-results').classList.add('active');
+            
+            const scores = calculateScores();
+            const interpretation = getInterpretation(scores);
+            
+            const resultsHTML = `
+                <div class="score-section">
+                    <h3>Información del Estudiante</h3>
+                    <p><strong>Nombre:</strong> ${responses.studentInfo.name}</p>
+                    <p><strong>Grado:</strong> ${responses.studentInfo.grade}</p>
+                    <p><strong>Evaluador:</strong> ${responses.studentInfo.evaluator}</p>
+                    <p><strong>Período de observación:</strong> ${responses.studentInfo.weeks} semanas</p>
+                    <p><strong>Estado de medicación:</strong> ${responses.studentInfo.medication}</p>
+                    <p><strong>Fecha de evaluación:</strong> ${responses.studentInfo.date}</p>
+                </div>
+
+                <div class="score-section">
+                    <h3>Síntomas Principales TDAH <span class="score-value">${interpretation.severity.level}</span></h3>
+                    <p><strong>Inatención:</strong> ${scores.inattention.count}/9 síntomas significativos (Total: ${scores.inattention.total}/27)</p>
+                    <p><strong>Hiperactividad/Impulsividad:</strong> ${scores.hyperactivity.count}/9 síntomas significativos (Total: ${scores.hyperactivity.total}/27)</p>
+                    <p><strong>Puntuación total síntomas TDAH:</strong> ${scores.totalSymptoms}/54</p>
+                </div>
+
+                <div class="score-section">
+                    <h3>Comorbilidades</h3>
+                    <p><strong>Trastorno Oposicionista Desafiante:</strong> ${scores.odd.count}/10 síntomas significativos</p>
+                    <p><strong>Ansiedad/Depresión:</strong> ${scores.anxiety.count}/7 síntomas significativos</p>
+                </div>
+
+                <div class="score-section">
+                    <h3>Deterioro Funcional</h3>
+                    <p><strong>Rendimiento Académico:</strong> ${scores.academic.impairment}/4 áreas con deterioro</p>
+                    <p><strong>Conducta en Clase:</strong> ${scores.behavior.impairment}/5 áreas con deterioro</p>
+                </div>
+
+                ${interpretation.alerts.length > 0 ? `
+                <div class="alert-high">
+                    <h4>⚠️ Alertas Clínicas</h4>
+                    ${interpretation.alerts.map(alert => `<p>• ${alert}</p>`).join('')}
+                </div>
+                ` : ''}
+
+                <div class="interpretation">
+                    <h3>Interpretación Clínica</h3>
+                    <p><strong>Resultado:</strong> ${interpretation.main}</p>
+                    
+                    ${interpretation.recommendations.length > 0 ? `
+                    <h4>Recomendaciones Específicas:</h4>
+                    <ul>
+                        ${interpretation.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                    ` : ''}
+                    
+                    <h4>Criterios Vanderbilt:</h4>
+                    <p>• <strong>Síntomas TDAH:</strong> ${scores.inattention.count >= 6 || scores.hyperactivity.count >= 6 ? '✓ Cumple' : '✗ No cumple'} criterio sintomático</p>
+                    <p>• <strong>Deterioro funcional:</strong> ${scores.academic.impairment >= 1 || scores.behavior.impairment >= 1 ? '✓ Presente' : '✗ No documentado'}</p>
+                    
+                    <div style="margin-top: 15px; padding: 10px; background: #FFF8EE; border-radius: 8px;">
+                        <p><small><strong>Nota profesional:</strong> Esta evaluación debe integrarse con historia clínica, observación directa y evaluación en múltiples contextos para diagnóstico definitivo. Los resultados representan el funcionamiento en el ambiente escolar específicamente.</small></p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results-content').innerHTML = resultsHTML;
+            document.getElementById('back-btn').classList.add('hidden');
+        }
+
+        function exportToPDF() {
+            const resultsContent = document.getElementById('results-content');
+            const studentName = responses.studentInfo.name.replace(/\s+/g, '_');
+            const filename = `Vanderbilt_${studentName}_${new Date().toISOString().split('T')[0]}.pdf`;
+            
+            if (window.print) {
+                // Crear una nueva ventana con solo el contenido de resultados
+                const printWindow = window.open('', '', 'height=600,width=800');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Resultados Escala Vanderbilt - ${responses.studentInfo.name}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 20px; }
+                                .score-section { margin-bottom: 20px; padding: 15px; border-left: 4px solid #29A98C; background: #f9f9f9; }
+                                .alert-high { background: #f56565; color: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
+                                .interpretation { background: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+                                h3 { color: #112F33; margin-bottom: 15px; }
+                                .score-value { background: #29A98C; color: white; padding: 5px 15px; border-radius: 20px; }
+                            </style>
+                        </head>
+                        <body>
+                            <h1>Resultados Escala Vanderbilt para Maestros</h1>
+                            ${resultsContent.innerHTML}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            } else {
+                alert('Función de exportación no disponible en este dispositivo. Use la opción de captura de imagen.');
+            }
+        }
+
+        function captureResults() {
+            if (navigator.share) {
+                // API de compartir nativo
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 800;
+                canvas.height = 1000;
+                
+                // Fondo blanco
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Convertir a imagen y compartir
+                canvas.toBlob(blob => {
+                    const file = new File([blob], `Vanderbilt_${responses.studentInfo.name}_${new Date().toISOString().split('T')[0]}.png`, {type: 'image/png'});
+                    navigator.share({
+                        files: [file],
+                        title: 'Resultados Escala Vanderbilt'
+                    });
+                });
+            } else {
+                alert('Para capturar la imagen, use la función de captura de pantalla de su dispositivo en esta sección de resultados.');
+            }
+        }
+
+        function sendEmail() {
+            const subject = `Resultados Escala Vanderbilt - ${responses.studentInfo.name}`;
+            const body = `Estimado profesional,
+
+Adjunto encontrará los resultados de la Escala Vanderbilt para Maestros completada para el estudiante ${responses.studentInfo.name}.
+
+Evaluador: ${responses.studentInfo.evaluator}
+Fecha: ${responses.studentInfo.date}
+Período de observación: ${responses.studentInfo.weeks} semanas
+
+Los resultados están disponibles para revisión en el sistema.
+
+Cordialmente,
+${responses.studentInfo.evaluator}`;
+
+            const mailtoLink = `mailto:${responses.studentInfo.recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            if (window.location.protocol === 'mailto:' || navigator.userAgent.match(/iPhone|iPad|iPod|Android/i)) {
+                window.location.href = mailtoLink;
+            } else {
+                window.open(mailtoLink);
+            }
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                currentCard = 0;
+                responses = {};
+                subResponses = {};
+                
+                // Ocultar todas las cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // Mostrar la primera card
+                document.getElementById('card-0').classList.add('active');
+                
+                // Resetear formulario
+                document.getElementById('evaluator-email').value = '';
+                document.getElementById('recipient-email').value = '';
+                document.getElementById('student-name').value = '';
+                document.getElementById('student-grade').value = '';
+                document.getElementById('evaluator-name').value = '';
+                document.getElementById('observation-weeks').value = '';
+                document.querySelectorAll('input[name="medication-status"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                
+                updateProgress();
+                updateBackButton();
+            }
+        }
+
+        // Inicialización
+        updateProgress();
+        updateBackButton();
+
+        // Atajos de teclado para navegación
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && currentCard > 1) {
+                goBack();
+            }
+        });
+    </script>
+</body>
+</html>

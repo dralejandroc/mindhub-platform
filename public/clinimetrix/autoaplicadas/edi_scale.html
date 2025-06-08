@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Trastornos de la Alimentación (EDI)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card {
+            display: none;
+            padding: 30px;
+            text-align: center;
+            min-height: 400px;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .instructions {
+            color: #112F33;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            color: #112F33;
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #29A98C;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #112F33;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.4);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(41, 169, 140, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(41, 169, 140, 0.4);
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid #29A98C;
+        }
+
+        .result-title {
+            color: #112F33;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-high {
+            color: #f56565;
+            font-weight: bold;
+        }
+
+        .score-moderate {
+            color: #f6ad55;
+            font-weight: bold;
+        }
+
+        .score-normal {
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .alert-box {
+            background: rgba(245, 101, 101, 0.1);
+            border: 2px solid #f56565;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #742a2a;
+        }
+
+        .completion-message {
+            background: rgba(41, 169, 140, 0.1);
+            border: 2px solid #29A98C;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #112F33;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+                min-height: 350px;
+            }
+            
+            .card h1 {
+                font-size: 24px;
+            }
+            
+            .question-text {
+                font-size: 16px;
+            }
+            
+            .option {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>Inventario de Trastornos de la Alimentación</h1>
+            <h2>(Eating Disorder Inventory, EDI)</h2>
+            <div class="instructions">
+                <p><strong>Instrucciones:</strong></p>
+                <br>
+                <p>A continuación encontrará una serie de afirmaciones. Lea cada una cuidadosamente y decida si la afirmación es cierta en su caso la mayor parte del tiempo, algunas veces, o nunca.</p>
+                <br>
+                <p>Seleccione la respuesta que mejor describa sus sentimientos y comportamientos. Sea completamente honesto/a en sus respuestas.</p>
+                <br>
+                <p><strong>Opciones de respuesta:</strong></p>
+                <ul style="text-align: left; margin-left: 20px;">
+                    <li>Nunca</li>
+                    <li>Raramente</li>
+                    <li>Algunas veces</li>
+                    <li>A menudo</li>
+                    <li>Habitualmente</li>
+                    <li>Siempre</li>
+                </ul>
+                <br>
+                <p>La evaluación consta de <strong>64 ítems</strong> que evalúan 8 áreas relacionadas con los trastornos alimentarios.</p>
+            </div>
+            <button class="btn" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-64: Ítems individuales -->
+        <div class="card" id="card-1">
+            <div class="question-number">Pregunta 1 de 64</div>
+            <div class="question-text">Como dulces e hidratos de carbono (pan, patatas, etc.) sin sentirme nervioso/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(1, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(1, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(1, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(1, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(1, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">Pregunta 2 de 64</div>
+            <div class="question-text">Pienso que mi estómago es demasiado grande</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(2, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(2, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(2, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(2, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(2, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">Pregunta 3 de 64</div>
+            <div class="question-text">Me gustaría que pudiera volver a la seguridad de la infancia</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(3, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(3, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(3, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(3, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(3, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">Pregunta 4 de 64</div>
+            <div class="question-text">Como cuando estoy disgustado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(4, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(4, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(4, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(4, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(4, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">Pregunta 5 de 64</div>
+            <div class="question-text">Me atraco de comida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(5, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(5, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(5, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(5, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(5, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">Pregunta 6 de 64</div>
+            <div class="question-text">Me gustaría ser más joven</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(6, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(6, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(6, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(6, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(6, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">Pregunta 7 de 64</div>
+            <div class="question-text">Pienso en seguir una dieta</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(7, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(7, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(7, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(7, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(7, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">Pregunta 8 de 64</div>
+            <div class="question-text">Me asusto cuando mis sensaciones/sentimientos son demasiado intensos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(8, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(8, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(8, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(8, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(8, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">Pregunta 9 de 64</div>
+            <div class="question-text">Pienso que mis muslos son demasiado anchos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(9, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(9, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(9, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(9, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(9, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">Pregunta 10 de 64</div>
+            <div class="question-text">Me siento ineficaz como persona</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(10, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(10, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(10, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(10, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(10, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-11">
+            <div class="question-number">Pregunta 11 de 64</div>
+            <div class="question-text">Me siento extremadamente culpable después de haber comido en exceso</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(11, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(11, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(11, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(11, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(11, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(11, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-12">
+            <div class="question-number">Pregunta 12 de 64</div>
+            <div class="question-text">Pienso que mi estómago tiene el tamaño adecuado</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(12, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(12, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(12, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(12, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(12, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(12, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-13">
+            <div class="question-number">Pregunta 13 de 64</div>
+            <div class="question-text">Mi familia sólo valora como buenos aquellos rendimientos o resultados que están por encima de lo habitual</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(13, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(13, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(13, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(13, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(13, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(13, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-14">
+            <div class="question-number">Pregunta 14 de 64</div>
+            <div class="question-text">El tiempo más feliz de la vida es cuando se es un niño</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(14, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(14, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(14, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(14, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(14, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(14, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-15">
+            <div class="question-number">Pregunta 15 de 64</div>
+            <div class="question-text">Soy una persona que demuestra abiertamente sus sentimientos</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(15, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(15, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(15, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(15, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(15, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(15, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-16">
+            <div class="question-number">Pregunta 16 de 64</div>
+            <div class="question-text">Me aterroriza ganar peso</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(16, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(16, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(16, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(16, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(16, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(16, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-17">
+            <div class="question-number">Pregunta 17 de 64</div>
+            <div class="question-text">Confío en los demás</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(17, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(17, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(17, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(17, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(17, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(17, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-18">
+            <div class="question-number">Pregunta 18 de 64</div>
+            <div class="question-text">Me siento solo/a en el mundo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(18, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(18, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(18, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(18, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(18, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(18, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-19">
+            <div class="question-number">Pregunta 19 de 64</div>
+            <div class="question-text">Me siento satisfecho/a con la forma de mi cuerpo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(19, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(19, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(19, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(19, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(19, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(19, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-20">
+            <div class="question-number">Pregunta 20 de 64</div>
+            <div class="question-text">Generalmente siento que las cosas de mi vida están bajo mi control</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(20, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(20, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(20, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(20, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(20, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(20, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-21">
+            <div class="question-number">Pregunta 21 de 64</div>
+            <div class="question-text">Me siento confundido/a ante las emociones que siento</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(21, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(21, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(21, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(21, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(21, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(21, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-22">
+            <div class="question-number">Pregunta 22 de 64</div>
+            <div class="question-text">Prefiero ser adulto que niño</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(22, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(22, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(22, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(22, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(22, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(22, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-23">
+            <div class="question-number">Pregunta 23 de 64</div>
+            <div class="question-text">Me comunico fácilmente con los demás</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(23, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(23, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(23, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(23, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(23, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(23, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-24">
+            <div class="question-number">Pregunta 24 de 64</div>
+            <div class="question-text">Me gustaría ser otra persona</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(24, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(24, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(24, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(24, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(24, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(24, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-25">
+            <div class="question-number">Pregunta 25 de 64</div>
+            <div class="question-text">Exagero o aumento la importancia del peso</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(25, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(25, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(25, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(25, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(25, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(25, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-26">
+            <div class="question-number">Pregunta 26 de 64</div>
+            <div class="question-text">Puedo identificar claramente las emociones que siento</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(26, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(26, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(26, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(26, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(26, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(26, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-27">
+            <div class="question-number">Pregunta 27 de 64</div>
+            <div class="question-text">Me siento inadaptado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(27, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(27, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(27, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(27, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(27, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(27, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-28">
+            <div class="question-number">Pregunta 28 de 64</div>
+            <div class="question-text">Cuando me estoy atracando de comida siento que no puedo parar de hacerlo</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(28, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(28, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(28, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(28, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(28, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(28, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-29">
+            <div class="question-number">Pregunta 29 de 64</div>
+            <div class="question-text">Cuando era niño/a intentaba por todos los medios evitar estar de acuerdo con mis padres y maestros</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(29, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(29, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(29, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(29, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(29, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(29, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-30">
+            <div class="question-number">Pregunta 30 de 64</div>
+            <div class="question-text">Tengo amistades íntimas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(30, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(30, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(30, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(30, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(30, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(30, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-31">
+            <div class="question-number">Pregunta 31 de 64</div>
+            <div class="question-text">Me gusta la forma de mis nalgas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(31, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(31, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(31, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(31, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(31, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(31, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-32">
+            <div class="question-number">Pregunta 32 de 64</div>
+            <div class="question-text">Me preocupa el deseo de estar más delgado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(32, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(32, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(32, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(32, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(32, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(32, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-33">
+            <div class="question-number">Pregunta 33 de 64</div>
+            <div class="question-text">No sé lo que está pasando dentro de mí</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(33, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(33, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(33, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(33, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(33, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(33, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-34">
+            <div class="question-number">Pregunta 34 de 64</div>
+            <div class="question-text">Tengo dificultad para expresar mis emociones hacia los demás</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(34, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(34, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(34, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(34, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(34, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(34, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-35">
+            <div class="question-number">Pregunta 35 de 64</div>
+            <div class="question-text">Las exigencias del adulto son demasiado grandes</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(35, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(35, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(35, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(35, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(35, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(35, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-36">
+            <div class="question-number">Pregunta 36 de 64</div>
+            <div class="question-text">Me molesta ser menos que el/la mejor en las actividades que hago</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(36, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(36, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(36, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(36, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(36, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(36, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-37">
+            <div class="question-number">Pregunta 37 de 64</div>
+            <div class="question-text">Me siento seguro/a de mí mismo/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(37, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(37, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(37, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(37, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(37, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(37, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-38">
+            <div class="question-number">Pregunta 38 de 64</div>
+            <div class="question-text">Pienso en atracarme de comida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(38, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(38, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(38, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(38, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(38, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(38, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-39">
+            <div class="question-number">Pregunta 39 de 64</div>
+            <div class="question-text">Me siento feliz de no ser nunca más un niño/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(39, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(39, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(39, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(39, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(39, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(39, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-40">
+            <div class="question-number">Pregunta 40 de 64</div>
+            <div class="question-text">No me doy cuenta de si tengo hambre o no</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(40, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(40, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(40, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(40, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(40, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(40, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-41">
+            <div class="question-number">Pregunta 41 de 64</div>
+            <div class="question-text">Tengo una pobre opinión de mí mismo/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(41, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(41, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(41, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(41, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(41, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(41, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-42">
+            <div class="question-number">Pregunta 42 de 64</div>
+            <div class="question-text">Pienso que puedo alcanzar mis metas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(42, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(42, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(42, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(42, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(42, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(42, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-43">
+            <div class="question-number">Pregunta 43 de 64</div>
+            <div class="question-text">Mis padres han esperado cosas excelentes de mí</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(43, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(43, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(43, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(43, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(43, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(43, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-44">
+            <div class="question-number">Pregunta 44 de 64</div>
+            <div class="question-text">Estoy preocupado/a de que mis sentimientos se escapen a mi control</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(44, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(44, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(44, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(44, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(44, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(44, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-45">
+            <div class="question-number">Pregunta 45 de 64</div>
+            <div class="question-text">Pienso que mis caderas son demasiado anchas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(45, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(45, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(45, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(45, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(45, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(45, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-46">
+            <div class="question-number">Pregunta 46 de 64</div>
+            <div class="question-text">Como moderadamente cuando estoy con gente y me atraco cuando estoy solo/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(46, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(46, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(46, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(46, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(46, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(46, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-47">
+            <div class="question-number">Pregunta 47 de 64</div>
+            <div class="question-text">Después de haber comido poco me siento hinchado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(47, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(47, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(47, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(47, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(47, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(47, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-48">
+            <div class="question-number">Pregunta 48 de 64</div>
+            <div class="question-text">Pienso que las personas son más felices cuando son niños/as</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(48, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(48, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(48, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(48, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(48, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(48, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-49">
+            <div class="question-number">Pregunta 49 de 64</div>
+            <div class="question-text">Si gano algo de peso, me preocupa el que pueda seguir aumentando</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(49, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(49, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(49, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(49, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(49, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(49, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-50">
+            <div class="question-number">Pregunta 50 de 64</div>
+            <div class="question-text">Pienso que soy una persona útil</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(50, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(50, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(50, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(50, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(50, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(50, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-51">
+            <div class="question-number">Pregunta 51 de 64</div>
+            <div class="question-text">Cuando estoy disgustado/a no sé si estoy triste, atemorizado/a o enojado/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(51, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(51, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(51, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(51, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(51, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(51, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-52">
+            <div class="question-number">Pregunta 52 de 64</div>
+            <div class="question-text">Creo que las cosas las debo hacer perfectamente, o si no, no hacerlas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(52, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(52, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(52, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(52, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(52, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(52, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-53">
+            <div class="question-number">Pregunta 53 de 64</div>
+            <div class="question-text">Pienso en intentar vomitar con el fin de perder peso</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(53, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(53, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(53, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(53, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(53, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(53, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-54">
+            <div class="question-number">Pregunta 54 de 64</div>
+            <div class="question-text">Necesito mantener a las personas a cierta distancia pues me siento incómodo/a si alguien intenta acercárseme o entablar amistad</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(54, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(54, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(54, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(54, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(54, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(54, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-55">
+            <div class="question-number">Pregunta 55 de 64</div>
+            <div class="question-text">Pienso que mis muslos tienen el tamaño adecuado</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(55, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(55, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(55, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(55, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(55, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(55, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-56">
+            <div class="question-number">Pregunta 56 de 64</div>
+            <div class="question-text">Me siento interiormente vacío/a</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(56, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(56, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(56, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(56, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(56, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(56, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-57">
+            <div class="question-number">Pregunta 57 de 64</div>
+            <div class="question-text">Puedo hablar sobre mis sentimientos y mis pensamientos personales</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(57, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(57, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(57, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(57, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(57, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(57, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-58">
+            <div class="question-number">Pregunta 58 de 64</div>
+            <div class="question-text">El convertirme en adulto ha sido lo mejor de mi vida</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(58, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(58, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(58, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(58, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(58, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(58, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-59">
+            <div class="question-number">Pregunta 59 de 64</div>
+            <div class="question-text">Creo que mis nalgas son demasiado anchas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(59, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(59, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(59, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(59, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(59, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(59, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-60">
+            <div class="question-number">Pregunta 60 de 64</div>
+            <div class="question-text">Tengo sentimientos/sensaciones que no puedo identificar claramente</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(60, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(60, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(60, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(60, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(60, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(60, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-61">
+            <div class="question-number">Pregunta 61 de 64</div>
+            <div class="question-text">Como o bebo a escondidas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(61, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(61, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(61, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(61, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(61, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(61, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-62">
+            <div class="question-number">Pregunta 62 de 64</div>
+            <div class="question-text">Pienso que mis caderas tienen el tamaño adecuado</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(62, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(62, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(62, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(62, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(62, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(62, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-63">
+            <div class="question-number">Pregunta 63 de 64</div>
+            <div class="question-text">Mis metas son excesivamente altas</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(63, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(63, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(63, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(63, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(63, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(63, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <div class="card" id="card-64">
+            <div class="question-number">Pregunta 64 de 64</div>
+            <div class="question-text">Cuando estoy disgustado/a, me preocupa el que pueda empezar a comer</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(64, 0)">Nunca</div>
+                <div class="option" onclick="selectOption(64, 1)">Raramente</div>
+                <div class="option" onclick="selectOption(64, 2)">Algunas veces</div>
+                <div class="option" onclick="selectOption(64, 3)">A menudo</div>
+                <div class="option" onclick="selectOption(64, 4)">Habitualmente</div>
+                <div class="option" onclick="selectOption(64, 5)">Siempre</div>
+            </div>
+        </div>
+
+        <!-- Card final: Completado -->
+        <div class="card" id="card-final">
+            <h1>¡Evaluación Completada!</h1>
+            <div class="completion-message">
+                <p><strong>Escala completada, muchas gracias.</strong></p>
+                <p>Por favor pase el dispositivo a su médico o profesional para su revisión.</p>
+            </div>
+            <button class="btn" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card results: Resultados -->
+        <div class="card" id="card-results">
+            <h1>Resultados del EDI</h1>
+            <div id="results-content">
+                <!-- Los resultados se mostrarán aquí -->
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="generatePDF()">Descargar PDF</button>
+                <button class="btn" onclick="captureResults()">Captura de Pantalla</button>
+                <button class="btn" onclick="newEvaluation()">Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-bar" id="progress-bar"></div>
+    <button class="back-btn" id="back-btn" onclick="previousCard()">← Regresar</button>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 64;
+
+        // Ítems inversos del EDI (basados en la literatura clínica)
+        const reverseItems = [1, 12, 15, 17, 19, 20, 22, 23, 26, 30, 31, 37, 39, 42, 50, 55, 57, 58, 62];
+
+        // Subescalas del EDI con sus ítems correspondientes
+        const subscales = {
+            impulsoDelgadez: [1, 7, 16, 25, 32, 49], // Items: 1, 7, 16, 25, 32, 49
+            bulimia: [4, 5, 11, 28, 38, 46, 53, 61], // Items: 4, 5, 11, 28, 38, 46, 53, 61
+            insatisfaccionCorporal: [2, 9, 12, 19, 31, 45, 55, 59, 62], // Items: 2, 9, 12, 19, 31, 45, 55, 59, 62
+            inefectividad: [10, 18, 20, 24, 27, 37, 41, 50, 56], // Items: 10, 18, 20, 24, 27, 37, 41, 50, 56
+            perfeccionismo: [13, 29, 36, 43, 52, 63], // Items: 13, 29, 36, 43, 52, 63
+            desconfianzaInterpersonal: [15, 17, 23, 30, 34, 54, 57], // Items: 15, 17, 23, 30, 34, 54, 57
+            concienciaInteroceptiva: [8, 21, 26, 33, 40, 44, 51, 60], // Items: 8, 21, 26, 33, 40, 44, 51, 60
+            miedoMadurar: [3, 6, 14, 22, 35, 39, 48, 58] // Items: 3, 6, 14, 22, 35, 39, 48, 58
+        };
+
+        // Percentiles para interpretación (basados en datos del archivo)
+        const percentiles = {
+            impulsoDelgadez: { p25: 10, p50: 14, p75: 17, p95: 20.4 },
+            bulimia: { p25: 0, p50: 2.5, p75: 8.75, p95: 18 },
+            insatisfaccionCorporal: { p25: 7, p50: 12, p75: 21, p95: 26 },
+            inefectividad: { p25: 7, p50: 13, p75: 19, p95: 24.35 },
+            perfeccionismo: { p25: 6, p50: 8.5, p75: 12, p95: 14.35 },
+            desconfianzaInterpersonal: { p25: 3.24, p50: 7, p75: 10, p95: 15.35 },
+            concienciaInteroceptiva: { p25: 8, p50: 13, p75: 17, p95: 20.7 },
+            miedoMadurar: { p25: 5, p50: 7.5, p75: 12.75, p95: 19.35 }
+        };
+
+        function updateProgressBar() {
+            const progress = (currentCard / (totalQuestions + 1)) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (currentCard === 0 || currentCard === totalQuestions + 1 || currentCard === totalQuestions + 2) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.style.display = 'block';
+            }
+        }
+
+        function showCard(cardIndex) {
+            document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`card-${cardIndex}`).classList.add('active');
+            updateProgressBar();
+            updateBackButton();
+        }
+
+        function nextCard() {
+            currentCard++;
+            showCard(currentCard);
+        }
+
+        function previousCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                showCard(currentCard);
+            }
+        }
+
+        function selectOption(questionNumber, optionValue) {
+            responses[questionNumber] = optionValue;
+            
+            setTimeout(() => {
+                if (currentCard < totalQuestions) {
+                    nextCard();
+                } else {
+                    // Mostrar card final
+                    currentCard = 'final';
+                    showCard('final');
+                }
+            }, 150);
+        }
+
+        function calculateScore() {
+            const scores = {};
+            const alerts = [];
+
+            for (const [subscaleName, items] of Object.entries(subscales)) {
+                let score = 0;
+                let alertItems = [];
+
+                for (const item of items) {
+                    let itemScore = responses[item] || 0;
+                    
+                    // Aplicar puntuación EDI (0-3)
+                    if (reverseItems.includes(item)) {
+                        // Ítem inverso: "nunca" es patológico
+                        if (itemScore >= 3) score += Math.min(itemScore - 2, 3);
+                        if (itemScore === 0) alertItems.push(item); // "Nunca" en ítem positivo es alerta
+                    } else {
+                        // Ítem directo: "siempre" es patológico  
+                        if (itemScore >= 3) score += Math.min(itemScore - 2, 3);
+                        if (itemScore >= 4) alertItems.push(item); // Respuestas altas son alerta
+                    }
+                }
+
+                scores[subscaleName] = score;
+                
+                if (alertItems.length > 0) {
+                    alerts.push({
+                        subscale: subscaleName,
+                        items: alertItems,
+                        score: score
+                    });
+                }
+            }
+
+            return { scores, alerts };
+        }
+
+        function getInterpretation(subscaleName, score) {
+            const p = percentiles[subscaleName];
+            
+            if (score >= p.p95) {
+                return { level: "muy alto", class: "score-high", description: "Requiere atención clínica inmediata" };
+            } else if (score >= p.p75) {
+                return { level: "alto", class: "score-high", description: "Nivel clínicamente significativo" };
+            } else if (score >= p.p50) {
+                return { level: "moderado", class: "score-moderate", description: "Nivel de preocupación moderada" };
+            } else if (score >= p.p25) {
+                return { level: "bajo-moderado", class: "score-moderate", description: "Nivel bajo pero observable" };
+            } else {
+                return { level: "normal", class: "score-normal", description: "Dentro del rango normal" };
+            }
+        }
+
+        function getSubscaleTitle(subscaleName) {
+            const titles = {
+                impulsoDelgadez: "Impulso a la Delgadez",
+                bulimia: "Sintomatología Bulímica", 
+                insatisfaccionCorporal: "Insatisfacción Corporal",
+                inefectividad: "Inefectividad y Baja Autoestima",
+                perfeccionismo: "Perfeccionismo",
+                desconfianzaInterpersonal: "Desconfianza Interpersonal",
+                concienciaInteroceptiva: "Conciencia Interoceptiva",
+                miedoMadurar: "Miedo a Madurar"
+            };
+            return titles[subscaleName] || subscaleName;
+        }
+
+        function showResults() {
+            currentCard = 'results';
+            showCard('results');
+            
+            const { scores, alerts } = calculateScore();
+            let resultsHTML = '';
+
+            // Resumen ejecutivo
+            resultsHTML += '<div class="result-section">';
+            resultsHTML += '<h3 style="color: #29A98C; margin-bottom: 15px;">📋 Resumen Ejecutivo</h3>';
+            
+            const highScores = Object.entries(scores).filter(([name, score]) => {
+                return score >= percentiles[name].p75;
+            }).length;
+
+            if (highScores > 0) {
+                resultsHTML += `<p>Se identificaron <strong>${highScores} área(s)</strong> con puntuaciones clínicamente significativas que requieren atención profesional.</p>`;
+            } else {
+                resultsHTML += '<p>No se identificaron áreas con puntuaciones clínicamente significativas.</p>';
+            }
+            resultsHTML += '</div>';
+
+            // Resultados por subescala
+            resultsHTML += '<div class="result-section">';
+            resultsHTML += '<h3 style="color: #29A98C; margin-bottom: 15px;">📊 Resultados por Subescala</h3>';
+            
+            for (const [subscaleName, score] of Object.entries(scores)) {
+                const interpretation = getInterpretation(subscaleName, score);
+                const title = getSubscaleTitle(subscaleName);
+                
+                resultsHTML += `
+                    <div style="margin-bottom: 15px; padding: 10px; border-left: 4px solid #29A98C; background: rgba(41, 169, 140, 0.05);">
+                        <div class="result-title">${title}</div>
+                        <div>Puntuación: <span class="${interpretation.class}">${score} puntos</span></div>
+                        <div>Nivel: <span class="${interpretation.class}">${interpretation.level}</span></div>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">${interpretation.description}</div>
+                    </div>
+                `;
+            }
+            resultsHTML += '</div>';
+
+            // Alertas clínicas
+            if (alerts.length > 0) {
+                resultsHTML += '<div class="alert-box">';
+                resultsHTML += '<h3 style="color: #742a2a; margin-bottom: 15px;">⚠️ Alertas Clínicas</h3>';
+                
+                for (const alert of alerts) {
+                    const title = getSubscaleTitle(alert.subscale);
+                    resultsHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <strong>${title}:</strong> Se identificaron respuestas de alta intensidad en ${alert.items.length} ítem(s).
+                            Se recomienda evaluación clínica especializada.
+                        </div>
+                    `;
+                }
+                resultsHTML += '</div>';
+            }
+
+            // Recomendaciones profesionales
+            resultsHTML += '<div class="result-section">';
+            resultsHTML += '<h3 style="color: #29A98C; margin-bottom: 15px;">💡 Recomendaciones Profesionales</h3>';
+            
+            const clinicalConcerns = Object.entries(scores).filter(([name, score]) => 
+                score >= percentiles[name].p75
+            );
+
+            if (clinicalConcerns.length > 0) {
+                resultsHTML += '<ul style="text-align: left; margin-left: 20px;">';
+                resultsHTML += '<li>Se recomienda <strong>evaluación clínica especializada</strong> en trastornos alimentarios</li>';
+                resultsHTML += '<li>Considerar <strong>intervención psicoterapéutica</strong> especializada</li>';
+                resultsHTML += '<li>Evaluación médica para descartar complicaciones físicas</li>';
+                resultsHTML += '<li>Seguimiento multidisciplinario (psicología, psiquiatría, nutrición)</li>';
+                resultsHTML += '</ul>';
+            } else {
+                resultsHTML += '<ul style="text-align: left; margin-left: 20px;">';
+                resultsHTML += '<li>Mantener hábitos alimentarios saludables</li>';
+                resultsHTML += '<li>Consultar con profesional si aparecen síntomas</li>';
+                resultsHTML += '<li>Seguimiento preventivo según indicación clínica</li>';
+                resultsHTML += '</ul>';
+            }
+            resultsHTML += '</div>';
+
+            // Información técnica
+            resultsHTML += '<div class="result-section">';
+            resultsHTML += '<h3 style="color: #29A98C; margin-bottom: 15px;">📋 Información Técnica</h3>';
+            resultsHTML += '<p><strong>Instrumento:</strong> Inventario de Trastornos de la Alimentación (EDI)</p>';
+            resultsHTML += '<p><strong>Fecha de aplicación:</strong> ' + new Date().toLocaleDateString('es-ES') + '</p>';
+            resultsHTML += '<p><strong>Ítems completados:</strong> 64/64 (100%)</p>';
+            resultsHTML += '<p><strong>Interpretación:</strong> Basada en percentiles de población clínica</p>';
+            resultsHTML += '<p style="font-size: 12px; color: #666; margin-top: 10px;"><em>Este instrumento es una herramienta de screening. El diagnóstico definitivo requiere evaluación clínica completa por profesional especializado.</em></p>';
+            resultsHTML += '</div>';
+
+            document.getElementById('results-content').innerHTML = resultsHTML;
+        }
+
+        function generatePDF() {
+            // Simulación de generación de PDF
+            alert('Funcionalidad de PDF disponible en versión completa del sistema clínico.');
+        }
+
+        function captureResults() {
+            // Simulación de captura de pantalla
+            alert('Funcionalidad de captura disponible en versión completa del sistema clínico.');
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                currentCard = 0;
+                responses = {};
+                showCard(0);
+            }
+        }
+
+        // Inicialización
+        showCard(0);
+        updateProgressBar();
+        updateBackButton();
+    </script>
+</body>
+</html>

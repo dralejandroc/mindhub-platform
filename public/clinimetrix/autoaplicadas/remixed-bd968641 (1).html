@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASH-II - Evaluación Diagnóstica para Discapacitados Graves</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(17, 47, 51, 0.2);
+            overflow: hidden;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .progress-percentage {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .question-container {
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .question-number {
+            background: #29A98C;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.3);
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            line-height: 1.6;
+            color: #112F33;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #FFF8EE;
+            border-radius: 15px;
+            border-left: 5px solid #29A98C;
+        }
+
+        .questions-container {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .question-section {
+            background: #f8f9fa;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .question-section.completed {
+            border-color: #28a745;
+            background: #e8f5e9;
+        }
+
+        .question-section.active {
+            border-color: #4facfe;
+            background: #e3f2fd;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2);
+        }
+
+        .question-header {
+            margin-bottom: 20px;
+        }
+
+        .question-header h4 {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .options-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-item {
+            position: relative;
+        }
+
+        .option-item input[type="radio"] {
+            opacity: 0;
+            position: absolute;
+        }
+
+        .option-item label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            min-width: 180px;
+            min-height: 120px;
+            justify-content: center;
+        }
+
+        .option-item input[type="radio"]:checked + label {
+            background: #29A98C;
+            color: white;
+            border-color: #29A98C;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(41, 169, 140, 0.4);
+        }
+
+        .option-item label:hover {
+            border-color: #29A98C;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.2);
+        }
+
+        .option-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #FFF8EE;
+            color: #112F33;
+            margin: 0 auto 15px auto;
+        }
+
+        .option-item input[type="radio"]:checked + label .option-number {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .option-text {
+            font-size: 1em;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 150px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            box-shadow: 0 4px 15px rgba(41, 169, 140, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(41, 169, 140, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #112F33, #29A98C);
+            color: white;
+            box-shadow: 0 4px 15px rgba(17, 47, 51, 0.4);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 47, 51, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.6);
+        }
+
+        .results-container {
+            display: none;
+            padding: 40px 30px;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .results-header h3 {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .result-card.normal {
+            border-color: #28a745;
+        }
+
+        .result-card.warning {
+            border-color: #ffc107;
+        }
+
+        .result-card.danger {
+            border-color: #dc3545;
+        }
+
+        .result-card h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .result-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .normal-score {
+            color: #28a745;
+        }
+
+        .warning-score {
+            color: #ffc107;
+        }
+
+        .danger-score {
+            color: #dc3545;
+        }
+
+        .result-interpretation {
+            background: #e9ecef;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .result-interpretation h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .result-interpretation ul {
+            text-align: left;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .result-interpretation li {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .questions-container {
+                margin-bottom: 30px;
+            }
+
+            .question-section {
+                margin-bottom: 25px;
+                padding: 20px;
+            }
+
+            .options-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .option-item label {
+                min-width: 100%;
+                min-height: 100px;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .completion-celebration {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .completion-celebration h3 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .completion-celebration p {
+            font-size: 1.3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DASH-II</h1>
+            <p>Evaluación Diagnóstica para Discapacitados Graves</p>
+            <p><em>Johnny L. Matson, 1994 - Versión Española: Ramon Novell, 1999</em></p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-info">
+                <span class="progress-text">Pregunta <span id="current-question">1</span> de <span id="total-questions">84</span></span>
+                <span class="progress-percentage" id="progress-percentage">1%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 1%"></div>
+            </div>
+        </div>
+
+        <div class="content" id="question-content">
+            <div class="question-container">
+                <div class="question-number" id="question-number">1</div>
+                <div class="question-text" id="question-text">
+                    <!-- La pregunta se cargará aquí -->
+                </div>
+            </div>
+
+            <div class="questions-container">
+                <div class="question-section" id="frecuencia-section">
+                    <div class="question-header">
+                        <h4>1. ¿Con qué frecuencia ha ocurrido este comportamiento en las últimas dos semanas?</h4>
+                    </div>
+                    <div class="options-container">
+                        <div class="option-item">
+                            <input type="radio" id="f_0" name="frecuencia" value="0">
+                            <label for="f_0">
+                                <div class="option-number">0</div>
+                                <div class="option-text">No ha sucedido</div>
+                            </label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="f_1" name="frecuencia" value="1">
+                            <label for="f_1">
+                                <div class="option-number">1</div>
+                                <div class="option-text">Entre 1 y 10 veces</div>
+                            </label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="f_2" name="frecuencia" value="2">
+                            <label for="f_2">
+                                <div class="option-number">2</div>
+                                <div class="option-text">Más de 10 veces</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section" id="duracion-section">
+                    <div class="question-header">
+                        <h4>2. ¿Durante cuánto tiempo ha estado ocurriendo este comportamiento?</h4>
+                    </div>
+                    <div class="options-container">
+                        <div class="option-item">
+                            <input type="radio" id="d_0" name="duracion" value="0">
+                            <label for="d_0">
+                                <div class="option-number">0</div>
+                                <div class="option-text">Menos de 1 mes</div>
+                            </label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="d_1" name="duracion" value="1">
+                            <label for="d_1">
+                                <div class="option-number">1</div>
+                                <div class="option-text">De 1 a 12 meses</div>
+                            </label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="d_2" name="duracion" value="2">
+                            <label for="d_2">
+                                <div class="option-number">2</div>
+                                <div class="option-text">Más de 12 meses</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section" id="gravedad-section">
+                    <div class="question-header">
+                        <h4>3. ¿Cuál ha sido la gravedad de este comportamiento en las últimas dos semanas?</h4>
+                    </div>
+                    <div class="options-container">
+                        <div class="option-item">
+                            <input type="radio" id="g_0" name="gravedad" value="0">
+                            <label for="g_0">
+                                <div class="option-number">0</div>
+                                <div class="option-text">No causó disrupciones</div>
+                            </label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="g_1" name="gravedad" value="1">
+                            <label for="g_1">
+                                <div class="option-number">1</div>
+                                <div class="option-text">Interrumpió actividades</div>
+                            </label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="g_2" name="gravedad" value="2">
+                            <label for="g_2">
+                                <div class="option-number">2</div>
+                                <div class="option-text">Causó lesión o daño</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn btn-secondary" id="prev-btn" onclick="previousQuestion()" disabled>
+                    ← Anterior
+                </button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
+                    Siguiente →
+                </button>
+                <button class="btn btn-success" id="finish-btn" onclick="finishEvaluation()" style="display: none;">
+                    🎯 Finalizar Evaluación
+                </button>
+            </div>
+        </div>
+
+        <div class="results-container" id="results-container">
+            <div class="completion-celebration">
+                <h3>🎉 ¡Evaluación Completada!</h3>
+                <p>Gracias por completar la evaluación DASH-II</p>
+            </div>
+            
+            <div class="results-header">
+                <h3>📊 Resultados de la Evaluación</h3>
+            </div>
+            
+            <div class="results-grid" id="results-grid">
+                <!-- Los resultados se generarán dinámicamente -->
+            </div>
+            
+            <div class="result-interpretation" id="interpretation">
+                <!-- Interpretación general -->
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn btn-primary" onclick="generatePDF()">📄 Generar PDF</button>
+                <button class="btn btn-secondary" onclick="startNewEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            "Pega, da patadas o pellizca a otras personas.",
+            "Golpea su cabeza contra objetos.",
+            "Se desnuda o se exhibe en público deliberadamente.",
+            "Busca protección en el personal asistencial o en personas conocidas cuando se enfrenta a ciertos objetos o situaciones.",
+            "Muestra excesiva necesidad de atención o aprobación de los otros.",
+            "Manifiesta quejas psíquicas.",
+            "El humor parece totalmente sin relación de aquello que sucede a su alrededor.",
+            "Roba comida.",
+            "Está inquieto o agitado.",
+            "Habla con gente imaginaria u objetos inanimados como el televisor o fotografías o cuadros.",
+            "No responde a la luz o movimiento cercanos aunque tenga capacidad para ver (no aplicable si es ciego).",
+            "Está impaciente cuando espera para que se cumplan sus necesidades o demandas.",
+            "Tira deliberadamente objetos a la gente.",
+            "Tiene dificultad para mantenerse despierto durante el día.",
+            "Huye o se esconde ante determinados objetos o situaciones.",
+            "Tiene disminuida la necesidad de dormir.",
+            "No responde a un sonido fuerte o cercano aunque tenga capacidad para oír (no aplicable si es sordo).",
+            "Tiene poco apetito.",
+            "Se despierta frecuentemente durante la noche.",
+            "Presenta rabietas o cólera sin motivo aparente.",
+            "Se entretiene con un conjunto limitado de objetos o con actividades muy repetitivas.",
+            "Se resiste o ignora los intentos de los demás para relacionarse con él/ella.",
+            "Se altera cuando se le supervisa.",
+            "Se queja cuando no tiene cosas para hacer o entretenerse.",
+            "Llora cuando se enfrenta a ciertos objetos o situaciones.",
+            "Está quejoso o irritable.",
+            "Toca o acaricia inapropiadamente a otros.",
+            "Colecciona o acumula objetos.",
+            "Coge propiedades o pertenencias de otra persona (excepto comida).",
+            "Se resiste a hacer lo que le mandan.",
+            "Hace movimientos corporales repetitivos como balanceos, giros o aleteos de manos.",
+            "Se disgusta con los cambios en la rutina o en el entorno.",
+            "Deja de controlar los esfínteres, aunque posee las condiciones físicas para hacerlo.",
+            "El habla o la producción de sonidos está enlentecida o faltada de emoción.",
+            "Se agita o llora cuando se le separa de gente conocida.",
+            "Presenta un periodo de brusca actividad motora o vocal tal como espasmos, contorsiones, pequeños golpes o gritos.",
+            "Consume rápidamente una gran cantidad de comida en poco tiempo.",
+            "Presenta una atención voluble.",
+            "Tiene dificultad para conciliar el sueño.",
+            "Es sonámbulo.",
+            "Repite las mismas palabras o sonidos.",
+            "Daña o destruye la propiedad deliberadamente.",
+            "Provoca incendios.",
+            "Su habla es más difícil de entender que antes.",
+            "Es incapaz de recordar cosas que antes sabía.",
+            "Se masturba en público.",
+            "Está extremadamente feliz o alegre sin ninguna razón obvia.",
+            "Tiene un gran apetito.",
+            "Habla del mismo tema o asunto una y otra vez.",
+            "Chilla o grita sin provocación.",
+            "Olvida palabras o usa las palabras de forma menos correcta que antes.",
+            "Manipula o juega con saliva, mocos o heces.",
+            "Responde con más lentitud que habitualmente (por ejemplo respuesta retardada o se mueve lentamente).",
+            "Se hurga en llagas o heridas.",
+            "Se mete verbalmente con la gente (por ejemplo chillando o gritando).",
+            "Muerde a otras personas.",
+            "Ha perdido el interés por su actividad u objeto favorito.",
+            "Se atraganta con comida o se indigesta por comer demasiado deprisa.",
+            "Vomita o regurgita comida deliberadamente.",
+            "El habla es un revoltijo de palabras o ideas con poco o ningún sentido.",
+            "Se muerde a sí mismo.",
+            "Habla o emite sonidos en un tono más elevado que el habitual.",
+            "Tiembla o se agita sin razón aparente.",
+            "Oye cosas que son imaginarias (no aplicable si no habla).",
+            "De pie o sentado adopta posturas extrañas o inapropiadas.",
+            "Experimenta sensaciones sobre su piel que son imaginarias (no aplicable si no habla).",
+            "La respiración se vuelve más fuerte o agitada cuando se enfrenta a determinados objetos o situaciones.",
+            "Ve cosas que son imaginarias (no aplicable si no habla).",
+            "Habla rápidamente.",
+            "Manifiesta quejas físicas sin causa justificada.",
+            "Tiembla o se agita cuando se enfrenta a ciertos objetos o situaciones.",
+            "Se queja por la ausencia de determinadas personas.",
+            "Se desanima fácilmente ante la dificultad de una tarea.",
+            "Suda visiblemente cuando se enfrenta a ciertos objetos o situaciones.",
+            "Come e intenta comer objetos no comestibles como papel, pequeñas piedras, juguetes, etc.",
+            "Presenta cambios de humor rápidos.",
+            "Chupa o se lleva a la boca partes de su cuerpo.",
+            "Aparece enuresis.",
+            "Se despierta llorando o gritando.",
+            "Llora fácilmente o sin razón aparente.",
+            "Se arranca el pelo.",
+            "Dice palabrotas.",
+            "Muestra excesiva necesidad de atención o aprobación de los otros.",
+            "Se pega a sí mismo."
+        ];
+
+        // Categorías y sus ítems correspondientes
+        const categories = {
+            "Impulsos": [1, 5, 12, 13, 20, 23, 29, 30, 42, 43, 50, 52, 55, 56, 73, 82, 83],
+            "Orgánico": [9, 11, 17, 38, 44, 45, 51, 53, 76],
+            "Ansiedad": [4, 15, 25, 35, 63, 67, 71, 74],
+            "Humor": [6, 9, 14, 18, 19, 24, 26, 34, 39, 48, 53, 57, 70, 72, 80],
+            "Manía": [9, 16, 26, 38, 47, 62, 69],
+            "TPD/Autismo": [21, 22, 31, 32, 41, 49],
+            "Esquizofrenia": [7, 10, 60, 64, 65, 66, 68],
+            "Estereotipias": [21, 28, 31, 36, 41, 49, 77]
+        };
+
+        let currentQuestion = 0;
+        let responses = {};
+
+        function initializeEvaluation() {
+            document.getElementById('total-questions').textContent = items.length;
+            loadQuestion(0);
+            updateProgress();
+            setupEventListeners();
+        }
+
+        function loadQuestion(questionIndex) {
+            currentQuestion = questionIndex;
+            
+            document.getElementById('current-question').textContent = questionIndex + 1;
+            document.getElementById('question-number').textContent = questionIndex + 1;
+            document.getElementById('question-text').textContent = items[questionIndex];
+            
+            // Limpiar selecciones anteriores
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+            });
+            
+            // Cargar respuestas guardadas si existen
+            if (responses[questionIndex]) {
+                const response = responses[questionIndex];
+                if (response.frecuencia !== undefined) {
+                    document.querySelector(`input[name="frecuencia"][value="${response.frecuencia}"]`).checked = true;
+                }
+                if (response.duracion !== undefined) {
+                    document.querySelector(`input[name="duracion"][value="${response.duracion}"]`).checked = true;
+                }
+                if (response.gravedad !== undefined) {
+                    document.querySelector(`input[name="gravedad"][value="${response.gravedad}"]`).checked = true;
+                }
+            }
+            
+            // Actualizar estado de los botones
+            updateButtons();
+            updateProgress();
+            updateSectionStates();
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    saveCurrentResponse();
+                    updateButtons();
+                    updateSectionStates();
+                });
+            });
+        }
+
+        function saveCurrentResponse() {
+            if (!responses[currentQuestion]) {
+                responses[currentQuestion] = {};
+            }
+            
+            const frecuencia = document.querySelector('input[name="frecuencia"]:checked');
+            const duracion = document.querySelector('input[name="duracion"]:checked');
+            const gravedad = document.querySelector('input[name="gravedad"]:checked');
+            
+            if (frecuencia) responses[currentQuestion].frecuencia = parseInt(frecuencia.value);
+            if (duracion) responses[currentQuestion].duracion = parseInt(duracion.value);
+            if (gravedad) responses[currentQuestion].gravedad = parseInt(gravedad.value);
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const finishBtn = document.getElementById('finish-btn');
+            
+            // Botón anterior
+            prevBtn.disabled = currentQuestion === 0;
+            
+            // Verificar si la pregunta actual está completamente respondida
+            const isCurrentComplete = isQuestionComplete(currentQuestion);
+            
+            if (currentQuestion === items.length - 1) {
+                // Última pregunta
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+                finishBtn.disabled = !isCurrentComplete;
+            } else {
+                // No es la última pregunta
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+                nextBtn.disabled = !isCurrentComplete;
+            }
+        }
+
+        function updateSectionStates() {
+            const frecuenciaSelected = document.querySelector('input[name="frecuencia"]:checked');
+            const duracionSelected = document.querySelector('input[name="duracion"]:checked');
+            const gravedadSelected = document.querySelector('input[name="gravedad"]:checked');
+            
+            // Actualizar estilos de las secciones
+            const frecuenciaSection = document.getElementById('frecuencia-section');
+            const duracionSection = document.getElementById('duracion-section');
+            const gravedadSection = document.getElementById('gravedad-section');
+            
+            // Marcar como completado o activo
+            frecuenciaSection.classList.toggle('completed', !!frecuenciaSelected);
+            frecuenciaSection.classList.toggle('active', !frecuenciaSelected);
+            
+            duracionSection.classList.toggle('completed', !!duracionSelected);
+            duracionSection.classList.toggle('active', !!frecuenciaSelected && !duracionSelected);
+            
+            gravedadSection.classList.toggle('completed', !!gravedadSelected);
+            gravedadSection.classList.toggle('active', !!frecuenciaSelected && !!duracionSelected && !gravedadSelected);
+        }
+
+        function isQuestionComplete(questionIndex) {
+            const response = responses[questionIndex];
+            return response && 
+                   response.frecuencia !== undefined && 
+                   response.duracion !== undefined && 
+                   response.gravedad !== undefined;
+        }
+
+        function updateProgress() {
+            const completedQuestions = Object.keys(responses).filter(key => isQuestionComplete(parseInt(key))).length;
+            const percentage = Math.round((completedQuestions / items.length) * 100);
+            
+            document.getElementById('progress-percentage').textContent = percentage + '%';
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < items.length - 1) {
+                saveCurrentResponse();
+                loadQuestion(currentQuestion + 1);
+                
+                // Smooth scroll to top
+                document.querySelector('.question-container').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                saveCurrentResponse();
+                loadQuestion(currentQuestion - 1);
+                
+                // Smooth scroll to top
+                document.querySelector('.question-container').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }
+
+        function finishEvaluation() {
+            saveCurrentResponse();
+            
+            // Verificar que todas las preguntas estén completas
+            const incompleteQuestions = [];
+            for (let i = 0; i < items.length; i++) {
+                if (!isQuestionComplete(i)) {
+                    incompleteQuestions.push(i + 1);
+                }
+            }
+            
+            if (incompleteQuestions.length > 0) {
+                alert(`Por favor, complete las siguientes preguntas antes de finalizar: ${incompleteQuestions.join(', ')}`);
+                return;
+            }
+            
+            calculateAndDisplayResults();
+        }
+
+        function calculateAndDisplayResults() {
+            const categoryScores = {};
+            
+            // Calcular puntuaciones por categoría
+            Object.keys(categories).forEach(category => {
+                let totalScore = 0;
+                categories[category].forEach(itemNum => {
+                    const response = responses[itemNum - 1];
+                    if (response) {
+                        totalScore += (response.frecuencia || 0) + (response.duracion || 0) + (response.gravedad || 0);
+                    }
+                });
+                categoryScores[category] = totalScore;
+            });
+
+            displayResults(categoryScores);
+        }
+
+        function displayResults(scores) {
+            const questionContent = document.getElementById('question-content');
+            const resultsContainer = document.getElementById('results-container');
+            const resultsGrid = document.getElementById('results-grid');
+            const interpretation = document.getElementById('interpretation');
+            
+            // Ocultar el contenido de preguntas y mostrar resultados
+            questionContent.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            resultsGrid.innerHTML = '';
+            
+            // Umbrales para determinar si requiere atención
+            const thresholds = {
+                "Impulsos": { normal: 8, warning: 15 },
+                "Orgánico": { normal: 5, warning: 10 },
+                "Ansiedad": { normal: 4, warning: 8 },
+                "Humor": { normal: 8, warning: 15 },
+                "Manía": { normal: 4, warning: 8 },
+                "TPD/Autismo": { normal: 3, warning: 6 },
+                "Esquizofrenia": { normal: 3, warning: 6 },
+                "Estereotipias": { normal: 3, warning: 6 }
+            };
+
+            let criticalAreas = [];
+            let warningAreas = [];
+
+            Object.entries(scores).forEach(([category, score]) => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                const threshold = thresholds[category];
+                let scoreClass = 'normal-score';
+                let status = 'Normal';
+                let cardClass = 'normal';
+                
+                if (score >= threshold.warning) {
+                    scoreClass = 'danger-score';
+                    status = 'Requiere Atención Inmediata';
+                    cardClass = 'danger';
+                    criticalAreas.push(category);
+                } else if (score >= threshold.normal) {
+                    scoreClass = 'warning-score';
+                    status = 'Requiere Seguimiento';
+                    cardClass = 'warning';
+                    warningAreas.push(category);
+                }
+
+                card.classList.add(cardClass);
+                card.innerHTML = `
+                    <h4>${category}</h4>
+                    <div class="result-score ${scoreClass}">${score}</div>
+                    <p><strong>${status}</strong></p>
+                    <small>Normal: < ${threshold.normal} | Seguimiento: ${threshold.normal}-${threshold.warning-1} | Crítico: ≥ ${threshold.warning}</small>
+                `;
+                
+                resultsGrid.appendChild(card);
+            });
+
+            // Generar interpretación con ítems más severos
+            let interpretationText = '<h4>⚠️ Ítems Más Severos en las Últimas Dos Semanas</h4>';
+            
+            // Identificar ítems con alta frecuencia o gravedad
+            const severeBehaviors = [];
+            const concerningBehaviors = [];
+            
+            items.forEach((item, index) => {
+                const response = responses[index];
+                if (response) {
+                    const frecuencia = response.frecuencia || 0;
+                    const gravedad = response.gravedad || 0;
+                    
+                    // Ítems severos: frecuencia 2 O gravedad 2
+                    if (frecuencia === 2 || gravedad === 2) {
+                        severeBehaviors.push({
+                            number: index + 1,
+                            text: item,
+                            frecuencia: frecuencia,
+                            gravedad: gravedad,
+                            duracion: response.duracion || 0
+                        });
+                    }
+                    // Ítems de preocupación: frecuencia 1 Y gravedad 1
+                    else if (frecuencia >= 1 && gravedad >= 1) {
+                        concerningBehaviors.push({
+                            number: index + 1,
+                            text: item,
+                            frecuencia: frecuencia,
+                            gravedad: gravedad,
+                            duracion: response.duracion || 0
+                        });
+                    }
+                }
+            });
+
+            if (severeBehaviors.length > 0) {
+                interpretationText += '<div style="background: #ffebee; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 5px solid #f44336;">';
+                interpretationText += '<h5 style="color: #d32f2f; margin-bottom: 15px;">🚨 Comportamientos de Alta Severidad:</h5>';
+                interpretationText += '<ul style="margin: 0; padding-left: 20px;">';
+                
+                severeBehaviors.forEach(behavior => {
+                    const frecuenciaText = behavior.frecuencia === 0 ? 'No ocurrió' : 
+                                         behavior.frecuencia === 1 ? '1-10 veces' : 'Más de 10 veces';
+                    const gravedadText = behavior.gravedad === 0 ? 'Sin disrupciones' : 
+                                       behavior.gravedad === 1 ? 'Interrumpió actividades' : 'Causó lesión/daño';
+                    const duracionText = behavior.duracion === 0 ? 'Menos de 1 mes' :
+                                       behavior.duracion === 1 ? '1-12 meses' : 'Más de 12 meses';
+                    
+                    interpretationText += '<li style="margin-bottom: 12px;">';
+                    interpretationText += '<strong>Ítem ' + behavior.number + ':</strong> ' + behavior.text + '<br>';
+                    interpretationText += '<small style="color: #666;">';
+                    interpretationText += '<strong>Frecuencia:</strong> ' + frecuenciaText + ' | ';
+                    interpretationText += '<strong>Gravedad:</strong> ' + gravedadText + ' | ';
+                    interpretationText += '<strong>Duración:</strong> ' + duracionText;
+                    interpretationText += '</small>';
+                    interpretationText += '</li>';
+                });
+                
+                interpretationText += '</ul></div>';
+            }
+
+            if (concerningBehaviors.length > 0) {
+                interpretationText += '<div style="background: #fff3e0; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 5px solid #ff9800;">';
+                interpretationText += '<h5 style="color: #f57c00; margin-bottom: 15px;">⚠️ Comportamientos de Preocupación Moderada:</h5>';
+                interpretationText += '<ul style="margin: 0; padding-left: 20px;">';
+                
+                concerningBehaviors.forEach(behavior => {
+                    const frecuenciaText = behavior.frecuencia === 0 ? 'No ocurrió' : 
+                                         behavior.frecuencia === 1 ? '1-10 veces' : 'Más de 10 veces';
+                    const gravedadText = behavior.gravedad === 0 ? 'Sin disrupciones' : 
+                                       behavior.gravedad === 1 ? 'Interrumpió actividades' : 'Causó lesión/daño';
+                    const duracionText = behavior.duracion === 0 ? 'Menos de 1 mes' :
+                                       behavior.duracion === 1 ? '1-12 meses' : 'Más de 12 meses';
+                    
+                    interpretationText += '<li style="margin-bottom: 12px;">';
+                    interpretationText += '<strong>Ítem ' + behavior.number + ':</strong> ' + behavior.text + '<br>';
+                    interpretationText += '<small style="color: #666;">';
+                    interpretationText += '<strong>Frecuencia:</strong> ' + frecuenciaText + ' | ';
+                    interpretationText += '<strong>Gravedad:</strong> ' + gravedadText + ' | ';
+                    interpretationText += '<strong>Duración:</strong> ' + duracionText;
+                    interpretationText += '</small>';
+                    interpretationText += '</li>';
+                });
+                
+                interpretationText += '</ul></div>';
+            }
+
+            if (severeBehaviors.length === 0 && concerningBehaviors.length === 0) {
+                interpretationText += '<div style="background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 5px solid #4caf50;">';
+                interpretationText += '<p style="color: #2e7d32; margin: 0;"><strong>✅ No se identificaron comportamientos de alta severidad en las últimas dos semanas.</strong></p>';
+                interpretationText += '</div>';
+            }
+
+            // Resumen estadístico
+            interpretationText += '<div style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 15px 0;">';
+            interpretationText += '<h5 style="color: #333; margin-bottom: 15px;">📊 Resumen de Severidad:</h5>';
+            interpretationText += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">';
+            interpretationText += '<div style="text-align: center;">';
+            interpretationText += '<div style="font-size: 2em; font-weight: bold; color: #d32f2f;">' + severeBehaviors.length + '</div>';
+            interpretationText += '<div style="color: #666;">Comportamientos Severos</div>';
+            interpretationText += '</div>';
+            interpretationText += '<div style="text-align: center;">';
+            interpretationText += '<div style="font-size: 2em; font-weight: bold; color: #f57c00;">' + concerningBehaviors.length + '</div>';
+            interpretationText += '<div style="color: #666;">Comportamientos Moderados</div>';
+            interpretationText += '</div>';
+            interpretationText += '<div style="text-align: center;">';
+            interpretationText += '<div style="font-size: 2em; font-weight: bold; color: #4caf50;">' + (items.length - severeBehaviors.length - concerningBehaviors.length) + '</div>';
+            interpretationText += '<div style="color: #666;">Comportamientos Leves/Ausentes</div>';
+            interpretationText += '</div>';
+            interpretationText += '</div>';
+            interpretationText += '</div>';
+            
+            interpretationText += '<div style="background: #e3f2fd; padding: 20px; border-radius: 10px; margin: 15px 0;">';
+            interpretationText += '<h5 style="color: #1976d2;">📝 Nota Importante:</h5>';
+            interpretationText += '<p style="margin: 0; color: #333; line-height: 1.5;">';
+            interpretationText += 'Esta lista identifica los comportamientos más problemáticos observados en las últimas dos semanas. ';
+            interpretationText += 'Los ítems marcados como "severos" requieren atención prioritaria, mientras que los "moderados" ';
+            interpretationText += 'necesitan monitoreo continuo. Esta información debe ser interpretada por un profesional calificado ';
+            interpretationText += 'en el contexto de una evaluación integral.';
+            interpretationText += '</p>';
+            interpretationText += '</div>';
+            
+            interpretation.innerHTML = interpretationText;
+            
+            // Scroll hacia los resultados
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configurar el PDF
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('DASH-II - Evaluación Diagnóstica para Discapacitados Graves', 20, 20);
+            
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text('Johnny L. Matson, 1994 - Versión Española: Ramon Novell, 1999', 20, 30);
+            
+            // Información de la evaluación
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMACIÓN DE LA EVALUACIÓN', 20, 50);
+            doc.setFont(undefined, 'normal');
+            
+            let yPos = 60;
+            doc.text('Fecha de Evaluación: ' + new Date().toLocaleDateString('es-ES'), 20, yPos);
+            yPos += 10;
+            doc.text('Hora de Finalización: ' + new Date().toLocaleTimeString('es-ES'), 20, yPos);
+            yPos += 10;
+            doc.text('Total de Ítems Evaluados: ' + items.length, 20, yPos);
+            
+            // Calcular resultados para el PDF
+            const categoryScores = {};
+            Object.keys(categories).forEach(category => {
+                let totalScore = 0;
+                categories[category].forEach(itemNum => {
+                    const response = responses[itemNum - 1];
+                    if (response) {
+                        totalScore += (response.frecuencia || 0) + (response.duracion || 0) + (response.gravedad || 0);
+                    }
+                });
+                categoryScores[category] = totalScore;
+            });
+            
+            // Resultados por categorías
+            yPos += 20;
+            doc.setFont(undefined, 'bold');
+            doc.text('RESULTADOS POR CATEGORÍAS', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            
+            yPos += 15;
+            const thresholds = {
+                "Impulsos": { normal: 8, warning: 15 },
+                "Orgánico": { normal: 5, warning: 10 },
+                "Ansiedad": { normal: 4, warning: 8 },
+                "Humor": { normal: 8, warning: 15 },
+                "Manía": { normal: 4, warning: 8 },
+                "TPD/Autismo": { normal: 3, warning: 6 },
+                "Esquizofrenia": { normal: 3, warning: 6 },
+                "Estereotipias": { normal: 3, warning: 6 }
+            };
+
+            Object.entries(categoryScores).forEach(([category, score]) => {
+                const threshold = thresholds[category];
+                let status = 'Normal';
+                
+                if (score >= threshold.warning) {
+                    status = 'Requiere Atención Inmediata';
+                } else if (score >= threshold.normal) {
+                    status = 'Requiere Seguimiento';
+                }
+                
+                doc.text(category + ': ' + score + ' puntos - ' + status, 20, yPos);
+                yPos += 8;
+                
+                if (yPos > 250) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+            });
+            
+            // Ítems más severos para el PDF
+            yPos += 20;
+            doc.setFont(undefined, 'bold');
+            doc.text('ÍTEMS MÁS SEVEROS EN LAS ÚLTIMAS DOS SEMANAS', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            
+            yPos += 15;
+
+            // Identificar ítems severos para el PDF
+            const severeBehaviorsPDF = [];
+            const concerningBehaviorsPDF = [];
+            
+            items.forEach((item, index) => {
+                const response = responses[index];
+                if (response) {
+                    const frecuencia = response.frecuencia || 0;
+                    const gravedad = response.gravedad || 0;
+                    
+                    if (frecuencia === 2 || gravedad === 2) {
+                        severeBehaviorsPDF.push({
+                            number: index + 1,
+                            text: item,
+                            frecuencia: frecuencia,
+                            gravedad: gravedad,
+                            duracion: response.duracion || 0
+                        });
+                    }
+                    else if (frecuencia >= 1 && gravedad >= 1) {
+                        concerningBehaviorsPDF.push({
+                            number: index + 1,
+                            text: item,
+                            frecuencia: frecuencia,
+                            gravedad: gravedad,
+                            duracion: response.duracion || 0
+                        });
+                    }
+                }
+            });
+
+            if (severeBehaviorsPDF.length > 0) {
+                doc.setFont(undefined, 'bold');
+                doc.text('COMPORTAMIENTOS DE ALTA SEVERIDAD:', 20, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += 10;
+                
+                severeBehaviorsPDF.forEach(behavior => {
+                    if (yPos > 250) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    
+                    const frecuenciaText = behavior.frecuencia === 0 ? 'No ocurrió' : 
+                                         behavior.frecuencia === 1 ? '1-10 veces' : 'Más de 10 veces';
+                    const gravedadText = behavior.gravedad === 0 ? 'Sin disrupciones' : 
+                                       behavior.gravedad === 1 ? 'Interrumpió actividades' : 'Causó lesión/daño';
+                    
+                    doc.text(behavior.number + '. ' + behavior.text, 20, yPos);
+                    yPos += 6;
+                    doc.text('   Frecuencia: ' + frecuenciaText + ' | Gravedad: ' + gravedadText, 20, yPos);
+                    yPos += 10;
+                });
+            }
+
+            if (concerningBehaviorsPDF.length > 0) {
+                yPos += 5;
+                doc.setFont(undefined, 'bold');
+                doc.text('COMPORTAMIENTOS DE PREOCUPACIÓN MODERADA:', 20, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += 10;
+                
+                concerningBehaviorsPDF.forEach(behavior => {
+                    if (yPos > 250) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    
+                    const frecuenciaText = behavior.frecuencia === 0 ? 'No ocurrió' : 
+                                         behavior.frecuencia === 1 ? '1-10 veces' : 'Más de 10 veces';
+                    const gravedadText = behavior.gravedad === 0 ? 'Sin disrupciones' : 
+                                       behavior.gravedad === 1 ? 'Interrumpió actividades' : 'Causó lesión/daño';
+                    
+                    doc.text(behavior.number + '. ' + behavior.text, 20, yPos);
+                    yPos += 6;
+                    doc.text('   Frecuencia: ' + frecuenciaText + ' | Gravedad: ' + gravedadText, 20, yPos);
+                    yPos += 10;
+                });
+            }
+
+            if (severeBehaviorsPDF.length === 0 && concerningBehaviorsPDF.length === 0) {
+                doc.text('No se identificaron comportamientos de alta severidad en las últimas dos semanas.', 20, yPos);
+                yPos += 10;
+            }
+
+            // Resumen estadístico en PDF
+            yPos += 10;
+            doc.setFont(undefined, 'bold');
+            doc.text('RESUMEN DE SEVERIDAD:', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            yPos += 10;
+            doc.text('Comportamientos Severos: ' + severeBehaviorsPDF.length, 20, yPos);
+            yPos += 8;
+            doc.text('Comportamientos Moderados: ' + concerningBehaviorsPDF.length, 20, yPos);
+            yPos += 8;
+            doc.text('Comportamientos Leves/Ausentes: ' + (items.length - severeBehaviorsPDF.length - concerningBehaviorsPDF.length), 20, yPos);
+            
+            // Pie de página
+            doc.setFontSize(10);
+            doc.text('Generado el: ' + new Date().toLocaleString('es-ES'), 20, 280);
+            
+            // Guardar el PDF
+            const fechaHoy = new Date().toISOString().split('T')[0];
+            doc.save('DASH-II_Evaluacion_' + fechaHoy + '.pdf');
+        }
+
+        function startNewEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán todos los datos actuales.')) {
+                // Reiniciar variables
+                currentQuestion = 0;
+                responses = {};
+                
+                // Mostrar contenido de preguntas y ocultar resultados
+                document.getElementById('question-content').style.display = 'flex';
+                document.getElementById('results-container').style.display = 'none';
+                
+                // Reinicializar la evaluación
+                initializeEvaluation();
+                
+                // Scroll hacia arriba
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Función placeholder para auto-guardado (mantenemos en memoria durante la sesión)
+        function autoSave() {
+            // Los datos se mantienen en memoria en la variable 'responses'
+            // No se requiere almacenamiento persistente en este entorno
+        }
+
+        function autoLoad() {
+            // Los datos se inicializan vacíos al cargar
+            // En un entorno de producción, aquí se cargarían los datos guardados
+        }
+
+        // Funciones de navegación con teclado
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('question-content').style.display !== 'none') {
+                switch(event.key) {
+                    case 'ArrowLeft':
+                        event.preventDefault();
+                        if (!document.getElementById('prev-btn').disabled) {
+                            previousQuestion();
+                        }
+                        break;
+                    case 'ArrowRight':
+                        event.preventDefault();
+                        if (!document.getElementById('next-btn').disabled) {
+                            nextQuestion();
+                        } else if (!document.getElementById('finish-btn').disabled && document.getElementById('finish-btn').style.display !== 'none') {
+                            finishEvaluation();
+                        }
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                        event.preventDefault();
+                        // Enfocar en la primera sección no completada
+                        const sections = ['frecuencia', 'duracion', 'gravedad'];
+                        for (let section of sections) {
+                            if (!document.querySelector('input[name="' + section + '"]:checked')) {
+                                const input = document.querySelector('input[name="' + section + '"][value="' + event.key + '"]');
+                                if (input) {
+                                    input.checked = true;
+                                    input.dispatchEvent(new Event('change'));
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                }
+            }
+        });
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            autoLoad();
+            initializeEvaluation();
+            
+            // Mostrar instrucciones inicial
+            setTimeout(() => {
+                alert('Instrucciones:\n\n• Evalúe cada comportamiento en las tres escalas\n• Use las flechas del teclado para navegar\n• Use las teclas 0, 1, 2 para responder rápidamente\n• Complete todas las preguntas para obtener los resultados');
+            }, 1000);
+        });
+
+        // Función placeholder para limpiar datos (no necesaria en este entorno)
+        function clearAutoSave() {
+            // En un entorno de producción, aquí se limpiarían los datos guardados
+        }
+    </script>
+</body>
+</html>

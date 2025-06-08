@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsADFUN - Escala de Síntomas Cognitivos en Depresión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h1 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #112F33;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #29A98C;
+            background: linear-gradient(135deg, rgba(41, 169, 140, 0.1), rgba(17, 47, 51, 0.1));
+            transform: translateX(5px);
+        }
+
+        .option-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #29A98C;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .option.selected .option-circle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #29A98C;
+            border-radius: 50%;
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-style: italic;
+            color: #112F33;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .back-button.hidden {
+            display: none;
+        }
+
+        .complete-button {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .complete-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-container {
+            margin-top: 20px;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .interpretation {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .interpretation h3 {
+            color: #112F33;
+            margin-bottom: 10px;
+        }
+
+        .level-normal { border-left: 4px solid #48bb78; }
+        .level-mild { border-left: 4px solid #f6ad55; }
+        .level-moderate { border-left: 4px solid #ed8936; }
+        .level-severe { border-left: 4px solid #f56565; }
+
+        .alert-item {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid #f56565;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            min-width: 140px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .technical-info {
+            background: rgba(17, 47, 51, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #112F33;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card h1 {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-button {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h1>EsADFUN</h1>
+            <h2>Escala de Autoevaluación para Depresión y Funcionalidad</h2>
+            
+            <div class="instructions">
+                <strong>Instrucciones:</strong><br>
+                Las siguientes preguntas describen problemas que la gente puede tener con su memoria, atención o concentración. Por favor seleccione respuestas basadas en su experiencia durante los últimos 7 días.
+            </div>
+
+            <p style="margin-bottom: 15px; color: #112F33;">
+                Esta escala evalúa síntomas cognitivos relacionados con:
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 20px; color: #112F33;">
+                <li>Atención y concentración</li>
+                <li>Planeación y organización</li>
+                <li>Memoria retrospectiva y prospectiva</li>
+                <li>Velocidad de procesamiento</li>
+            </ul>
+
+            <p style="margin-bottom: 20px; color: #112F33;">
+                <strong>Tiempo de aplicación:</strong> Aproximadamente 5 minutos<br>
+                <strong>Preguntas:</strong> 10 ítems con escala de frecuencia
+            </p>
+
+            <button class="complete-button" onclick="nextCard()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Cards 1-10: Preguntas -->
+        <div class="card" id="card-1">
+            <div class="question-number">1</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido ha tenido dificultad para organizar sus pendientes?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(1, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-2">
+            <div class="question-number">2</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido se distrae fácilmente de sus actividades cotidianas?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(2, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-3">
+            <div class="question-number">3</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido tuvo problemas recordando los nombres de personas o cosas?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(3, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-4">
+            <div class="question-number">4</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido olvidó para qué había entrado a una habitación?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(4, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-5">
+            <div class="question-number">5</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido le toma más tiempo del habitual realizar sus actividades?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(5, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-6">
+            <div class="question-number">6</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido tuvo problemas para tomar decisiones?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(6, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(6, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-7">
+            <div class="question-number">7</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido tuvo problemas poniendo atención en lo que las personas le están diciendo durante una conversación?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(7, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(7, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-8">
+            <div class="question-number">8</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido ha tenido dificultades para comunicar sus sentimientos a los demás?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(8, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(8, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-9">
+            <div class="question-number">9</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido olvida con frecuencia donde dejó las llaves o la cartera?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(9, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(9, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-10">
+            <div class="question-number">10</div>
+            <div class="question-text">Durante los últimos 7 días, ¿qué tan seguido le toma más tiempo del habitual poner en palabras lo que está pensando?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(10, 0)">
+                    <div class="option-circle"></div>
+                    <span>Nunca en los últimos 7 días</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 1)">
+                    <div class="option-circle"></div>
+                    <span>Raramente (una o dos veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 2)">
+                    <div class="option-circle"></div>
+                    <span>Algunas veces (3 a 5 veces)</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 3)">
+                    <div class="option-circle"></div>
+                    <span>Frecuente (alrededor de una vez al día)</span>
+                </div>
+                <div class="option" onclick="selectOption(10, 4)">
+                    <div class="option-circle"></div>
+                    <span>Muy frecuente (más de una vez al día)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h1>✓ Evaluación Completada</h1>
+            <p style="text-align: center; font-size: 1.1rem; color: #112F33; margin-bottom: 20px;">
+                Escala completada, muchas gracias.<br>
+                Por favor pase el dispositivo a su médico o profesional para su revisión.
+            </p>
+            <button class="complete-button" onclick="showResults()">Revisar Resultados (Médico)</button>
+        </div>
+
+        <!-- Card Resultados -->
+        <div class="card" id="card-results">
+            <h1>Resultados EsADFUN</h1>
+            
+            <div class="score-display">
+                <div class="score-value" id="totalScore">0</div>
+                <div>Puntuación Total (0-40)</div>
+            </div>
+
+            <div id="interpretationSection" class="results-container"></div>
+
+            <div class="action-buttons">
+                <button class="action-button" onclick="exportToPDF()">📄 Exportar PDF</button>
+                <button class="action-button" onclick="captureResults()">📸 Capturar</button>
+                <button class="action-button" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+
+            <div class="technical-info">
+                <strong>Información técnica:</strong> EsADFUN - Escala de Autoevaluación para Depresión y Funcionalidad. 
+                Sensibilidad: 97%, Especificidad: 83%. Punto de corte validado: ≥5 puntos para afectación cognitiva.
+                Evalúa: atención/concentración, planeación/organización, memoria retrospectiva y prospectiva, velocidad de procesamiento.
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+    <button class="back-button" id="backButton" onclick="previousCard()">← Regresar</button>
+
+    <script>
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 10;
+
+        const questions = [
+            "¿Ha tenido dificultad para organizar sus pendientes?",
+            "¿Se distrae fácilmente de sus actividades cotidianas?",
+            "¿Tuvo problemas recordando los nombres de personas o cosas?",
+            "¿Olvidó para qué había entrado a una habitación?",
+            "¿Le toma más tiempo del habitual realizar sus actividades?",
+            "¿Tuvo problemas para tomar decisiones?",
+            "¿Tuvo problemas poniendo atención en lo que las personas le están diciendo durante una conversación?",
+            "¿Ha tenido dificultades para comunicar sus sentimientos a los demás?",
+            "¿Olvida con frecuencia donde dejó las llaves o la cartera?",
+            "¿Le toma más tiempo del habitual poner en palabras lo que está pensando?"
+        ];
+
+        function updateProgressBar() {
+            // Total: card-0 + 10 preguntas + card-final + card-results = 13 cards
+            const totalCards = totalQuestions + 3;
+            const progress = (currentCard / (totalCards - 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function updateBackButton() {
+            const backButton = document.getElementById('backButton');
+            if (currentCard === 0 || currentCard === totalQuestions + 1 || currentCard === totalQuestions + 2) {
+                backButton.classList.add('hidden');
+            } else {
+                backButton.classList.remove('hidden');
+            }
+        }
+
+        function showCard(cardNumber) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            let cardId;
+            if (cardNumber === totalQuestions + 1) {
+                cardId = 'card-final';
+            } else if (cardNumber === totalQuestions + 2) {
+                cardId = 'card-results';
+            } else {
+                cardId = `card-${cardNumber}`;
+            }
+            
+            const targetCard = document.getElementById(cardId);
+            if (targetCard) {
+                targetCard.classList.add('active');
+            }
+            
+            updateProgressBar();
+            updateBackButton();
+        }
+
+        function nextCard() {
+            if (currentCard === 0) {
+                // De bienvenida a primera pregunta
+                currentCard = 1;
+                showCard(currentCard);
+            } else if (currentCard >= 1 && currentCard < totalQuestions) {
+                // Entre preguntas
+                currentCard++;
+                showCard(currentCard);
+            }
+            // No avanzar automáticamente después de la última pregunta
+            // El avance a card-final se maneja en selectOption()
+        }
+
+        function previousCard() {
+            if (currentCard > 1 && currentCard <= totalQuestions) {
+                currentCard--;
+                showCard(currentCard);
+            } else if (currentCard === totalQuestions + 1) {
+                // Desde card-final volver a la última pregunta
+                currentCard = totalQuestions;
+                showCard(currentCard);
+            }
+        }
+
+        function selectOption(questionNum, value) {
+            responses[questionNum] = value;
+            
+            // Update visual selection
+            const currentOptions = document.querySelectorAll(`#card-${questionNum} .option`);
+            currentOptions.forEach(option => option.classList.remove('selected'));
+            currentOptions[value].classList.add('selected');
+            
+            // Auto-advance after selection
+            setTimeout(() => {
+                if (questionNum === totalQuestions) {
+                    // Si es la última pregunta, ir a card-final
+                    currentCard = totalQuestions + 1;
+                    showCard(currentCard);
+                } else {
+                    nextCard();
+                }
+            }, 150);
+        }
+
+        function calculateScore() {
+            let total = 0;
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (responses[i] !== undefined) {
+                    total += responses[i];
+                }
+            }
+            return total;
+        }
+
+        function getInterpretation(score) {
+            let level, description, recommendations, className;
+            
+            if (score < 5) {
+                level = "Sin afectación cognitiva significativa";
+                description = "La puntuación obtenida se encuentra por debajo del punto de corte establecido (≥5 puntos), sugiriendo ausencia de afectación cognitiva significativa relacionada con síntomas depresivos.";
+                recommendations = "Continuar con monitoreo rutinario. La función cognitiva reportada se encuentra dentro de parámetros esperados.";
+                className = "level-normal";
+            } else if (score >= 5 && score <= 15) {
+                level = "Afectación cognitiva leve";
+                description = "Se detecta afectación cognitiva leve. Los síntomas reportados sugieren dificultades mínimas en atención, memoria y velocidad de procesamiento que pueden interferir ocasionalmente con el funcionamiento diario.";
+                recommendations = "Monitoreo estrecho de evolución. Considerar evaluación neuropsicológica básica. Implementar estrategias de compensación cognitiva.";
+                className = "level-mild";
+            } else if (score >= 16 && score <= 25) {
+                level = "Afectación cognitiva moderada";
+                description = "Se detecta afectación cognitiva moderada con impacto en múltiples dominios. Los síntomas pueden interferir significativamente con actividades laborales, académicas y sociales.";
+                recommendations = "Evaluación neuropsicológica comprehensiva recomendada. Considerar intervenciones cognitivas específicas. Optimización del tratamiento antidepresivo actual.";
+                className = "level-moderate";
+            } else {
+                level = "Afectación cognitiva severa";
+                description = "Se detecta afectación cognitiva severa con impacto sustancial en el funcionamiento global. Los síntomas cognitivos requieren atención clínica prioritaria.";
+                recommendations = "Evaluación neuropsicológica urgente. Revisión inmediata del plan terapéutico. Considerar evaluación multidisciplinaria. Implementar estrategias de rehabilitación cognitiva.";
+                className = "level-severe";
+            }
+
+            return { level, description, recommendations, className };
+        }
+
+        function getHighAlertItems(responses) {
+            const alerts = [];
+            const maxScore = 4;
+            const alertThreshold = Math.ceil(maxScore * 0.66); // ≥66% del máximo (≥3 puntos)
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (responses[i] >= alertThreshold) {
+                    alerts.push({
+                        question: i,
+                        score: responses[i],
+                        text: questions[i-1]
+                    });
+                }
+            }
+            return alerts;
+        }
+
+        function showResults() {
+            currentCard = totalQuestions + 2;
+            const score = calculateScore();
+            const interpretation = getInterpretation(score);
+            const alerts = getHighAlertItems(responses);
+
+            document.getElementById('totalScore').textContent = score;
+
+            let resultsHTML = `
+                <div class="interpretation ${interpretation.className}">
+                    <h3>${interpretation.level}</h3>
+                    <p style="margin-bottom: 15px;">${interpretation.description}</p>
+                    <p><strong>Recomendaciones clínicas:</strong> ${interpretation.recommendations}</p>
+                </div>
+            `;
+
+            if (alerts.length > 0) {
+                resultsHTML += `
+                    <div class="interpretation">
+                        <h3 style="color: #f56565;">Ítems de Alerta (≥3 puntos)</h3>
+                        <p style="margin-bottom: 15px;">Los siguientes ítems obtuvieron puntuaciones altas que requieren atención específica:</p>
+                `;
+                
+                alerts.forEach(alert => {
+                    resultsHTML += `
+                        <div class="alert-item">
+                            <strong>Ítem ${alert.question}:</strong> ${alert.text}<br>
+                            <small>Puntuación: ${alert.score}/4 - Frecuencia alta reportada</small>
+                        </div>
+                    `;
+                });
+                
+                resultsHTML += `</div>`;
+            }
+
+            // Análisis por dominios
+            const domainAnalysis = analyzeDomains(responses);
+            resultsHTML += `
+                <div class="interpretation">
+                    <h3>Análisis por Dominios Cognitivos</h3>
+                    ${domainAnalysis}
+                </div>
+            `;
+
+            document.getElementById('interpretationSection').innerHTML = resultsHTML;
+            showCard(currentCard);
+        }
+
+        function analyzeDomains(responses) {
+            const domains = {
+                'Atención/Concentración': [2, 7], // Ítems 2, 7
+                'Planeación/Organización': [1, 6], // Ítems 1, 6
+                'Memoria Retrospectiva': [3, 9], // Ítems 3, 9
+                'Memoria Prospectiva': [4], // Ítem 4
+                'Velocidad de Procesamiento': [5, 10], // Ítems 5, 10
+                'Comunicación': [8] // Ítem 8
+            };
+
+            let analysis = '';
+            
+            Object.keys(domains).forEach(domain => {
+                const items = domains[domain];
+                const scores = items.map(item => responses[item] || 0);
+                const average = scores.reduce((a, b) => a + b, 0) / scores.length;
+                const severity = average < 1.5 ? 'Normal' : average < 2.5 ? 'Leve' : average < 3.5 ? 'Moderado' : 'Severo';
+                
+                analysis += `<p><strong>${domain}:</strong> ${severity} (${average.toFixed(1)}/4)</p>`;
+            });
+
+            return analysis;
+        }
+
+        function exportToPDF() {
+            const results = document.getElementById('card-results').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Resultados EsADFUN</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .score-display { background: #29A98C; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+                        .score-value { font-size: 2rem; font-weight: bold; }
+                        .interpretation { background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+                        .level-normal { border-left: 4px solid #48bb78; }
+                        .level-mild { border-left: 4px solid #f6ad55; }
+                        .level-moderate { border-left: 4px solid #ed8936; }
+                        .level-severe { border-left: 4px solid #f56565; }
+                        .alert-item { background: rgba(245, 101, 101, 0.1); border: 1px solid #f56565; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+                        .action-buttons { display: none; }
+                        .technical-info { background: #f0f0f0; padding: 15px; border-radius: 8px; font-size: 0.9rem; }
+                    </style>
+                </head>
+                <body>${results}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function captureResults() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Resultados EsADFUN',
+                    text: `Puntuación: ${calculateScore()}/40`,
+                });
+            } else {
+                // Fallback para navegadores que no soportan Web Share API
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 800;
+                canvas.height = 600;
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#29A98C';
+                ctx.font = 'bold 24px Arial';
+                ctx.fillText('Resultados EsADFUN', 50, 50);
+                
+                ctx.fillStyle = '#333333';
+                ctx.font = '18px Arial';
+                ctx.fillText(`Puntuación Total: ${calculateScore()}/40`, 50, 100);
+                
+                const link = document.createElement('a');
+                link.download = 'resultados-esadfun.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        function newEvaluation() {
+            currentCard = 0;
+            responses = {};
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            showCard(0);
+        }
+
+        // Inicialización
+        updateProgressBar();
+        updateBackButton();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' && currentCard > 0 && currentCard <= totalQuestions) {
+                previousCard();
+            } else if (e.key === 'ArrowRight' && currentCard < totalQuestions && currentCard > 0) {
+                nextCard();
+            } else if (e.key >= '1' && e.key <= '5' && currentCard >= 1 && currentCard <= totalQuestions) {
+                selectOption(currentCard, parseInt(e.key) - 1);
+            }
+        });
+    </script>
+</body>
+</html>

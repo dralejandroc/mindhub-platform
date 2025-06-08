@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BECK 13 - Inventario de Depresión de Beck (Versión Abreviada)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29A98C 0%, #112F33 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h2 {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .card h3 {
+            color: #112F33;
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .option:hover {
+            border-color: #29A98C;
+            background: rgba(41, 169, 140, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(41, 169, 140, 0.2);
+        }
+
+        .option.selected {
+            border-color: #29A98C;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(41, 169, 140, 0.3);
+        }
+
+        .instructions {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: left;
+            color: #112F33;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 10px;
+            min-width: 140px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(41, 169, 140, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #374151);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(41, 169, 140, 0.4);
+        }
+
+        .back-btn.hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #29A98C, #112F33);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #29A98C, #112F33);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .score-display h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .interpretation {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .alert {
+            background: rgba(245, 101, 101, 0.1);
+            border-left: 4px solid #f56565;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            color: #742a2a;
+        }
+
+        .recommendations {
+            background: rgba(41, 169, 140, 0.1);
+            border-left: 4px solid #29A98C;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .card {
+                padding: 30px 20px;
+            }
+            
+            .card h2 {
+                font-size: 1.6rem;
+            }
+            
+            .options {
+                gap: 12px;
+            }
+            
+            .option {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                margin: 5px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card 0: Bienvenida -->
+        <div class="card active" id="card-0">
+            <h2>BECK 13</h2>
+            <h3>Inventario de Depresión de Beck (Versión Abreviada)</h3>
+            
+            <div class="instructions">
+                <h4>Instrucciones:</h4>
+                <p>Este cuestionario consiste en 13 grupos de afirmaciones. Por favor, lea atentamente cada grupo completo antes de realizar su elección.</p>
+                <p>Seleccione UNA afirmación de cada grupo que mejor describa cómo se ha sentido <strong>actualmente</strong>.</p>
+                <p>Si varias afirmaciones del mismo grupo le parecen aplicables, seleccione la que indique el mayor grado de intensidad.</p>
+                <p>Asegúrese de leer todas las afirmaciones de cada grupo antes de hacer su elección.</p>
+            </div>
+            
+            <button class="btn" onclick="startScale()">Comenzar Evaluación</button>
+        </div>
+
+        <!-- Card Final -->
+        <div class="card" id="card-final">
+            <h2>Evaluación Completada</h2>
+            <h3>Muchas gracias por completar el cuestionario</h3>
+            
+            <div class="instructions">
+                <p>Ha completado exitosamente el Inventario de Depresión de Beck-13.</p>
+                <p>Por favor, entregue el dispositivo a su médico o profesional de la salud mental para la revisión de los resultados.</p>
+            </div>
+            
+            <button class="btn" onclick="showResults()">Revisar Resultados (Profesional)</button>
+        </div>
+
+        <!-- Card Results -->
+        <div class="card" id="card-results">
+            <h2>Resultados BECK 13</h2>
+            
+            <div class="score-display">
+                <h3>Puntuación Total</h3>
+                <div id="total-score" style="font-size: 2rem; font-weight: bold;"></div>
+                <div id="score-range" style="margin-top: 10px;"></div>
+            </div>
+
+            <div class="interpretation">
+                <h4>Interpretación Clínica</h4>
+                <div id="clinical-interpretation"></div>
+            </div>
+
+            <div id="alerts-section"></div>
+
+            <div class="recommendations">
+                <h4>Descripción Técnica</h4>
+                <div id="technical-description"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="generatePDF()">📄 Generar PDF</button>
+                <button class="btn" onclick="captureScreen()">📷 Capturar Pantalla</button>
+                <button class="btn btn-secondary" onclick="newEvaluation()">🔄 Nueva Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" id="back-btn" onclick="goBack()">←</button>
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <script>
+        // Variables globales
+        let currentCard = 0;
+        let responses = {};
+        const totalQuestions = 13;
+
+        // Datos de los ítems del BECK 13
+        const beck13Items = [
+            {
+                number: 1,
+                title: "Estado de ánimo",
+                options: [
+                    { text: "No me encuentro triste", score: 0 },
+                    { text: "Me siento triste o melancólico", score: 1 },
+                    { text: "Constantemente estoy melancólico o triste y no puedo superarlo", score: 2 },
+                    { text: "Me siento tan triste o infeliz que no puedo resistirlo", score: 3 }
+                ]
+            },
+            {
+                number: 2,
+                title: "Pesimismo",
+                options: [
+                    { text: "No soy particularmente pesimista y no me encuentro desalentado respecto al futuro", score: 0 },
+                    { text: "Me siento desanimado respecto al futuro", score: 1 },
+                    { text: "No tengo nada que esperar del futuro", score: 2 },
+                    { text: "No tengo ninguna esperanza en el futuro y creo que las cosas no pueden mejorar", score: 3 }
+                ]
+            },
+            {
+                number: 3,
+                title: "Sentimiento de fracaso",
+                options: [
+                    { text: "No me siento fracasado", score: 0 },
+                    { text: "Creo que he fracasado más que la mayoría de las personas", score: 1 },
+                    { text: "Cuando miro hacia atrás en mi vida, todo lo que veo son un montón de fracasos", score: 2 },
+                    { text: "Creo que como persona soy un completo fracaso (como padre, marido, esposa etc)", score: 3 }
+                ]
+            },
+            {
+                number: 4,
+                title: "Insatisfacción",
+                options: [
+                    { text: "No estoy particularmente descontento", score: 0 },
+                    { text: "No disfruto de las cosas como antes", score: 1 },
+                    { text: "No encuentro satisfacción en nada", score: 2 },
+                    { text: "Me siento descontento de todo", score: 3 }
+                ]
+            },
+            {
+                number: 5,
+                title: "Sentimientos de culpa",
+                options: [
+                    { text: "No me siento particularmente culpable", score: 0 },
+                    { text: "Me siento malo o indigno muchas veces", score: 1 },
+                    { text: "Me siento culpable", score: 2 },
+                    { text: "Pienso que soy muy malo e indigno", score: 3 }
+                ]
+            },
+            {
+                number: 6,
+                title: "Autodesprecio",
+                options: [
+                    { text: "No me siento decepcionado conmigo mismo", score: 0 },
+                    { text: "Estoy decepcionado conmigo mismo", score: 1 },
+                    { text: "Estoy disgustado conmigo mismo", score: 2 },
+                    { text: "Me odio", score: 3 }
+                ]
+            },
+            {
+                number: 7,
+                title: "Ideas suicidas",
+                options: [
+                    { text: "No tengo pensamientos de dañarme", score: 0 },
+                    { text: "Creo que estaría mejor muerto", score: 1 },
+                    { text: "Tengo planes precisos para suicidarme", score: 2 },
+                    { text: "Me mataría si tuviera la oportunidad", score: 3 }
+                ]
+            },
+            {
+                number: 8,
+                title: "Aislamiento social",
+                options: [
+                    { text: "No he perdido el interés por los demás", score: 0 },
+                    { text: "Estoy menos interesado en los demás que antes", score: 1 },
+                    { text: "He perdido la mayor parte del interés por los demás y pienso poco en ellos", score: 2 },
+                    { text: "He perdido todo el interés por los demás y no me importa en absoluto", score: 3 }
+                ]
+            },
+            {
+                number: 9,
+                title: "Indecisión",
+                options: [
+                    { text: "Tomo mis decisiones con la misma facilidad que antes", score: 0 },
+                    { text: "Trato de no tener que tomar decisiones", score: 1 },
+                    { text: "Tengo grandes dificultades para tomar decisiones", score: 2 },
+                    { text: "Ya no puedo tomar decisiones", score: 3 }
+                ]
+            },
+            {
+                number: 10,
+                title: "Imagen corporal",
+                options: [
+                    { text: "No creo que mi aspecto haya empeorado", score: 0 },
+                    { text: "Estoy preocupado porque me veo viejo y poco atractivo", score: 1 },
+                    { text: "Creo que mi aspecto empeora constantemente quitándome atractivo", score: 2 },
+                    { text: "Siento que mi aspecto es feo y repulsivo", score: 3 }
+                ]
+            },
+            {
+                number: 11,
+                title: "Capacidad laboral",
+                options: [
+                    { text: "Puedo trabajar igual de bien que antes", score: 0 },
+                    { text: "Me cuesta un esfuerzo especial comenzar a hacer algo", score: 1 },
+                    { text: "Debo esforzarme mucho para hacer cualquier cosa", score: 2 },
+                    { text: "No puedo realizar ningún trabajo", score: 3 }
+                ]
+            },
+            {
+                number: 12,
+                title: "Fatiga",
+                options: [
+                    { text: "No me canso más que antes", score: 0 },
+                    { text: "Me canso más fácilmente que antes", score: 1 },
+                    { text: "Me canso por cualquier cosa", score: 2 },
+                    { text: "Me canso demasiado por hacer cualquier cosa", score: 3 }
+                ]
+            },
+            {
+                number: 13,
+                title: "Pérdida de apetito",
+                options: [
+                    { text: "Mi apetito es normal (igual que antes)", score: 0 },
+                    { text: "Mi apetito no es tan bueno como antes (subió o bajó)", score: 1 },
+                    { text: "Mi apetito es ahora mucho peor (bajó mucho o subió mucho)", score: 2 },
+                    { text: "He perdido el apetito por completo (no como nada o como cada que tengo oportunidad)", score: 3 }
+                ]
+            }
+        ];
+
+        // Funciones principales
+        function startScale() {
+            createItemCards();
+            showCard(1);
+            updateBackButton();
+            updateProgressBar();
+        }
+
+        function createItemCards() {
+            const container = document.querySelector('.container');
+            const cardFinal = document.getElementById('card-final');
+            
+            beck13Items.forEach(item => {
+                const cardHTML = `
+                    <div class="card" id="card-${item.number}">
+                        <div class="question-number">${item.number}</div>
+                        <h3>${item.title}</h3>
+                        
+                        <div class="options">
+                            ${item.options.map((option, index) => `
+                                <div class="option" onclick="selectOption(${item.number}, ${index}, ${option.score})">
+                                    ${option.text}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                cardFinal.insertAdjacentHTML('beforebegin', cardHTML);
+            });
+        }
+
+        function selectOption(questionNumber, optionIndex, score) {
+            responses[questionNumber] = score;
+            
+            // Marcar opción seleccionada
+            const card = document.getElementById(`card-${questionNumber}`);
+            if (card) {
+                const options = card.querySelectorAll('.option');
+                options.forEach((option, index) => {
+                    option.classList.toggle('selected', index === optionIndex);
+                });
+            }
+            
+            // Auto-avance después de 120ms
+            setTimeout(() => {
+                if (questionNumber < totalQuestions) {
+                    showCard(questionNumber + 1);
+                } else {
+                    showCard('final');
+                }
+                updateBackButton();
+                updateProgressBar();
+            }, 120);
+        }
+
+        function showCard(cardId) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            let targetCard;
+            if (typeof cardId === 'number') {
+                currentCard = cardId;
+                targetCard = document.getElementById(`card-${cardId}`);
+            } else {
+                currentCard = cardId;
+                targetCard = document.getElementById(`card-${cardId}`);
+            }
+            
+            if (targetCard) {
+                targetCard.classList.add('active');
+            }
+        }
+
+        function goBack() {
+            if (currentCard > 1) {
+                showCard(currentCard - 1);
+                updateBackButton();
+                updateProgressBar();
+            } else if (currentCard === 1) {
+                showCard(0);
+                updateBackButton();
+                updateProgressBar();
+            }
+        }
+
+        function updateBackButton() {
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                const shouldHide = currentCard === 0 || currentCard === 'final' || currentCard === 'results';
+                backBtn.classList.toggle('hidden', shouldHide);
+            }
+        }
+
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBar) {
+                let progress = 0;
+                
+                if (typeof currentCard === 'number' && currentCard > 0) {
+                    progress = (currentCard / totalQuestions) * 100;
+                } else if (currentCard === 'final') {
+                    progress = 100;
+                }
+                
+                progressBar.style.width = `${progress}%`;
+            }
+        }
+
+        function calculateScore() {
+            return Object.values(responses).reduce((sum, score) => sum + score, 0);
+        }
+
+        function getInterpretation(score) {
+            if (score >= 0 && score <= 8) {
+                return {
+                    level: "Depresión Mínima",
+                    color: "#48bb78",
+                    range: "0-8 puntos",
+                    description: "Las puntuaciones en este rango indican síntomas depresivos mínimos o ausentes. Los síntomas presentes no interfieren significativamente con el funcionamiento diario.",
+                    clinical: "Sin sintomatología depresiva clínicamente significativa. El paciente presenta un estado de ánimo dentro de parámetros normales."
+                };
+            } else if (score >= 9 && score <= 12) {
+                return {
+                    level: "Depresión Leve",
+                    color: "#f6ad55",
+                    range: "9-12 puntos",
+                    description: "Presencia de síntomas depresivos leves que pueden interferir ocasionalmente con el funcionamiento diario. Se requiere evaluación clínica adicional.",
+                    clinical: "Sintomatología depresiva leve. Los síntomas están presentes pero no cumplen criterios para episodio depresivo mayor. Posible trastorno adaptativo con estado de ánimo deprimido."
+                };
+            } else if (score >= 13 && score <= 20) {
+                return {
+                    level: "Depresión Moderada",
+                    color: "#ed8936",
+                    range: "13-20 puntos",
+                    description: "Sintomatología depresiva moderada que interfiere de manera significativa con el funcionamiento diario. Se requiere intervención terapéutica estructurada.",
+                    clinical: "Presencia de sintomatología depresiva moderada. Probable episodio depresivo mayor. Los síntomas interfieren significativamente con el funcionamiento social, laboral o en otras áreas importantes."
+                };
+            } else {
+                return {
+                    level: "Depresión Grave",
+                    color: "#f56565",
+                    range: "21-39 puntos",
+                    description: "Sintomatología depresiva grave que interfiere severamente con el funcionamiento diario. Se requiere intervención inmediata y seguimiento especializado.",
+                    clinical: "Episodio depresivo mayor grave. Los síntomas son severos e interfieren marcadamente con el funcionamiento. Alto riesgo de deterioro funcional y posibles ideas suicidas."
+                };
+            }
+        }
+
+        function getHighRiskItems() {
+            const highRiskItems = [];
+            const maxScore = 3;
+            const threshold = Math.ceil(maxScore * 0.66);
+            
+            beck13Items.forEach(item => {
+                const score = responses[item.number];
+                if (score !== undefined && score >= threshold) {
+                    highRiskItems.push({
+                        number: item.number,
+                        title: item.title,
+                        score: score,
+                        selectedText: item.options.find(opt => opt.score === score)?.text || ""
+                    });
+                }
+            });
+            
+            return highRiskItems;
+        }
+
+        function showResults() {
+            const totalScore = calculateScore();
+            const interpretation = getInterpretation(totalScore);
+            const highRiskItems = getHighRiskItems();
+            
+            // Mostrar puntuación total
+            const totalScoreEl = document.getElementById('total-score');
+            const scoreRangeEl = document.getElementById('score-range');
+            if (totalScoreEl) totalScoreEl.textContent = `${totalScore} / 39`;
+            if (scoreRangeEl) scoreRangeEl.textContent = interpretation.range;
+            
+            // Cambiar color según el nivel
+            const scoreDisplay = document.querySelector('.score-display');
+            if (scoreDisplay) {
+                scoreDisplay.style.background = `linear-gradient(135deg, ${interpretation.color}, #112F33)`;
+            }
+            
+            // Interpretación clínica
+            const clinicalInterpretationEl = document.getElementById('clinical-interpretation');
+            if (clinicalInterpretationEl) {
+                clinicalInterpretationEl.innerHTML = `
+                    <h5 style="color: ${interpretation.color}; margin-bottom: 10px;">${interpretation.level}</h5>
+                    <p style="margin-bottom: 15px;"><strong>Interpretación:</strong> ${interpretation.clinical}</p>
+                    <p><strong>Descripción:</strong> ${interpretation.description}</p>
+                `;
+            }
+            
+            // Descripción técnica
+            const technicalDescriptionEl = document.getElementById('technical-description');
+            if (technicalDescriptionEl) {
+                technicalDescriptionEl.innerHTML = `
+                    <p><strong>Instrumento:</strong> Inventario de Depresión de Beck-13 (BDI-13)</p>
+                    <p><strong>Número de ítems:</strong> 13 (versión abreviada)</p>
+                    <p><strong>Rango de puntuación:</strong> 0-39 puntos</p>
+                    <p><strong>Sistema de puntuación:</strong> Uniforme 0-1-2-3 puntos por ítem</p>
+                    <p><strong>Consistencia interna:</strong> α = 0.85-0.92</p>
+                    <p><strong>Tiempo de aplicación:</strong> 3-5 minutos</p>
+                `;
+            }
+            
+            // Alertas para ítems de alto riesgo
+            const alertsSection = document.getElementById('alerts-section');
+            if (alertsSection) {
+                if (highRiskItems.length > 0) {
+                    const alertHTML = `
+                        <div class="alert">
+                            <h4 style="color: #742a2a; margin-bottom: 15px;">⚠️ Ítems de Atención Clínica</h4>
+                            <p style="margin-bottom: 15px;">Los siguientes ítems presentan puntuaciones ≥66% del máximo y requieren evaluación clínica específica:</p>
+                            ${highRiskItems.map(item => `
+                                <div style="margin: 10px 0; padding: 10px; background: rgba(245, 101, 101, 0.1); border-radius: 6px;">
+                                    <strong>Ítem ${item.number} - ${item.title}:</strong> ${item.score}/3 puntos<br>
+                                    <em style="font-size: 0.9em; color: #666;">"${item.selectedText}"</em>
+                                </div>
+                            `).join('')}
+                            ${highRiskItems.some(item => item.number === 7) ? 
+                                '<div style="margin-top: 15px; padding: 15px; background: rgba(245, 101, 101, 0.2); border-radius: 6px; border: 2px solid #f56565;"><strong style="color: #742a2a;">⚠️ ALERTA: Riesgo suicida identificado. Evaluación inmediata requerida.</strong></div>' 
+                                : ''}
+                        </div>
+                    `;
+                    alertsSection.innerHTML = alertHTML;
+                } else {
+                    alertsSection.innerHTML = '';
+                }
+            }
+            
+            showCard('results');
+            updateBackButton();
+            updateProgressBar();
+        }
+
+        function generatePDF() {
+            const totalScore = calculateScore();
+            const interpretation = getInterpretation(totalScore);
+            
+            const printContent = `
+                <html>
+                <head>
+                    <title>Reporte BECK 13</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #29A98C; padding-bottom: 15px; }
+                        .score { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
+                        .interpretation { background: #f9fafb; padding: 15px; border-left: 4px solid #29A98C; margin: 15px 0; }
+                        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 0.9em; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>INVENTARIO DE DEPRESIÓN DE BECK-13</h1>
+                        <h2>(Versión Abreviada)</h2>
+                    </div>
+                    
+                    <div class="score">
+                        <h2>Resultado: ${totalScore} / 39 puntos</h2>
+                        <h3 style="color: ${interpretation.color};">${interpretation.level} (${interpretation.range})</h3>
+                    </div>
+                    
+                    <div class="interpretation">
+                        <h3>Interpretación Clínica</h3>
+                        <p>${interpretation.clinical}</p>
+                        <p>${interpretation.description}</p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p><strong>Nota importante:</strong> Este reporte es un instrumento de evaluación psicométrica y debe ser interpretado únicamente por profesionales de la salud mental calificados. No constituye un diagnóstico por sí mismo.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function captureScreen() {
+            alert('Para capturar la pantalla, use la función de captura de pantalla de su dispositivo:\n\n• Windows: Win + Shift + S\n• Mac: Cmd + Shift + 4\n• Android: Botón encendido + Volumen abajo\n• iOS: Botón lateral + Volumen arriba');
+        }
+
+        function newEvaluation() {
+            if (confirm('¿Está seguro de que desea iniciar una nueva evaluación? Se perderán los datos actuales.')) {
+                responses = {};
+                currentCard = 0;
+                
+                // Eliminar cards de ítems generados dinámicamente
+                beck13Items.forEach(item => {
+                    const card = document.getElementById(`card-${item.number}`);
+                    if (card) {
+                        card.remove();
+                    }
+                });
+                
+                showCard(0);
+                updateBackButton();
+                updateProgressBar();
+            }
+        }
+
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            updateBackButton();
+            updateProgressBar();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindHub - Login</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #FFF8EE; 
+            color: #112F33;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 { color: #29A98C; text-align: center; }
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #29A98C; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #237a6a; }
+        .link { text-align: center; margin-top: 15px; }
+        .link a { color: #29A98C; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 MindHub</h1>
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <div class="link">
+            <a href="/register.html">¿No tienes cuenta? Regístrate</a>
+        </div>
+        <div id="message" style="margin-top: 15px; text-align: center;"></div>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            console.log('🚀 Intentando login a /api/login con:', email);
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('📡 Response status:', response.status);
+                
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+                
+                if (data.success) {
+                    messageDiv.innerHTML = '<span style="color: #29A98C;">✅ Login exitoso! Redirigiendo...</span>';
+                    setTimeout(() => window.location.href = '/sistema.html', 1000);
+                } else {
+                    messageDiv.innerHTML = '<span style="color: #EC7367;">❌ ' + data.message + '</span>';
+                }
+            } catch (error) {
+                console.error('❌ Error completo:', error);
+                messageDiv.innerHTML = '<span style="color: #EC7367;">❌ Error de conexión: ' + error.message + '</span>';
+            }
+        });
+    </script>
+</body>
+</html>
