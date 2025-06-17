@@ -160,16 +160,13 @@
             
             // Obtener datos del formulario
             const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                specialization: document.getElementById('specialization').value,
-                license: document.getElementById('license').value,
-                institution: document.getElementById('institution').value,
-                password: document.getElementById('password').value,
-                confirmPassword: document.getElementById('confirmPassword').value
-            };
-            
-            // Validaciones básicas
+                nombre: document.getElementById("name").value,
+                apellido: "Usuario",
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                confirmPassword: document.getElementById("confirmPassword").value,
+                institucion: document.getElementById("institution").value
+            };            // Validaciones básicas
             if (formData.password !== formData.confirmPassword) {
                 errorMsg.textContent = 'Las contraseñas no coinciden';
                 errorMsg.style.display = 'block';
